@@ -1,4 +1,6 @@
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BlogViewerPage extends StatelessWidget {
@@ -14,9 +16,26 @@ class BlogViewerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                UpdateBlogPage.route(),
+              );
+            },
+            icon: Icon(
+              CupertinoIcons.pencil_circle,
+            ),
+          ),
+        ],
+      ),
       body: Column(
-        children: [Text(blog.title)],
+        children: [
+          Text(blog.title),
+          Text(blog.content),
+        ],
       ),
     );
   }
