@@ -13,6 +13,7 @@ import 'package:etqan_application_2025/src/features/blog/data/repositories/blog_
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/usecases/update_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -104,6 +105,11 @@ void _intitBlog() {
       ),
     )
     ..registerFactory(
+      () => UpdateBlog(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
       () => GetAllBlogs(
         serviceLocator(),
       ),
@@ -112,6 +118,7 @@ void _intitBlog() {
     ..registerLazySingleton(
       () => BlogBloc(
         submitBlog: serviceLocator(),
+        updateBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
       ),
     );

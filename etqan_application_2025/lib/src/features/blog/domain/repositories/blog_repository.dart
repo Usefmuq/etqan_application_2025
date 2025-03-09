@@ -9,5 +9,12 @@ abstract interface class BlogRepository {
     required String content,
     required List<String> topics,
   });
+  Future<Either<Failure, Blog>> updateBlog({
+    required String id,
+    required String createdById,
+    required String title,
+    required String content,
+    required List<String> topics,
+  });
   Future<Either<Failure, List<Blog>>> getAllBlogs();
 }

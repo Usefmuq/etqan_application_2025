@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog);
+  Future<BlogModel> updateBlog(BlogModel blog);
   Future<List<BlogModel>> getAllBlogs();
 }
 
@@ -19,6 +20,23 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
             blog.toJson(),
           )
           .select();
+      return BlogModel.fromJson(blogData.first);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<BlogModel> updateBlog(BlogModel blog) async {
+    try {
+      final blogData = await supabaseClient
+          .from('blogs')
+          .update(
+            blog.toJson(),
+          )
+          .eq('id', blog.id) // Ensure you update the correct row
+          .select();
+      print(blog.id);
       return BlogModel.fromJson(blogData.first);
     } catch (e) {
       throw ServerException(e.toString());

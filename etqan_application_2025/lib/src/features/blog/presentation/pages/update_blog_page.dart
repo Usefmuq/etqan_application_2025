@@ -1,35 +1,42 @@
 import 'package:dotted_border/dotted_border.dart';
-import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UpdateBlogPage extends StatefulWidget {
-  const UpdateBlogPage({super.key});
-  static route() => MaterialPageRoute(
-        builder: (context) => const UpdateBlogPage(),
+  final Blog blog;
+  const UpdateBlogPage({super.key, required this.blog});
+  static route(Blog blog) => MaterialPageRoute(
+        builder: (context) => UpdateBlogPage(
+          blog: blog,
+        ),
       );
+
   @override
   State<UpdateBlogPage> createState() => _UpdateBlogPageState();
 }
 
 class _UpdateBlogPageState extends State<UpdateBlogPage> {
+  late Blog blog; // Declare a variable to hold the Blog object
+
   final TextEditingController titleControler = TextEditingController();
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
 
-  void _submitBlog() {
+  void _updateBlog() {
     if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
-      final createdById =
-          (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-      context.read<BlogBloc>().add(BlogSubmitEvent(
-            createdById: createdById,
+      // final createdById =
+      //     (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+      context.read<BlogBloc>().add(BlogUpdateEvent(
+            id: blog.id,
+            createdById: blog.createdById,
             title: titleControler.text.trim(),
             content: contentControler.text.trim(),
             topics: selectedTopics,
@@ -38,20 +45,22 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    titleControler.dispose();
-    contentControler.dispose();
+  void initState() {
+    super.initState();
+    blog = widget.blog; // Assign the Blog object in initState
   }
 
   @override
   Widget build(BuildContext context) {
+    selectedTopics = blog.topics;
+    titleControler.text = blog.title;
+    contentControler.text = blog.content;
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
             onPressed: () {
-              _submitBlog();
+              _updateBlog();
             },
             icon: Icon(Icons.done_rounded),
           )
@@ -181,5 +190,12 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    titleControler.dispose();
+    contentControler.dispose();
   }
 }

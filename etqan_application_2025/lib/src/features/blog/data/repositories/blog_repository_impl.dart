@@ -36,6 +36,32 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
+  Future<Either<Failure, Blog>> updateBlog({
+    required String id,
+    required String createdById,
+    required String title,
+    required String content,
+    required List<String> topics,
+  }) async {
+    try {
+      BlogModel blogModel = BlogModel(
+        id: id,
+        createdById: createdById,
+        updatedAt: DateTime.now(),
+        title: title,
+        content: content,
+        topics: topics,
+      );
+      final updatedBlog = await blogRemoteDataSource.updateBlog(blogModel);
+      return right(updatedBlog);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<Blog>>> getAllBlogs() async {
     try {
       final blogs = await blogRemoteDataSource.getAllBlogs();

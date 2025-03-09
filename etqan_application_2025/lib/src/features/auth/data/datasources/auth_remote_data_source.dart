@@ -38,7 +38,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return UserModel.fromJson(response.user!.toJson())
           .copyWith(email: currentUserSession!.user.email);
     } catch (e) {
-      print(e);
       throw ServerException('ServerException ~ ${e.toString()}');
     }
   }

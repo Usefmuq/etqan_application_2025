@@ -22,7 +22,7 @@ class BlogViewerPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                UpdateBlogPage.route(),
+                UpdateBlogPage.route(blog),
               );
             },
             icon: Icon(
