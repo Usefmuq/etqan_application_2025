@@ -35,6 +35,7 @@ class BlogViewerPage extends StatelessWidget {
         children: [
           Text(blog.title),
           Text(blog.content),
+          Text(blog.createdByName ?? ''),
         ],
       ),
     );

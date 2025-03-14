@@ -36,7 +36,6 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           )
           .eq('id', blog.id) // Ensure you update the correct row
           .select();
-      print(blog.id);
       return BlogModel.fromJson(blogData.first);
     } catch (e) {
       throw ServerException(e.toString());
@@ -51,7 +50,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .select('*, users (first_name_en, last_name_en)');
       return blogs
           .map((blog) => BlogModel.fromJson(blog).copyWith(
-                createdByName: blog['users']['first_name_en'],
+                createdByName:
+                    "${blog['users']['first_name_en']} ${blog['users']['last_name_en']}",
               ))
           .toList();
     } catch (e) {
