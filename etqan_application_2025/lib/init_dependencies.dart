@@ -1,4 +1,7 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
+import 'package:etqan_application_2025/src/core/data/repositories/Permission_repository_impl.dart';
+import 'package:etqan_application_2025/src/core/domain/repository/permission_repository.dart';
 import 'package:etqan_application_2025/src/core/network/connection_checker.dart';
 import 'package:etqan_application_2025/src/core/supabase/supabase_conf.dart';
 import 'package:etqan_application_2025/src/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -39,6 +42,16 @@ Future<void> initdependencies() async {
   );
   serviceLocator.registerFactory<ConnectionChecker>(
     () => ConnectionCheckerImpl(
+      serviceLocator(),
+    ),
+  );
+  serviceLocator.registerFactory<PermissionRemoteDataSource>(
+    () => PermissionRemoteDataSourceImpl(
+      serviceLocator(),
+    ),
+  );
+  serviceLocator.registerFactory<PermissionRepository>(
+    () => PermissionRepositoryImpl(
       serviceLocator(),
     ),
   );
@@ -95,6 +108,7 @@ void _intitBlog() {
     // Repository
     ..registerFactory<BlogRepository>(
       () => BlogRepositoryImpl(
+        serviceLocator(),
         serviceLocator(),
       ),
     )

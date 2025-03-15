@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
@@ -9,7 +10,11 @@ import 'package:uuid/uuid.dart';
 
 class BlogRepositoryImpl implements BlogRepository {
   final BlogRemoteDataSource blogRemoteDataSource;
-  BlogRepositoryImpl(this.blogRemoteDataSource);
+  final PermissionRemoteDataSource permissionRemoteDataSource;
+  const BlogRepositoryImpl(
+    this.blogRemoteDataSource,
+    this.permissionRemoteDataSource,
+  );
   @override
   Future<Either<Failure, Blog>> submitBlog({
     required String createdById,
@@ -64,6 +69,9 @@ class BlogRepositoryImpl implements BlogRepository {
   @override
   Future<Either<Failure, List<Blog>>> getAllBlogs() async {
     try {
+      final xx = await permissionRemoteDataSource.getPermissions(
+          userId: "8105e363-a848-4b9b-8ebd-6a50e0efbe80");
+      print(xx.first.permissionDescriptionAr);
       final blogs = await blogRemoteDataSource.getAllBlogs();
       return right(blogs);
     } on ServerException catch (e) {
