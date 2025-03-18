@@ -2,7 +2,10 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
+import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
@@ -19,10 +22,27 @@ class AddNewBlogPage extends StatefulWidget {
 }
 
 class _AddNewBlogPageState extends State<AddNewBlogPage> {
+  List<String>? permissions;
   final TextEditingController titleControler = TextEditingController();
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
+  @override
+  void initState() {
+    super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+
+    Future.microtask(() async {
+      final fetchedPermissions = await fetchUserPermissions(userId);
+
+      if (mounted) {
+        setState(() {
+          permissions = fetchedPermissions;
+        });
+      }
+    });
+  }
 
   void _submitBlog() {
     if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
@@ -46,6 +66,10 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (!isUserHasPermissionsView(
+        permissions ?? [], PermissionsConstants.addBlog)) {
+      return NoPermissions();
+    }
     return Scaffold(
       appBar: AppBar(
         actions: [

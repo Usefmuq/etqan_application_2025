@@ -1,7 +1,11 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
+import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
@@ -23,6 +27,8 @@ class UpdateBlogPage extends StatefulWidget {
 }
 
 class _UpdateBlogPageState extends State<UpdateBlogPage> {
+  List<String>? permissions;
+
   late Blog blog; // Declare a variable to hold the Blog object
 
   final TextEditingController titleControler = TextEditingController();
@@ -47,11 +53,27 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   @override
   void initState() {
     super.initState();
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+
+    Future.microtask(() async {
+      final fetchedPermissions = await fetchUserPermissions(userId);
+
+      if (mounted) {
+        setState(() {
+          permissions = fetchedPermissions;
+        });
+      }
+    });
     blog = widget.blog; // Assign the Blog object in initState
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!isUserHasPermissionsView(
+        permissions ?? [], PermissionsConstants.updateBlog)) {
+      return NoPermissions();
+    }
     selectedTopics = blog.topics;
     titleControler.text = blog.title;
     contentControler.text = blog.content;
