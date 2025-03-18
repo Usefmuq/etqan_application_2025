@@ -1,6 +1,6 @@
-Future<bool> isUserHasPermissionsView(
-  String userId,
+bool isUserHasPermissionsView(
+  List<String> permissionsList,
   String permissionId,
-) async {
-  return false;
+) {
+  return permissionsList.contains(permissionId);
 }

@@ -25,9 +25,7 @@ class BlogViewerPage extends StatelessWidget {
                 UpdateBlogPage.route(blog),
               );
             },
-            icon: Icon(
-              CupertinoIcons.pencil_circle,
-            ),
+            icon: Icon(Icons.edit),
           ),
         ],
       ),
