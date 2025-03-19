@@ -40,13 +40,15 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
       // final createdById =
       //     (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-      context.read<BlogBloc>().add(BlogUpdateEvent(
-            id: blog.id,
-            createdById: blog.createdById,
-            title: titleControler.text.trim(),
-            content: contentControler.text.trim(),
-            topics: selectedTopics,
-          ));
+      context.read<BlogBloc>().add(
+            BlogUpdateEvent(
+              id: blog.id,
+              createdById: blog.createdById,
+              title: titleControler.text.trim(),
+              content: contentControler.text.trim(),
+              topics: selectedTopics,
+            ),
+          );
     }
   }
 
@@ -70,22 +72,22 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isUserHasPermissionsView(
-        permissions ?? [], PermissionsConstants.updateBlog)) {
-      return NoPermissions();
-    }
     selectedTopics = blog.topics;
     titleControler.text = blog.title;
     contentControler.text = blog.content;
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            onPressed: () {
-              _updateBlog();
-            },
-            icon: Icon(Icons.done_rounded),
-          )
+          if (isUserHasPermissionsView(
+            permissions ?? [],
+            PermissionsConstants.updateBlog,
+          ))
+            IconButton(
+              onPressed: () {
+                _updateBlog();
+              },
+              icon: Icon(Icons.done_rounded),
+            )
         ],
       ),
       body: BlocConsumer<BlogBloc, BlogState>(
@@ -101,7 +103,11 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
           }
         },
         builder: (context, state) {
-          if (state is BlogLoading) {
+          if (state is BlogLoading ||
+              !isUserHasPermissionsView(
+                permissions ?? [],
+                PermissionsConstants.updateBlog,
+              )) {
             return const Loader();
           }
           return SingleChildScrollView(

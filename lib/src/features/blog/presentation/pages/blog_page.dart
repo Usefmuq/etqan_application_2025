@@ -1,9 +1,7 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
-import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
@@ -46,16 +44,14 @@ class _BlogPageState extends State<BlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isUserHasPermissionsView(
-        permissions ?? [], PermissionsConstants.viewBlog)) {
-      return NoPermissions();
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Blog App'),
         actions: [
           if (isUserHasPermissionsView(
-              permissions ?? [], PermissionsConstants.addBlog))
+            permissions ?? [],
+            PermissionsConstants.addBlog,
+          ))
             IconButton(
               onPressed: () {
                 Navigator.push(
@@ -74,7 +70,11 @@ class _BlogPageState extends State<BlogPage> {
           }
         },
         builder: (context, state) {
-          if (state is BlogLoading) {
+          if (state is BlogLoading ||
+              !isUserHasPermissionsView(
+                permissions ?? [],
+                PermissionsConstants.viewBlog,
+              )) {
             return const Loader();
           }
           if (state is BlogShowAllSuccess) {

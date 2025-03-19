@@ -2,7 +2,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
@@ -48,12 +47,14 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
     if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
       final createdById =
           (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-      context.read<BlogBloc>().add(BlogSubmitEvent(
-            createdById: createdById,
-            title: titleControler.text.trim(),
-            content: contentControler.text.trim(),
-            topics: selectedTopics,
-          ));
+      context.read<BlogBloc>().add(
+            BlogSubmitEvent(
+              createdById: createdById,
+              title: titleControler.text.trim(),
+              content: contentControler.text.trim(),
+              topics: selectedTopics,
+            ),
+          );
     }
   }
 
@@ -66,10 +67,6 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isUserHasPermissionsView(
-        permissions ?? [], PermissionsConstants.addBlog)) {
-      return NoPermissions();
-    }
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -94,7 +91,11 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
           }
         },
         builder: (context, state) {
-          if (state is BlogLoading) {
+          if (state is BlogLoading ||
+              !isUserHasPermissionsView(
+                permissions ?? [],
+                PermissionsConstants.addBlog,
+              )) {
             return const Loader();
           }
           return SingleChildScrollView(
