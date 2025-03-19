@@ -1,6 +1,5 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';

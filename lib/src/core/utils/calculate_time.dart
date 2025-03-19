@@ -1,3 +1,3 @@
-int CalculateTime() {
-  return 1;
-}
+// int calculateTime() {
+//   return 1;
+// }

@@ -2,7 +2,6 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/no_permissions.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
@@ -94,7 +93,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
         listener: (context, state) {
           if (state is BlogFailure) {
             showSnackBar(context, state.error);
-          } else if (state is BlogSubmitSuccess) {
+          } else if (state is BlogUpdateSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
               BlogPage.route(),

@@ -16,36 +16,28 @@ class PermissionsCubit extends Cubit<PermissionsState> {
     response.fold(
       (failure) => emit(PermissionsInitial()), // Handle failure case
       (permissionsList) {
-        print("permissionsList ${permissionsList}");
         // ✅ Convert List<PermissionsView> to List<String>
-        List<String> permissionKeys =
-            permissionsList.map((perm) => perm.permissionKey).toList();
-        print("permissionKeys ${permissionKeys}");
+        // List<String> permissionKeys =
+        //     permissionsList.map((perm) => perm.permissionKey).toList();
         emit(PermissionsList(permissionsList));
       },
     );
   }
 
   bool hasPermission(String permissionId) {
-    print("🔍 Checking permission: $permissionId");
-
     if (state is! PermissionsList) {
-      print("⚠️ Permissions have not been loaded yet!");
       return false;
     }
 
     final permissionsList = (state as PermissionsList).permissions;
 
     if (permissionsList.isEmpty) {
-      print("❌ No permissions available.");
       return false;
     }
 
     final hasPerm =
         permissionsList.any((perm) => perm.permissionKey == permissionId);
 
-    print(
-        "✅ User ${hasPerm ? 'HAS' : 'DOES NOT HAVE'} permission: $permissionId");
     return hasPerm;
   }
 
