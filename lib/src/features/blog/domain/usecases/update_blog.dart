@@ -12,6 +12,9 @@ class UpdateBlog implements Usecase<Blog, UpdateBlogParams> {
     return await blogRepostory.updateBlog(
       id: params.id,
       createdById: params.createdById,
+      status: params.status,
+      requestId: params.requestId,
+      isActive: params.isActive,
       title: params.title,
       content: params.content,
       topics: params.topics,
@@ -22,6 +25,9 @@ class UpdateBlog implements Usecase<Blog, UpdateBlogParams> {
 class UpdateBlogParams {
   final String id;
   final String createdById;
+  final String status;
+  final int requestId;
+  final bool isActive;
   final String title;
   final String content;
   final List<String> topics;
@@ -29,6 +35,9 @@ class UpdateBlogParams {
   UpdateBlogParams({
     required this.id,
     required this.createdById,
+    required this.status,
+    required this.requestId,
+    required this.isActive,
     required this.title,
     required this.content,
     required this.topics,

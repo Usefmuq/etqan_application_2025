@@ -33,6 +33,8 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
   ) async {
     final response = await _submitBlog(SubmitBlogParams(
       createdById: event.createdById,
+      // status: event.status,
+      // requestId: event.requestId,
       title: event.title,
       content: event.content,
       topics: event.topics,
@@ -52,6 +54,9 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     final response = await _updateBlog(UpdateBlogParams(
       id: event.id,
       createdById: event.createdById,
+      status: event.status,
+      requestId: event.requestId,
+      isActive: event.isActive,
       title: event.title,
       content: event.content,
       topics: event.topics,

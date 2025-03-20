@@ -1,9 +1,11 @@
+import 'package:etqan_application_2025/src/core/common/entities/request_master.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
-  Future<BlogModel> submitBlog(BlogModel blog);
+  Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
   Future<BlogModel> updateBlog(BlogModel blog);
   Future<List<BlogModel>> getAllBlogs();
 }
@@ -12,12 +14,23 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   final SupabaseClient supabaseClient;
   BlogRemoteDataSourceImpl(this.supabaseClient);
   @override
-  Future<BlogModel> submitBlog(BlogModel blog) async {
+  Future<BlogModel> submitBlog(
+    BlogModel blog,
+    RequestMasterModel request,
+  ) async {
     try {
+      final requestData = await supabaseClient
+          .from('requests_master')
+          .insert(
+            request.toJson(),
+          )
+          .select();
+      final req = RequestMasterModel.fromJson(requestData.first);
+      print(req.requestId);
       final blogData = await supabaseClient
           .from('blogs')
           .insert(
-            blog.toJson(),
+            blog.copyWith(requestId: req.requestId).toJson(),
           )
           .select();
       return BlogModel.fromJson(blogData.first);

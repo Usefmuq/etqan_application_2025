@@ -43,6 +43,9 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
             BlogUpdateEvent(
               id: blog.id,
               createdById: blog.createdById,
+              status: blog.status,
+              requestId: blog.requestId,
+              isActive: blog.isActive,
               title: titleControler.text.trim(),
               content: contentControler.text.trim(),
               topics: selectedTopics,

@@ -5,12 +5,16 @@ sealed class BlogEvent {}
 
 final class BlogSubmitEvent extends BlogEvent {
   final String createdById;
+  // final String status;
+  // final String requestId;
   final String title;
   final String content;
   final List<String> topics;
 
   BlogSubmitEvent({
     required this.createdById,
+    // required this.status,
+    // required this.requestId,
     required this.title,
     required this.content,
     required this.topics,
@@ -20,6 +24,9 @@ final class BlogSubmitEvent extends BlogEvent {
 final class BlogUpdateEvent extends BlogEvent {
   final String id;
   final String createdById;
+  final String status;
+  final int requestId;
+  final bool isActive;
   final String title;
   final String content;
   final List<String> topics;
@@ -27,6 +34,9 @@ final class BlogUpdateEvent extends BlogEvent {
   BlogUpdateEvent({
     required this.id,
     required this.createdById,
+    required this.status,
+    required this.requestId,
+    required this.isActive,
     required this.title,
     required this.content,
     required this.topics,

@@ -11,6 +11,8 @@ class SubmitBlog implements Usecase<Blog, SubmitBlogParams> {
   Future<Either<Failure, Blog>> call(SubmitBlogParams params) async {
     return await blogRepostory.submitBlog(
       createdById: params.createdById,
+      // status: params.status,
+      // requestId: params.requestId,
       title: params.title,
       content: params.content,
       topics: params.topics,
@@ -20,12 +22,16 @@ class SubmitBlog implements Usecase<Blog, SubmitBlogParams> {
 
 class SubmitBlogParams {
   final String createdById;
+  // final String status;
+  // final String requestId;
   final String title;
   final String content;
   final List<String> topics;
 
   SubmitBlogParams({
     required this.createdById,
+    // required this.status,
+    // required this.requestId,
     required this.title,
     required this.content,
     required this.topics,
