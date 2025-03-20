@@ -1,6 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
-import 'package:etqan_application_2025/src/core/data/repositories/permission_repository_impl2.dart';
+import 'package:etqan_application_2025/src/core/data/repositories/permission_repository_impl.dart';
 import 'package:etqan_application_2025/src/core/domain/repository/permission_repository.dart';
 import 'package:etqan_application_2025/src/core/network/connection_checker.dart';
 import 'package:etqan_application_2025/src/core/supabase/supabase_conf.dart';
