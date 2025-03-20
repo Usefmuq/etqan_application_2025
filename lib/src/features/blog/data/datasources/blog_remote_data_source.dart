@@ -1,4 +1,3 @@
-import 'package:etqan_application_2025/src/core/common/entities/request_master.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
@@ -26,7 +25,6 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           )
           .select();
       final req = RequestMasterModel.fromJson(requestData.first);
-      print(req.requestId);
       final blogData = await supabaseClient
           .from('blogs')
           .insert(
