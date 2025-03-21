@@ -8,11 +8,14 @@ List<ApprovalSequenceModel> mapServiceApproversToApprovalSequence({
 }) {
   return serviceApprovers.map((approver) {
     return ApprovalSequenceModel(
-      approvalId: 0, // Let database handle auto-increment
+      // approvalId: 0, // Let database handle auto-increment
       requestId: requestId,
       roleId: approver.roleId,
       approverUserId: approver.approverUserId,
-      approvalStatus: LookupConstants.approvalStatusApprovalPending,
+      approvalStatus: approver.approvalOrder == 1
+          ? LookupConstants.approvalStatusApprovalPending
+          : LookupConstants.approvalStatusApprovalQueued,
+      approverComment: null,
       approvalOrder: approver.approvalOrder,
       approvedAt: null,
       isActive: approver.isActive,

@@ -4,7 +4,7 @@ class ServiceApprovalUsersModel extends ServiceApprovalUsers {
   ServiceApprovalUsersModel({
     required super.id,
     required super.serviceId,
-    required super.roleId,
+    super.roleId,
     super.approverUserId,
     required super.approvalOrder,
     super.isActive = true,

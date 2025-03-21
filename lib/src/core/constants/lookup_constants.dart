@@ -14,4 +14,6 @@ class LookupConstants {
   // approval_status
   static const String approvalStatusApprovalPending =
       "1968dba5-db7a-4d7c-bc5a-956dd2ff9d20";
+  static const String approvalStatusApprovalQueued =
+      "f343a374-eb8b-444f-bced-fb90fbfcf55a";
 }
