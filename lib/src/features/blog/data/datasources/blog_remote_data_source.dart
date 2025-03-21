@@ -1,5 +1,8 @@
+import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
+import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,6 +21,14 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     RequestMasterModel request,
   ) async {
     try {
+      final serviceAprovalUsersData = await supabaseClient
+          .from('service_approval_users')
+          .select('*')
+          .eq('service_id', ServicesConstants.blogServiceId)
+          .eq('is_active', true);
+      final serviceApprovalUsers = serviceAprovalUsersData
+          .map((item) => ServiceApprovalUsersModel.fromJson(item))
+          .toList();
       final requestData = await supabaseClient
           .from('requests_master')
           .insert(
@@ -25,6 +36,16 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           )
           .select();
       final req = RequestMasterModel.fromJson(requestData.first);
+      final approvalSequence = mapServiceApproversToApprovalSequence(
+        requestId: req.requestId ?? -1,
+        serviceApprovers: serviceApprovalUsers,
+      );
+      await supabaseClient
+          .from('approval_sequence')
+          .insert(
+            approvalSequence.map((e) => e.toJson()).toList(),
+          )
+          .select();
       final blogData = await supabaseClient
           .from('blogs')
           .insert(

@@ -11,7 +11,7 @@ class RequestMaster {
   final DateTime? approvedAt; // ✅ When the request was approved
 
   RequestMaster({
-    this.requestId,
+    required this.requestId,
     required this.userId,
     required this.serviceId,
     this.status,

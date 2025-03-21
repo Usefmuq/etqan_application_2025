@@ -10,4 +10,8 @@ class LookupConstants {
       "095a7934-bafc-4f92-98fc-89e471b7d698";
   static const String requestStatusInProgress =
       "1593bad1-d843-4323-a673-36cc01df315a";
+
+  // approval_status
+  static const String approvalStatusApprovalPending =
+      "1968dba5-db7a-4d7c-bc5a-956dd2ff9d20";
 }

@@ -29,6 +29,7 @@ class BlogRepositoryImpl implements BlogRepository {
   }) async {
     try {
       RequestMasterModel requestMasterModel = RequestMasterModel(
+        // requestId: 0,
         userId: createdById,
         serviceId: ServicesConstants.blogServiceId,
         status: LookupConstants.requestStatusPending,
