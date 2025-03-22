@@ -16,7 +16,9 @@ final class BlogSubmitSuccess extends BlogState {}
 
 final class BlogUpdateSuccess extends BlogState {}
 
+final class BlogApproveSuccess extends BlogState {}
+
 final class BlogShowAllSuccess extends BlogState {
-  final List<Blog> blogs;
-  BlogShowAllSuccess(this.blogs);
+  final BlogPageEntity blogPage;
+  BlogShowAllSuccess(this.blogPage);
 }

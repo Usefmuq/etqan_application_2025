@@ -1,5 +1,8 @@
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
+import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
 import 'package:fpdart/fpdart.dart';
 
 abstract interface class BlogRepository {
@@ -21,5 +24,9 @@ abstract interface class BlogRepository {
     required String content,
     required List<String> topics,
   });
-  Future<Either<Failure, List<Blog>>> getAllBlogs();
+  Future<Either<Failure, Blog>> approveBlog({
+    required ApprovalSequenceModel approvalSequenceModel,
+    required BlogModel blogModel,
+  });
+  Future<Either<Failure, BlogPageEntity>> getAllBlogs();
 }

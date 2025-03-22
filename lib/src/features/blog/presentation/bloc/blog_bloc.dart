@@ -1,5 +1,8 @@
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/usecases/approve_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/update_blog.dart';
@@ -12,13 +15,16 @@ part 'blog_state.dart';
 class BlogBloc extends Bloc<BlogEvent, BlogState> {
   final SubmitBlog _submitBlog;
   final UpdateBlog _updateBlog;
+  final ApproveBlog _approveBlog;
   final GetAllBlogs _getAllBlogs;
   BlogBloc({
     required SubmitBlog submitBlog,
     required UpdateBlog updateBlog,
+    required ApproveBlog approveBlog,
     required GetAllBlogs getAllBlogs,
   })  : _submitBlog = submitBlog,
         _updateBlog = updateBlog,
+        _approveBlog = approveBlog,
         _getAllBlogs = getAllBlogs,
         super(BlogInitial()) {
     on<BlogEvent>((event, emit) => emit(BlogLoading()));

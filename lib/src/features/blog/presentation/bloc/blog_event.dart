@@ -43,4 +43,20 @@ final class BlogUpdateEvent extends BlogEvent {
   });
 }
 
+final class BlogApproveEvent extends BlogEvent {
+  // final int approvalId;
+  // final String approverUserId;
+  // final String approvalStatus;
+  // final int requestId;
+  // final bool isActive;
+  // final String approverComment;
+  final ApprovalSequenceModel approvalSequence;
+  final BlogModel blogModel;
+
+  BlogApproveEvent({
+    required this.approvalSequence,
+    required this.blogModel,
+  });
+}
+
 final class BlogGetAllBlogsEvent extends BlogEvent {}

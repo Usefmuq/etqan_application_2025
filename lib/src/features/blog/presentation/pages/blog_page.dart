@@ -78,10 +78,11 @@ class _BlogPageState extends State<BlogPage> {
             return const Loader();
           }
           if (state is BlogShowAllSuccess) {
+            print(state.blogPage.approvals.length);
             return ListView.builder(
-              itemCount: state.blogs.length,
+              itemCount: state.blogPage.blogs.length,
               itemBuilder: (context, index) {
-                final blog = state.blogs[index];
+                final blog = state.blogPage.blogs[index];
                 return CustomCardWithChips(
                   chips: blog.topics,
                   title: blog.title,

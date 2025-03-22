@@ -1,4 +1,5 @@
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
@@ -9,7 +10,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
   Future<BlogModel> updateBlog(BlogModel blog);
+  Future<BlogModel> approveBlog(
+    ApprovalSequenceModel approvalSequence,
+    BlogModel blog,
+  );
   Future<List<BlogModel>> getAllBlogs();
+  Future<List<RequestMasterModel>> getAllRequests();
+  Future<List<ApprovalSequenceModel>> getAllApprovals();
 }
 
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
@@ -75,6 +82,23 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
+  Future<BlogModel> approveBlog(
+      ApprovalSequenceModel approvalSequence, BlogModel blog) async {
+    try {
+      final blogData = await supabaseClient
+          .from('blogs')
+          .update(
+            blog.toJson(),
+          )
+          .eq('id', blog.id) // Ensure you approve the correct row
+          .select();
+      return BlogModel.fromJson(blogData.first);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<List<BlogModel>> getAllBlogs() async {
     try {
       final blogs = await supabaseClient
@@ -85,6 +109,37 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
                 createdByName:
                     "${blog['users']['first_name_en']} ${blog['users']['last_name_en']}",
               ))
+          .toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<RequestMasterModel>> getAllRequests() async {
+    try {
+      final requests = await supabaseClient
+          .from('requests_master')
+          .select('*')
+          .eq('service_id', ServicesConstants.blogServiceId);
+      return requests
+          .map((requests) => RequestMasterModel.fromJson(requests))
+          .toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ApprovalSequenceModel>> getAllApprovals() async {
+    try {
+      final approvals = await supabaseClient
+          .from('approval_sequence')
+          .select('*')
+          .eq('requests_master.service_id', ServicesConstants.blogServiceId)
+          .select('*, requests_master!inner(service_id)');
+      return approvals
+          .map((approvals) => ApprovalSequenceModel.fromJson(approvals))
           .toList();
     } catch (e) {
       throw ServerException(e.toString());

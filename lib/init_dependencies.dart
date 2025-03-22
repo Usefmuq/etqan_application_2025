@@ -15,6 +15,7 @@ import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/blog/data/repositories/blog_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/usecases/approve_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/update_blog.dart';
@@ -134,11 +135,17 @@ void _intitBlog() {
         serviceLocator(),
       ),
     )
+    ..registerFactory(
+      () => ApproveBlog(
+        serviceLocator(),
+      ),
+    )
     //Bloc
     ..registerLazySingleton(
       () => BlogBloc(
         submitBlog: serviceLocator(),
         updateBlog: serviceLocator(),
+        approveBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
       ),
     );

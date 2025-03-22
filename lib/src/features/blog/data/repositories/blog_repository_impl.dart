@@ -1,12 +1,14 @@
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:uuid/uuid.dart';
@@ -90,10 +92,34 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  Future<Either<Failure, List<Blog>>> getAllBlogs() async {
+  Future<Either<Failure, Blog>> approveBlog({
+    required ApprovalSequenceModel approvalSequenceModel,
+    required BlogModel blogModel,
+  }) async {
+    try {
+      final approvedBlog = await blogRemoteDataSource.approveBlog(
+        approvalSequenceModel,
+        blogModel,
+      );
+      return right(approvedBlog);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, BlogPageEntity>> getAllBlogs() async {
     try {
       final blogs = await blogRemoteDataSource.getAllBlogs();
-      return right(blogs);
+      final requests = await blogRemoteDataSource.getAllRequests();
+      final approvals = await blogRemoteDataSource.getAllApprovals();
+      return right(BlogPageEntity(
+        blogs: blogs,
+        requests: requests,
+        approvals: approvals,
+      ));
     } on ServerException catch (e) {
       return left(Failure(e.message));
     } catch (e) {

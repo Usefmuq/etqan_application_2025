@@ -7,4 +7,5 @@ class PermissionsConstants {
   static const String viewBlog = "view_blog";
   static const String addBlog = "add_blog";
   static const String updateBlog = "update_blog";
+  static const String approveBlog = "approve_blog";
 }
