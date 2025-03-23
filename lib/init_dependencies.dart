@@ -1,10 +1,14 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
+import 'package:etqan_application_2025/src/core/data/datasources/user_roles_remote_data_source.dart';
 import 'package:etqan_application_2025/src/core/data/repositories/permission_repository_impl.dart';
+import 'package:etqan_application_2025/src/core/data/repositories/user_roles_repository_impl.dart';
 import 'package:etqan_application_2025/src/core/domain/repository/permission_repository.dart';
+import 'package:etqan_application_2025/src/core/domain/repository/user_roles_repository.dart';
 import 'package:etqan_application_2025/src/core/network/connection_checker.dart';
 import 'package:etqan_application_2025/src/core/supabase/supabase_conf.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
+import 'package:etqan_application_2025/src/core/usecase/get_user_roles.dart';
 import 'package:etqan_application_2025/src/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/auth/domain/repository/auth_repository.dart';
@@ -57,10 +61,23 @@ Future<void> initdependencies() async {
       serviceLocator(),
     ),
   );
+  serviceLocator.registerFactory<UserRolesRemoteDataSource>(
+    () => UserRolesRemoteDataSourceImpl(
+      serviceLocator(),
+    ),
+  );
+  serviceLocator.registerFactory<UserRolesRepository>(
+    () => UserRolesRepositoryImpl(
+      serviceLocator(),
+    ),
+  );
   //use cases
   // ✅ Register GetUserPermissions Use Case
   serviceLocator.registerLazySingleton<GetUserPermissions>(
     () => GetUserPermissions(serviceLocator()),
+  );
+  serviceLocator.registerLazySingleton<GetUserRoles>(
+    () => GetUserRoles(serviceLocator()),
   );
 }
 

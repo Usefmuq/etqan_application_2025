@@ -1,23 +1,27 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/approval_sequence.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/approve_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlogViewerPage extends StatefulWidget {
-  static route(Blog blog) => MaterialPageRoute(
+  static route(BlogViewerPageEntity blogViewerPage) => MaterialPageRoute(
         builder: (context) => BlogViewerPage(
-          blog: blog,
+          blogViewerPage: blogViewerPage,
         ),
       );
 
-  final Blog blog;
-  const BlogViewerPage({super.key, required this.blog});
+  final BlogViewerPageEntity blogViewerPage;
+  const BlogViewerPage({super.key, required this.blogViewerPage});
 
   @override
   State<BlogViewerPage> createState() => _BlogViewerPageState();
@@ -25,6 +29,7 @@ class BlogViewerPage extends StatefulWidget {
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
   List<String>? permissions;
+  ApprovalSequence? pendingApproval;
   @override
   void initState() {
     super.initState();
@@ -34,9 +39,20 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
 
+      final fetchPendingApproval = await widget.blogViewerPage.approval!
+          .firstWhereOrNullAsync((a) async {
+        return a.approvalStatus?.toLowerCase() ==
+                LookupConstants.approvalStatusApprovalPending &&
+            (a.approverUserId == userId ||
+                await isUserHasRole(
+                  userId,
+                  a.roleId ?? '',
+                ));
+      });
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
+          pendingApproval = fetchPendingApproval;
         });
       }
     });
@@ -55,10 +71,25 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  UpdateBlogPage.route(widget.blog),
+                  UpdateBlogPage.route(widget.blogViewerPage.blog),
                 );
               },
               icon: Icon(Icons.edit),
+            ),
+          if (isUserHasPermissionsView(
+                permissions ?? [],
+                PermissionsConstants.approveBlog,
+              ) &&
+              !pendingApproval.isNullOrEmpty)
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  ApproveBlogPage.route(
+                      widget.blogViewerPage.blog, pendingApproval!),
+                );
+              },
+              icon: Icon(Icons.check),
             ),
         ],
       ),
@@ -78,9 +109,13 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           }
           return Column(
             children: [
-              Text(widget.blog.title),
-              Text(widget.blog.content),
-              Text(widget.blog.createdByName ?? ''),
+              Text(widget.blogViewerPage.blog.title),
+              Text(widget.blogViewerPage.blog.content),
+              Text(widget.blogViewerPage.blog.createdByName ?? ''),
+              Text(
+                  "approvalStatus ${widget.blogViewerPage.approval!.first.approvalStatus ?? ''}"),
+              Text(
+                  "requestId ${widget.blogViewerPage.request!.requestId ?? ''}"),
             ],
           );
         },

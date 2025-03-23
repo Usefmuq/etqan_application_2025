@@ -30,6 +30,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     on<BlogEvent>((event, emit) => emit(BlogLoading()));
     on<BlogSubmitEvent>(_onBlogSubmitEvent);
     on<BlogUpdateEvent>(_onBlogUpdateEvent);
+    on<BlogApproveEvent>(_onBlogApproveEvent);
     on<BlogGetAllBlogsEvent>(_onBlogGetAllBlogsEvent);
   }
 
@@ -71,6 +72,22 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
       (failure) => emit(BlogFailure(failure.message)),
       (blog) {
         emit(BlogUpdateSuccess());
+      },
+    );
+  }
+
+  void _onBlogApproveEvent(
+    BlogApproveEvent event,
+    Emitter<BlogState> emit,
+  ) async {
+    final response = await _approveBlog(ApproveBlogParams(
+      approvalSequenceModel: event.approvalSequence,
+      blogModel: event.blogModel,
+    ));
+    response.fold(
+      (failure) => emit(BlogFailure(failure.message)),
+      (blog) {
+        emit(BlogApproveSuccess());
       },
     );
   }
