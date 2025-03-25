@@ -1,4 +1,5 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_card_wrapper.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
@@ -81,30 +82,35 @@ class _BlogPageState extends State<BlogPage> {
           }
           if (state is BlogShowAllSuccess) {
             return ListView.builder(
+              padding: const EdgeInsets.all(12),
               itemCount: state.blogPage.blogs.length,
               itemBuilder: (context, index) {
                 final blog = state.blogPage.blogs[index];
-                return CustomCardWithChips(
-                  chips: blog.topics,
-                  title: blog.title,
-                  onTap: () {
-                    if (context.mounted) {
-                      Navigator.push(
-                        context,
-                        BlogViewerPage.route(BlogViewerPageEntity(
-                          blog: blog,
-                          request: state.blogPage.requests.firstWhereOrNull(
-                            (r) => r.requestId == blog.requestId,
+
+                return AnimatedCardWrapper(
+                  index: index, // 👈 fade/slide stagger delay
+                  child: CustomCardWithChips(
+                    chips: blog.topics,
+                    title: blog.title,
+                    onTap: () {
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          BlogViewerPage.route(
+                            BlogViewerPageEntity(
+                              blog: blog,
+                              request: state.blogPage.requests.firstWhereOrNull(
+                                (r) => r.requestId == blog.requestId,
+                              ),
+                              approval: state.blogPage.approvals
+                                  .where((a) => a.requestId == blog.requestId)
+                                  .toList(),
+                            ),
                           ),
-                          approval: state.blogPage.approvals
-                              .where(
-                                (a) => a.requestId == blog.requestId,
-                              )
-                              .toList(),
-                        )),
-                      );
-                    }
-                  },
+                        );
+                      }
+                    },
+                  ),
                 );
               },
             );

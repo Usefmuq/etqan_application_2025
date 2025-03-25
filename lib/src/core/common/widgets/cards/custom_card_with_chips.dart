@@ -1,5 +1,5 @@
-import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 
 class CustomCardWithChips extends StatelessWidget {
   final double height;
@@ -10,70 +10,114 @@ class CustomCardWithChips extends StatelessWidget {
   final String description;
   final List<String> chips;
   final Color cardColor;
-  final VoidCallback? onTap; // ✅ Accepts an onTap function
+  final VoidCallback? onTap;
+
   const CustomCardWithChips({
     super.key,
     this.height = 200,
     this.margin = 16,
     this.padding = 16,
-    this.borderRadius = 10,
+    this.borderRadius = 16,
     this.title = '',
     this.description = '',
     this.chips = const [],
-    this.cardColor = AppPallete.greyColor,
+    this.cardColor = AppPallete.cardColor,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: height,
-        margin: EdgeInsets.all(margin).copyWith(
-          bottom: 4,
-        ),
-        padding: EdgeInsets.all(margin),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return Card(
+      elevation: 3,
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: margin),
+      color: cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(borderRadius),
+        onTap: onTap,
+        child: Container(
+          height: height,
+          padding: EdgeInsets.all(padding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Chips row
+              if (chips.isNotEmpty)
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: chips
-                        .map(
-                          (_) => Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: Chip(
-                              label: Text(
-                                _,
-                                style: TextStyle(fontSize: 15),
+                    children: chips.map(
+                      (chip) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 6.0),
+                          child: Chip(
+                            label: Text(
+                              chip,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
+                            backgroundColor:
+                                AppPallete.primaryLavender.withOpacity(0.12),
+                            labelStyle: const TextStyle(
+                              color: AppPallete.primaryLavender,
+                            ),
+                            shape: const StadiumBorder(),
                           ),
-                        )
-                        .toList(),
+                        );
+                      },
+                    ).toList(),
                   ),
                 ),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+
+              // Title and Description
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppPallete.textPrimary,
+                    ),
+                  ),
+                  if (description.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(
+                        description,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppPallete.textSecondary,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+
+              // Footer Info (like time)
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text(
+                  '1 min ago',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 12,
                   ),
                 ),
-              ],
-            ),
-            Text('1 min')
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
