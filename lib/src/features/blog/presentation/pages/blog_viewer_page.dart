@@ -2,8 +2,10 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/common/entities/approval_sequence.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -152,6 +154,33 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                             .format(widget.blogViewerPage.request!.approvedAt!)
                         : "Not yet",
                   },
+                ),
+                const SizedBox(height: 12),
+                CustomSectionTitle(
+                  title: "Approval Sequence",
+                ),
+                CustomTableGrid(
+                  headers: [
+                    'Approver ID',
+                    'Role ID',
+                    'Status',
+                    'Comment',
+                    'Approved At',
+                    'Order',
+                    'Created At',
+                  ],
+                  rows: widget.blogViewerPage.approval!
+                      .map((e) => e.toTableRow())
+                      .toList(),
+                  // onEdit: (row) {
+                  //   print('✏️ Edit row for approver: ${row['Approver ID']}');
+                  // },
+                  // onApprove: (row) {
+                  //   print('✅ Approve row: ${row['Approver ID']}');
+                  // },
+                  // onDelete: (row) {
+                  //   print('🗑 Delete row for role: ${row['Role ID']}');
+                  // },
                 ),
               ],
             ),

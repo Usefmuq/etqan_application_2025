@@ -62,7 +62,7 @@ class CustomCardWithChips extends StatelessWidget {
                               ),
                             ),
                             backgroundColor:
-                                AppPallete.primaryLavender.withOpacity(0.12),
+                                AppPallete.primaryLavender.withAlpha(30),
                             labelStyle: const TextStyle(
                               color: AppPallete.primaryLavender,
                             ),

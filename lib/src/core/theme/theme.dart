@@ -40,8 +40,8 @@ class AppTheme {
 
     // ✅ Chip styling
     chipTheme: ChipThemeData(
-      backgroundColor: AppPallete.primaryLavender.withOpacity(0.08),
-      selectedColor: AppPallete.primaryLavender.withOpacity(0.18),
+      backgroundColor: AppPallete.primaryLavender.withAlpha(20),
+      selectedColor: AppPallete.primaryLavender.withAlpha(46),
       disabledColor: Colors.grey.shade300,
       labelStyle: const TextStyle(
         fontSize: 14,
@@ -110,7 +110,7 @@ class AppTheme {
       primary: AppPallete.primaryLavender,
       secondary: AppPallete.gradient2,
       error: AppPallete.errorColor,
-      background: AppPallete.backgroundColor,
+      // background: AppPallete.backgroundColor,
       onPrimary: Colors.white,
       onSurface: AppPallete.textPrimary,
     ),

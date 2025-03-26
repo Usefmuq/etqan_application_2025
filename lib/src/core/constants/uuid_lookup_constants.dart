@@ -18,24 +18,31 @@ class UuidLookupConstants {
       'color': AppPallete.rejectColor,
     },
   };
-
-  static const Map<String, Map<String, String>> priorityMap = {
-    'uuid-high': {
-      'en': 'High',
-      'ar': 'عالية',
+  static const Map<String, Map<String, dynamic>> approvalStatusMap = {
+    '1968dba5-db7a-4d7c-bc5a-956dd2ff9d20': {
+      'en': 'Pending',
+      'ar': 'قيد الانتظار',
+      'color': AppPallete.inProgressColor,
     },
-    'uuid-medium': {
-      'en': 'Medium',
-      'ar': 'متوسطة',
+    'f343a374-eb8b-444f-bced-fb90fbfcf55a': {
+      'en': 'Queued',
+      'ar': 'لم يبدأ بعد',
+      'color': AppPallete.greyColor,
     },
-    'uuid-low': {
-      'en': 'Low',
-      'ar': 'منخفضة',
+    '3df55920-3446-4b68-9542-c4eb1a969aef': {
+      'en': 'Approved',
+      'ar': 'موافق عليه',
+      'color': AppPallete.completedColor,
+    },
+    'f05437f4-0305-4aa5-909d-9e54d2f4a409': {
+      'en': 'Rejected',
+      'ar': 'مرفوض',
+      'color': AppPallete.rejectColor,
     },
   };
 
   static final Map<String, Map<String, dynamic>> combinedLookup = {
     ...requestStatusMap,
-    ...priorityMap,
+    ...approvalStatusMap,
   };
 }

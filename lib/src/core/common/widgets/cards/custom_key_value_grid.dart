@@ -71,8 +71,10 @@ class CustomKeyValueGrid extends StatelessWidget {
         if (isChip && color != null) {
           valueWidget = Chip(
             label: Text(label),
-            backgroundColor: color.withOpacity(0.2),
-            // labelStyle: TextStyle(color: color),
+            backgroundColor: color.withAlpha(30),
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
             shape: const StadiumBorder(),
           );
         }

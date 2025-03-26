@@ -71,4 +71,17 @@ class ApprovalSequenceModel extends ApprovalSequence {
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  /// 🧩 For CustomTableGrid
+  Map<String, dynamic> toTableRow() {
+    return {
+      'Approver ID': approverUserId ?? '—',
+      'Role ID': roleId ?? '—',
+      'Status': approvalStatus,
+      'Comment': approverComment ?? '',
+      'Approved At': approvedAt,
+      'Order': approvalOrder,
+      'Created At': createdAt,
+    };
+  }
 }
