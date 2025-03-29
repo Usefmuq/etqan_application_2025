@@ -98,7 +98,7 @@ class _BlogPageState extends State<BlogPage> {
                           BlogViewerPage.route(
                             BlogViewerPageEntity(
                               blogsView: blog,
-                              approval: state.blogPage.approvals
+                              approval: state.blogPage.approvalsView
                                   .where((a) => a.requestId == blog.requestId)
                                   .toList(),
                             ),

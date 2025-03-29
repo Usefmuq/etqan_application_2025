@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
@@ -16,7 +17,7 @@ abstract interface class BlogRemoteDataSource {
     BlogModel blog,
   );
   Future<List<BlogsPageViewModel>> getAllBlogsView();
-  Future<List<ApprovalSequenceModel>> getAllApprovals();
+  Future<List<ApprovalSequenceViewModel>> getAllApprovalsView();
 }
 
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
@@ -112,15 +113,15 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<List<ApprovalSequenceModel>> getAllApprovals() async {
+  Future<List<ApprovalSequenceViewModel>> getAllApprovalsView() async {
     try {
-      final approvals = await supabaseClient
-          .from('approval_sequence')
-          .select('*')
-          .eq('requests_master.service_id', ServicesConstants.blogServiceId)
-          .select('*, requests_master!inner(service_id)');
-      return approvals
-          .map((approvals) => ApprovalSequenceModel.fromJson(approvals))
+      final approvalsView = await supabaseClient
+          .from('approval_sequence_view')
+          .select('*')  
+          .eq('service_id', ServicesConstants.blogServiceId)
+          .select('*');
+      return approvalsView
+          .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
           .toList();
     } catch (e) {
       throw ServerException(e.toString());

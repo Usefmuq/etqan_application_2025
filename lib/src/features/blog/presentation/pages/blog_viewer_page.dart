@@ -1,11 +1,10 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:etqan_application_2025/src/core/common/entities/approval_sequence.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
-import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
@@ -32,7 +31,7 @@ class BlogViewerPage extends StatefulWidget {
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
   List<String>? permissions;
-  ApprovalSequence? pendingApproval;
+  ApprovalSequenceViewModel? pendingApproval;
   @override
   void initState() {
     super.initState();
@@ -92,9 +91,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 Navigator.push(
                   context,
                   ApproveBlogPage.route(
-                      (widget.blogViewerPage.blogsView as BlogsPageViewModel)
-                          .toBlog()!,
-                      pendingApproval!),
+                    (widget.blogViewerPage.blogsView as BlogsPageViewModel)
+                        .toBlog()!,
+                    (pendingApproval as ApprovalSequenceViewModel)
+                        .toApprovalSequence(),
+                  ),
                 );
               },
               icon: Icon(Icons.check),
@@ -149,6 +150,23 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 ),
                 CustomTableGrid(
                   headers: [
+                    'Approval ID',
+                    'Request ID',
+                    'Approval Status EN',
+                    'Approver Name EN',
+                    'Role Name EN',
+                    'Approved At',
+                    'Created At',
+                    'Request User Name EN',
+                    'Service Name EN',
+                  ],
+                  rows: widget.blogViewerPage.approval!
+                      .map((e) => e.toTableRow())
+                      .toList(),
+                  useChipsForStatus: true,
+                ),
+                CustomTableGrid(
+                  headers: [
                     'Approver ID',
                     'Role ID',
                     'Status',
@@ -157,7 +175,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                     'Order',
                     'Created At',
                   ],
-                  rows: widget.blogViewerPage.approval!
+                  rows: (widget.blogViewerPage.approval
+                          as List<ApprovalSequenceViewModel>)
                       .map((e) => e.toTableRow())
                       .toList(),
                   // onEdit: (row) {

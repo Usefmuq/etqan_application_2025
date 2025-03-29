@@ -113,10 +113,10 @@ class BlogRepositoryImpl implements BlogRepository {
   Future<Either<Failure, BlogPageEntity>> getAllBlogs() async {
     try {
       final blogsVeiw = await blogRemoteDataSource.getAllBlogsView();
-      final approvals = await blogRemoteDataSource.getAllApprovals();
+      final approvalsView = await blogRemoteDataSource.getAllApprovalsView();
       return right(BlogPageEntity(
         blogsView: blogsVeiw,
-        approvals: approvals,
+        approvalsView: approvalsView,
       ));
     } on ServerException catch (e) {
       return left(Failure(e.message));
