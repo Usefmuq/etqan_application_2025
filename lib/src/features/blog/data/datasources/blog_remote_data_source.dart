@@ -5,6 +5,7 @@ import 'package:etqan_application_2025/src/core/data/models/service_approval_use
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
+import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
@@ -14,8 +15,7 @@ abstract interface class BlogRemoteDataSource {
     ApprovalSequenceModel approvalSequence,
     BlogModel blog,
   );
-  Future<List<BlogModel>> getAllBlogs();
-  Future<List<RequestMasterModel>> getAllRequests();
+  Future<List<BlogsPageViewModel>> getAllBlogsView();
   Future<List<ApprovalSequenceModel>> getAllApprovals();
 }
 
@@ -99,32 +99,13 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<List<BlogModel>> getAllBlogs() async {
+  Future<List<BlogsPageViewModel>> getAllBlogsView() async {
     try {
       final blogs = await supabaseClient
-          .from('blogs')
-          .select('*, users (first_name_en, last_name_en)');
-      return blogs
-          .map((blog) => BlogModel.fromJson(blog).copyWith(
-                createdByName:
-                    "${blog['users']['first_name_en']} ${blog['users']['last_name_en']}",
-              ))
-          .toList();
-    } catch (e) {
-      throw ServerException(e.toString());
-    }
-  }
-
-  @override
-  Future<List<RequestMasterModel>> getAllRequests() async {
-    try {
-      final requests = await supabaseClient
-          .from('requests_master')
+          .from('blogs_page_view')
           .select('*')
-          .eq('service_id', ServicesConstants.blogServiceId);
-      return requests
-          .map((requests) => RequestMasterModel.fromJson(requests))
-          .toList();
+          .eq('request_is_active', true);
+      return blogs.map((blog) => BlogsPageViewModel.fromJson(blog)).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

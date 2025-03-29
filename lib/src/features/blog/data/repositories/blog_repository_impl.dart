@@ -112,12 +112,10 @@ class BlogRepositoryImpl implements BlogRepository {
   @override
   Future<Either<Failure, BlogPageEntity>> getAllBlogs() async {
     try {
-      final blogs = await blogRemoteDataSource.getAllBlogs();
-      final requests = await blogRemoteDataSource.getAllRequests();
+      final blogsVeiw = await blogRemoteDataSource.getAllBlogsView();
       final approvals = await blogRemoteDataSource.getAllApprovals();
       return right(BlogPageEntity(
-        blogs: blogs,
-        requests: requests,
+        blogsView: blogsVeiw,
         approvals: approvals,
       ));
     } on ServerException catch (e) {

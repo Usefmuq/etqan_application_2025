@@ -8,6 +8,7 @@ import 'package:etqan_application_2025/src/core/constants/permissions_constants.
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
+import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/approve_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
@@ -73,7 +74,10 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  UpdateBlogPage.route(widget.blogViewerPage.blog),
+                  UpdateBlogPage.route(
+                    (widget.blogViewerPage.blogsView as BlogsPageViewModel)
+                        .toBlog()!,
+                  ),
                 );
               },
               icon: Icon(Icons.edit),
@@ -88,7 +92,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 Navigator.push(
                   context,
                   ApproveBlogPage.route(
-                      widget.blogViewerPage.blog, pendingApproval!),
+                      (widget.blogViewerPage.blogsView as BlogsPageViewModel)
+                          .toBlog()!,
+                      pendingApproval!),
                 );
               },
               icon: Icon(Icons.check),
@@ -115,46 +121,28 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 ),
                 CustomKeyValueGrid(
                   data: {
-                    'Title': widget.blogViewerPage.blog.title,
-                    'Status': widget.blogViewerPage.blog.status,
-                    'Topics': widget.blogViewerPage.blog.topics.join(', '),
-                    'Active': widget.blogViewerPage.blog.isActive,
-                    'Updated': widget.blogViewerPage.blog.updatedAt,
-                    'Created By': widget.blogViewerPage.blog.createdByName,
-                  },
-                ),
-                const Divider(),
-                CustomSectionTitle(
-                  title: "Request Info",
-                  trailing: IconButton(
-                    icon: Icon(Icons.info),
-                    onPressed: () {},
-                  ),
-                ),
-                CustomKeyValueGrid(
-                  data: {
-                    'Request ID': widget.blogViewerPage.request!.requestId,
-                    'Service ID': widget.blogViewerPage.request!.serviceId,
-                    'Status': widget.blogViewerPage.request!.status ?? '—',
-                    'Priority': widget.blogViewerPage.request!.priority ?? '—',
-                    'Details':
-                        widget.blogViewerPage.request!.requestDetails ?? '—',
-                    'Is Active':
-                        widget.blogViewerPage.request!.isActive ? 'Yes' : 'No',
-                    'Created At': DateFormat.yMMMd()
-                        .add_jm()
-                        .format(widget.blogViewerPage.request!.createdAt),
-                    'Updated At': DateFormat.yMMMd()
-                        .add_jm()
-                        .format(widget.blogViewerPage.request!.updatedAt),
-                    'Approved At': widget.blogViewerPage.request!.approvedAt !=
+                    'Title': widget.blogViewerPage.blogsView.title,
+                    'Request ID':
+                        "blog-${widget.blogViewerPage.blogsView.requestId}",
+                    'Status': widget.blogViewerPage.blogsView.requestStatusId,
+                    'Topics':
+                        widget.blogViewerPage.blogsView.topics!.join(', '),
+                    'Created By Ar': widget.blogViewerPage.blogsView.fullNameAr,
+                    'Priority': widget.blogViewerPage.blogsView.priorityId,
+                    'Request Details':
+                        widget.blogViewerPage.blogsView.requestDetails,
+                    'Created At': DateFormat.yMMMd().add_jm().format(
+                        widget.blogViewerPage.blogsView.requestCreatedAt!),
+                    'Updated': widget.blogViewerPage.blogsView.blogUpdatedAt,
+                    'Approved At': widget
+                                .blogViewerPage.blogsView.requestApprovedAt !=
                             null
-                        ? DateFormat.yMMMd()
-                            .add_jm()
-                            .format(widget.blogViewerPage.request!.approvedAt!)
+                        ? DateFormat.yMMMd().add_jm().format(
+                            widget.blogViewerPage.blogsView.requestApprovedAt!)
                         : "Not yet",
                   },
                 ),
+                const Divider(),
                 const SizedBox(height: 12),
                 CustomSectionTitle(
                   title: "Approval Sequence",

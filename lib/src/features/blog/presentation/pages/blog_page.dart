@@ -3,7 +3,6 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_ca
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
-import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -83,25 +82,22 @@ class _BlogPageState extends State<BlogPage> {
           if (state is BlogShowAllSuccess) {
             return ListView.builder(
               padding: const EdgeInsets.all(12),
-              itemCount: state.blogPage.blogs.length,
+              itemCount: state.blogPage.blogsView.length,
               itemBuilder: (context, index) {
-                final blog = state.blogPage.blogs[index];
+                final blog = state.blogPage.blogsView[index];
 
                 return AnimatedCardWrapper(
                   index: index, // 👈 fade/slide stagger delay
                   child: CustomCardWithChips(
-                    chips: blog.topics,
-                    title: blog.title,
+                    chips: blog.topics!,
+                    title: blog.title!,
                     onTap: () {
                       if (context.mounted) {
                         Navigator.push(
                           context,
                           BlogViewerPage.route(
                             BlogViewerPageEntity(
-                              blog: blog,
-                              request: state.blogPage.requests.firstWhereOrNull(
-                                (r) => r.requestId == blog.requestId,
-                              ),
+                              blogsView: blog,
                               approval: state.blogPage.approvals
                                   .where((a) => a.requestId == blog.requestId)
                                   .toList(),

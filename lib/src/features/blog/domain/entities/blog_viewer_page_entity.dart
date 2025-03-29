@@ -1,15 +1,13 @@
 import 'package:etqan_application_2025/src/core/common/entities/approval_sequence.dart';
-import 'package:etqan_application_2025/src/core/common/entities/request_master.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blogs_page_view.dart';
 
 class BlogViewerPageEntity {
-  final Blog blog;
-  final RequestMaster? request;
+  final BlogsPageView blogsView;
+
   final List<ApprovalSequence>? approval;
 
   BlogViewerPageEntity({
-    required this.blog,
-    this.request,
+    required this.blogsView,
     this.approval,
   });
 }
