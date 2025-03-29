@@ -91,10 +91,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 Navigator.push(
                   context,
                   ApproveBlogPage.route(
-                    (widget.blogViewerPage.blogsView as BlogsPageViewModel)
-                        .toBlog()!,
-                    (pendingApproval as ApprovalSequenceViewModel)
-                        .toApprovalSequence(),
+                    widget.blogViewerPage.blogsView,
+                    pendingApproval!,
                   ),
                 );
               },
@@ -164,30 +162,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                       .map((e) => e.toTableRow())
                       .toList(),
                   useChipsForStatus: true,
-                ),
-                CustomTableGrid(
-                  headers: [
-                    'Approver ID',
-                    'Role ID',
-                    'Status',
-                    'Comment',
-                    'Approved At',
-                    'Order',
-                    'Created At',
-                  ],
-                  rows: (widget.blogViewerPage.approval
-                          as List<ApprovalSequenceViewModel>)
-                      .map((e) => e.toTableRow())
-                      .toList(),
-                  // onEdit: (row) {
-                  //   print('✏️ Edit row for approver: ${row['Approver ID']}');
-                  // },
-                  // onApprove: (row) {
-                  //   print('✅ Approve row: ${row['Approver ID']}');
-                  // },
-                  // onDelete: (row) {
-                  //   print('🗑 Delete row for role: ${row['Role ID']}');
-                  // },
                 ),
               ],
             ),

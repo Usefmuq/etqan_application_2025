@@ -2,11 +2,13 @@ import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart'
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
+import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
@@ -93,8 +95,8 @@ class BlogRepositoryImpl implements BlogRepository {
 
   @override
   Future<Either<Failure, Blog>> approveBlog({
-    required ApprovalSequenceModel approvalSequenceModel,
-    required BlogModel blogModel,
+    required ApprovalSequenceViewModel approvalSequenceModel,
+    required BlogsPageViewModel blogModel,
   }) async {
     try {
       final approvedBlog = await blogRemoteDataSource.approveBlog(

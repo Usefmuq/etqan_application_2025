@@ -50,8 +50,8 @@ final class BlogApproveEvent extends BlogEvent {
   // final int requestId;
   // final bool isActive;
   // final String approverComment;
-  final ApprovalSequenceModel approvalSequence;
-  final BlogModel blogModel;
+  final ApprovalSequenceViewModel approvalSequence;
+  final BlogsPageViewModel blogModel;
 
   BlogApproveEvent({
     required this.approvalSequence,

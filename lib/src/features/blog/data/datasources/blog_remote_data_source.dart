@@ -13,8 +13,8 @@ abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
   Future<BlogModel> updateBlog(BlogModel blog);
   Future<BlogModel> approveBlog(
-    ApprovalSequenceModel approvalSequence,
-    BlogModel blog,
+    ApprovalSequenceViewModel approvalSequence,
+    BlogsPageViewModel blog,
   );
   Future<List<BlogsPageViewModel>> getAllBlogsView();
   Future<List<ApprovalSequenceViewModel>> getAllApprovalsView();
@@ -83,15 +83,15 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<BlogModel> approveBlog(
-      ApprovalSequenceModel approvalSequence, BlogModel blog) async {
+  Future<BlogModel> approveBlog(ApprovalSequenceViewModel approvalSequence,
+      BlogsPageViewModel blog) async {
     try {
       final blogData = await supabaseClient
           .from('blogs')
-          .update(
-            blog.toJson(),
-          )
-          .eq('id', blog.id) // Ensure you approve the correct row
+          // .update(
+          //   blog.toJson(),
+          // )
+          // .eq('id', blog.id) // Ensure you approve the correct row
           .select();
       return BlogModel.fromJson(blogData.first);
     } catch (e) {
@@ -117,7 +117,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     try {
       final approvalsView = await supabaseClient
           .from('approval_sequence_view')
-          .select('*')  
+          .select('*')
           .eq('service_id', ServicesConstants.blogServiceId)
           .select('*');
       return approvalsView
