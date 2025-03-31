@@ -4,12 +4,14 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_sect
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
+import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
@@ -91,16 +93,18 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       return;
     }
     if (confirmed != true) return;
-
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    print(userId);
     if (formKey.currentState!.validate()) {
       final updatedApproval = pendingApproval!.copyWith(
         approvalStatus: isApproved
             ? LookupConstants.approvalStatusApprovalApproved
             : LookupConstants.approvalStatusApprovalRejected,
         approverComment: commentController.text,
-        approvedBy: commentController.text,
+        approvedBy: userId,
       );
-
+      print(updatedApproval.approvedBy);
       context.read<BlogBloc>().add(
             BlogApproveEvent(
               approvalSequence: updatedApproval,
@@ -149,117 +153,144 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           //   ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Card(
-          elevation: 2,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CustomSectionTitle(
-                  title: "Blog details",
-                  trailing: IconButton(
-                    icon: Icon(Icons.info),
-                    onPressed: () {},
-                  ),
-                ),
-                CustomKeyValueGrid(
-                  data: {
-                    'Title': widget.blogViewerPage.blogsView.title,
-                    'Request ID':
-                        "blog-${widget.blogViewerPage.blogsView.requestId}",
-                    'Status': widget.blogViewerPage.blogsView.requestStatusId,
-                    'Topics':
-                        widget.blogViewerPage.blogsView.topics!.join(', '),
-                    'Created By Ar': widget.blogViewerPage.blogsView.fullNameAr,
-                    'Priority': widget.blogViewerPage.blogsView.priorityId,
-                    'Request Details':
-                        widget.blogViewerPage.blogsView.requestDetails,
-                    'Created At': DateFormat.yMMMd().add_jm().format(
-                        widget.blogViewerPage.blogsView.requestCreatedAt!),
-                    'Updated': widget.blogViewerPage.blogsView.blogUpdatedAt,
-                    'Approved At': widget
-                                .blogViewerPage.blogsView.requestApprovedAt !=
-                            null
-                        ? DateFormat.yMMMd().add_jm().format(
-                            widget.blogViewerPage.blogsView.requestApprovedAt!)
-                        : "Not yet",
-                  },
-                ),
-                const Divider(),
-                const SizedBox(height: 12),
-                CustomSectionTitle(
-                  title: "Approval Sequence",
-                ),
-                CustomTableGrid(
-                  headers: [
-                    'Approval ID',
-                    'Request ID',
-                    'Approval Status EN',
-                    'Approver Name EN',
-                    'Role Name EN',
-                    'Approved At',
-                    'Created At',
-                    'Request User Name EN',
-                    'Service Name EN',
-                  ],
-                  rows: widget.blogViewerPage.approval!
-                      .map((e) => e.toTableRow())
-                      .toList(),
-                  useChipsForStatus: true,
-                ),
-                const SizedBox(height: 30),
-                if (isUserHasPermissionsView(
-                      permissions ?? [],
-                      PermissionsConstants.approveBlog,
-                    ) &&
-                    !pendingApproval.isNullOrEmpty)
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        CustomTextFormField(
-                          controller: commentController,
-                          hintText: 'Approval comment',
-                          maxLines: null,
-                          readOnly: false,
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
+      body: BlocConsumer<BlogBloc, BlogState>(
+        listener: (context, state) {
+          if (state is BlogFailure) {
+            showSnackBar(context, state.error);
+          } else if (state is BlogUpdateSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              BlogViewerPage.route(widget.blogViewerPage),
+              (route) => false,
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is BlogLoading ||
+              !isUserHasPermissionsView(
+                permissions ?? [],
+                PermissionsConstants.viewBlog,
+              )) {
+            return const Loader();
+          }
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomSectionTitle(
+                      title: "Blog details",
+                      trailing: IconButton(
+                        icon: Icon(Icons.info),
+                        onPressed: () {},
+                      ),
+                    ),
+                    CustomKeyValueGrid(
+                      data: {
+                        'Title': widget.blogViewerPage.blogsView.title,
+                        'Request ID':
+                            "blog-${widget.blogViewerPage.blogsView.requestId}",
+                        'Status':
+                            widget.blogViewerPage.blogsView.requestStatusId,
+                        'Topics':
+                            widget.blogViewerPage.blogsView.topics!.join(', '),
+                        'Created By Ar':
+                            widget.blogViewerPage.blogsView.fullNameAr,
+                        'Priority': widget.blogViewerPage.blogsView.priorityId,
+                        'Request Details':
+                            widget.blogViewerPage.blogsView.requestDetails,
+                        'Created At': DateFormat.yMMMd().add_jm().format(
+                            widget.blogViewerPage.blogsView.requestCreatedAt!),
+                        'Updated':
+                            widget.blogViewerPage.blogsView.blogUpdatedAt,
+                        'Approved At':
+                            widget.blogViewerPage.blogsView.requestApprovedAt !=
+                                    null
+                                ? DateFormat.yMMMd().add_jm().format(widget
+                                    .blogViewerPage
+                                    .blogsView
+                                    .requestApprovedAt!)
+                                : "Not yet",
+                      },
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    CustomSectionTitle(
+                      title: "Approval Sequence",
+                    ),
+                    CustomTableGrid(
+                      headers: [
+                        'Approval ID',
+                        'Request ID',
+                        'Approval Status EN',
+                        'Approver Name EN',
+                        'Role Name EN',
+                        'Approved At',
+                        'Created At',
+                        'Request User Name EN',
+                        'Service Name EN',
+                      ],
+                      rows: widget.blogViewerPage.approval!
+                          .map((e) => e.toTableRow())
+                          .toList(),
+                      useChipsForStatus: true,
+                    ),
+                    const SizedBox(height: 30),
+                    if (isUserHasPermissionsView(
+                          permissions ?? [],
+                          PermissionsConstants.approveBlog,
+                        ) &&
+                        !pendingApproval.isNullOrEmpty)
+                      Form(
+                        key: formKey,
+                        child: Column(
                           children: [
-                            Expanded(
-                              child: CustomButton(
-                                text: 'Approve',
-                                icon: Icons.check_circle_outline,
-                                onPressed: () {
-                                  _approveBlog(isApproved: true);
-                                },
-                              ),
+                            CustomTextFormField(
+                              controller: commentController,
+                              hintText: 'Approval comment',
+                              maxLines: null,
+                              readOnly: false,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: CustomButton(
-                                text: 'Reject',
-                                icon: Icons.cancel_outlined,
-                                backgroundColor: AppPallete.errorColor,
-                                onPressed: () {
-                                  _approveBlog(isApproved: false);
-                                },
-                              ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomButton(
+                                    text: 'Approve',
+                                    icon: Icons.check_circle_outline,
+                                    onPressed: () {
+                                      _approveBlog(isApproved: true);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: CustomButton(
+                                    text: 'Reject',
+                                    icon: Icons.cancel_outlined,
+                                    backgroundColor: AppPallete.errorColor,
+                                    onPressed: () {
+                                      _approveBlog(isApproved: false);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-              ],
+                      ),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

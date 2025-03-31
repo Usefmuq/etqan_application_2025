@@ -41,6 +41,7 @@ Future<bool> isUserHasRole(
     return false;
   }, (userRolesList) {
     final roles = userRolesList.map((p) => p.roleId).toList();
+    print(roles);
     return roles.contains(roleId);
   });
 }

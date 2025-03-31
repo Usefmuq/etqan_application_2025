@@ -20,9 +20,8 @@ class UserRolesRemoteDataSourceImpl implements UserRolesRemoteDataSource {
           .from('userroles')
           .select('*')
           .eq('user_id', userId)
-          .gt(
-            'end_date',
-            DateTime.now().toIso8601String(),
+          .or(
+            'end_date.gt.${DateTime.now().toIso8601String()},end_date.is.null',
           );
       return userRoless
           .map((userRoless) => UserRolesModel.fromJson(userRoless))

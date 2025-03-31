@@ -87,6 +87,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
       ApprovalSequenceViewModel approvalSequence,
       BlogsPageViewModel blog) async {
     try {
+      print(approvalSequence.approvedBy);
+
       final approval = await supabaseClient
           .from('approval_sequence')
           .update({
@@ -115,15 +117,34 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           ) // Ensure you approve the correct row
           .eq(
             'approval_status',
-            LookupConstants.approvalStatusApprovalPending,
+            LookupConstants.approvalStatusApprovalQueued,
           ) // Ensure you approve the correct row
           .eq(
             'is_active',
             true,
           ) // Ensure you approve the correct row
           .select();
-
-      return blog;
+      if (nextApproval.isEmpty && approval.isNotEmpty) {
+        final request = await supabaseClient
+            .from('requests_master')
+            .update({
+              'status': LookupConstants.requestStatusCompleted,
+            })
+            .eq(
+              'request_id',
+              approvalSequence.requestId!,
+            )
+            .select();
+      }
+      final newBlog = await supabaseClient
+          .from('blogs_page_view')
+          .select('*')
+          .eq('request_is_active', true)
+          .eq(
+            'request_id',
+            approvalSequence.requestId!,
+          );
+      return newBlog.map((blog) => BlogsPageViewModel.fromJson(blog)).first;
     } catch (e) {
       throw ServerException(e.toString());
     }
