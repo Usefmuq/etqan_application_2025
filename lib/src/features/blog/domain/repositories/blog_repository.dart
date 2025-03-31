@@ -24,7 +24,7 @@ abstract interface class BlogRepository {
     required String content,
     required List<String> topics,
   });
-  Future<Either<Failure, Blog>> approveBlog({
+  Future<Either<Failure, BlogsPageViewModel>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,
     required BlogsPageViewModel blogModel,
   });

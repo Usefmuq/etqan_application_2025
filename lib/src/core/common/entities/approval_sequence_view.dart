@@ -30,6 +30,11 @@ class ApprovalSequenceView {
   final String? usersUnderRoleIds;
   final String? usersUnderRoleEmails;
 
+  final String? approvedBy;
+  final String? approvedByNameEn;
+  final String? approvedByNameAr;
+  final String? approvedByEmail;
+
   // Request Info
   final String? requestStatusId;
   final String? requestStatusKey;
@@ -68,6 +73,10 @@ class ApprovalSequenceView {
     this.usersUnderRoleAr,
     this.usersUnderRoleIds,
     this.usersUnderRoleEmails,
+    this.approvedBy,
+    this.approvedByNameEn,
+    this.approvedByNameAr,
+    this.approvedByEmail,
     this.requestStatusId,
     this.requestStatusKey,
     this.requestStatusEn,

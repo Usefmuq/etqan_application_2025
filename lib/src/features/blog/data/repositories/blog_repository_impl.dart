@@ -1,7 +1,6 @@
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
-import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
@@ -94,7 +93,7 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  Future<Either<Failure, Blog>> approveBlog({
+  Future<Either<Failure, BlogsPageViewModel>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,
     required BlogsPageViewModel blogModel,
   }) async {

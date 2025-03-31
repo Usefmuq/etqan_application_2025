@@ -2,15 +2,15 @@ import 'package:etqan_application_2025/src/core/data/models/approval_sequence_vi
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
-class ApproveBlog implements Usecase<Blog, ApproveBlogParams> {
+class ApproveBlog implements Usecase<BlogsPageViewModel, ApproveBlogParams> {
   final BlogRepository blogRepostory;
   ApproveBlog(this.blogRepostory);
   @override
-  Future<Either<Failure, Blog>> call(ApproveBlogParams params) async {
+  Future<Either<Failure, BlogsPageViewModel>> call(
+      ApproveBlogParams params) async {
     return await blogRepostory.approveBlog(
       approvalSequenceModel: params.approvalSequenceModel,
       blogModel: params.blogModel,

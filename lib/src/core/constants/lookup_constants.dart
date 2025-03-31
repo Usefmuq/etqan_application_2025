@@ -16,4 +16,8 @@ class LookupConstants {
       "1968dba5-db7a-4d7c-bc5a-956dd2ff9d20";
   static const String approvalStatusApprovalQueued =
       "f343a374-eb8b-444f-bced-fb90fbfcf55a";
+  static const String approvalStatusApprovalApproved =
+      "3df55920-3446-4b68-9542-c4eb1a969aef";
+  static const String approvalStatusApprovalRejected =
+      "f05437f4-0305-4aa5-909d-9e54d2f4a409";
 }

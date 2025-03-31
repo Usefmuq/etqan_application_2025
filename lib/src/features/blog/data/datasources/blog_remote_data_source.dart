@@ -1,5 +1,5 @@
+import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
-import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
@@ -12,7 +12,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
   Future<BlogModel> updateBlog(BlogModel blog);
-  Future<BlogModel> approveBlog(
+  Future<BlogsPageViewModel> approveBlog(
     ApprovalSequenceViewModel approvalSequence,
     BlogsPageViewModel blog,
   );
@@ -83,17 +83,47 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<BlogModel> approveBlog(ApprovalSequenceViewModel approvalSequence,
+  Future<BlogsPageViewModel> approveBlog(
+      ApprovalSequenceViewModel approvalSequence,
       BlogsPageViewModel blog) async {
     try {
-      final blogData = await supabaseClient
-          .from('blogs')
-          // .update(
-          //   blog.toJson(),
-          // )
-          // .eq('id', blog.id) // Ensure you approve the correct row
+      final approval = await supabaseClient
+          .from('approval_sequence')
+          .update({
+            'approver_comment': approvalSequence.approverComment,
+            'approval_status': approvalSequence.approvalStatus,
+            'approved_by': approvalSequence.approvedBy,
+            'approved_at': DateTime.now().toIso8601String(),
+          })
+          .eq(
+              'approval_id',
+              approvalSequence
+                  .approvalId!) // Ensure you approve the correct row
           .select();
-      return BlogModel.fromJson(blogData.first);
+      final nextApproval = await supabaseClient
+          .from('approval_sequence')
+          .update({
+            'approval_status': LookupConstants.approvalStatusApprovalPending,
+          })
+          .eq(
+            'request_id',
+            approvalSequence.requestId!,
+          ) // Ensure you approve the correct row
+          .eq(
+            'approval_order',
+            approvalSequence.approvalOrder! + 1,
+          ) // Ensure you approve the correct row
+          .eq(
+            'approval_status',
+            LookupConstants.approvalStatusApprovalPending,
+          ) // Ensure you approve the correct row
+          .eq(
+            'is_active',
+            true,
+          ) // Ensure you approve the correct row
+          .select();
+
+      return blog;
     } catch (e) {
       throw ServerException(e.toString());
     }

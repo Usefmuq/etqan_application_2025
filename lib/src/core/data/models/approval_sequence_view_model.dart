@@ -27,7 +27,10 @@ class ApprovalSequenceViewModel {
   final String? usersUnderRoleAr;
   final String? usersUnderRoleIds;
   final String? usersUnderRoleEmails;
-
+  final String? approvedBy;
+  final String? approvedByNameEn;
+  final String? approvedByNameAr;
+  final String? approvedByEmail;
   final String? requestStatusId;
   final String? requestStatusKey;
   final String? requestStatusEn;
@@ -64,6 +67,10 @@ class ApprovalSequenceViewModel {
     this.usersUnderRoleAr,
     this.usersUnderRoleIds,
     this.usersUnderRoleEmails,
+    this.approvedBy,
+    this.approvedByNameEn,
+    this.approvedByNameAr,
+    this.approvedByEmail,
     this.requestStatusId,
     this.requestStatusKey,
     this.requestStatusEn,
@@ -83,8 +90,12 @@ class ApprovalSequenceViewModel {
       requestId: map['request_id'],
       approverComment: map['approver_comment'],
       approvalOrder: map['approval_order'],
-      approvedAt: map['approved_at'] != null ? DateTime.tryParse(map['approved_at']) : null,
-      createdAt: map['created_at'] != null ? DateTime.tryParse(map['created_at']) : null,
+      approvedAt: map['approved_at'] != null
+          ? DateTime.tryParse(map['approved_at'])
+          : null,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'])
+          : null,
       isActive: map['is_active'],
       approvalStatus: map['approval_status'],
       approvalStatusKey: map['approval_status_key'],
@@ -101,6 +112,10 @@ class ApprovalSequenceViewModel {
       usersUnderRoleAr: map['users_under_role_ar'],
       usersUnderRoleIds: map['users_under_role_ids'],
       usersUnderRoleEmails: map['users_under_role_emails'],
+      approvedBy: map['approved_by'],
+      approvedByNameEn: map['approved_by_name_en'],
+      approvedByNameAr: map['approved_by_name_ar'],
+      approvedByEmail: map['approved_by_email'],
       requestStatusId: map['request_status_id'],
       requestStatusKey: map['request_status_key'],
       requestStatusEn: map['request_status_en'],
@@ -114,6 +129,81 @@ class ApprovalSequenceViewModel {
       requestUserEmail: map['request_user_email'],
     );
   }
+  ApprovalSequenceViewModel copyWith({
+    int? approvalId,
+    int? requestId,
+    String? approverComment,
+    int? approvalOrder,
+    DateTime? approvedAt,
+    DateTime? createdAt,
+    bool? isActive,
+    String? approvalStatus,
+    String? approvalStatusKey,
+    String? approvalStatusEn,
+    String? approvalStatusAr,
+    String? roleId,
+    String? roleNameEn,
+    String? roleNameAr,
+    String? approverUserId,
+    String? approverNameEn,
+    String? approverNameAr,
+    String? approverEmail,
+    String? usersUnderRoleEn,
+    String? usersUnderRoleAr,
+    String? usersUnderRoleIds,
+    String? usersUnderRoleEmails,
+    String? approvedBy,
+    String? approvedByNameEn,
+    String? approvedByNameAr,
+    String? approvedByEmail,
+    String? requestStatusId,
+    String? requestStatusKey,
+    String? requestStatusEn,
+    String? requestStatusAr,
+    int? serviceId,
+    String? serviceNameEn,
+    String? serviceNameAr,
+    String? requestUserId,
+    String? requestUserNameEn,
+    String? requestUserNameAr,
+    String? requestUserEmail,
+  }) {
+    return ApprovalSequenceViewModel(
+      approvalId: approvalId ?? this.approvalId,
+      requestId: requestId ?? this.requestId,
+      approverComment: approverComment ?? this.approverComment,
+      approvalOrder: approvalOrder ?? this.approvalOrder,
+      approvedAt: approvedAt ?? this.approvedAt,
+      createdAt: createdAt ?? this.createdAt,
+      isActive: isActive ?? this.isActive,
+      approvalStatus: approvalStatus ?? this.approvalStatus,
+      approvalStatusKey: approvalStatusKey ?? this.approvalStatusKey,
+      approvalStatusEn: approvalStatusEn ?? this.approvalStatusEn,
+      approvalStatusAr: approvalStatusAr ?? this.approvalStatusAr,
+      roleId: roleId ?? this.roleId,
+      roleNameEn: roleNameEn ?? this.roleNameEn,
+      roleNameAr: roleNameAr ?? this.roleNameAr,
+      approverUserId: approverUserId ?? this.approverUserId,
+      approverNameEn: approverNameEn ?? this.approverNameEn,
+      approverNameAr: approverNameAr ?? this.approverNameAr,
+      approverEmail: approverEmail ?? this.approverEmail,
+      usersUnderRoleEn: usersUnderRoleEn ?? this.usersUnderRoleEn,
+      usersUnderRoleAr: usersUnderRoleAr ?? this.usersUnderRoleAr,
+      usersUnderRoleIds: usersUnderRoleIds ?? this.usersUnderRoleIds,
+      usersUnderRoleEmails: usersUnderRoleEmails ?? this.usersUnderRoleEmails,
+      requestStatusId: requestStatusId ?? this.requestStatusId,
+      requestStatusKey: requestStatusKey ?? this.requestStatusKey,
+      requestStatusEn: requestStatusEn ?? this.requestStatusEn,
+      requestStatusAr: requestStatusAr ?? this.requestStatusAr,
+      serviceId: serviceId ?? this.serviceId,
+      serviceNameEn: serviceNameEn ?? this.serviceNameEn,
+      serviceNameAr: serviceNameAr ?? this.serviceNameAr,
+      requestUserId: requestUserId ?? this.requestUserId,
+      requestUserNameEn: requestUserNameEn ?? this.requestUserNameEn,
+      requestUserNameAr: requestUserNameAr ?? this.requestUserNameAr,
+      requestUserEmail: requestUserEmail ?? this.requestUserEmail,
+    );
+  }
 
   ApprovalSequence toApprovalSequence() {
     return ApprovalSequence(
@@ -121,6 +211,7 @@ class ApprovalSequenceViewModel {
       requestId: requestId ?? 0,
       roleId: roleId,
       approverUserId: approverUserId,
+      approvedBy: approverUserId,
       approvalStatus: approvalStatus,
       approverComment: approverComment,
       approvalOrder: approvalOrder ?? 0,
@@ -130,7 +221,7 @@ class ApprovalSequenceViewModel {
     );
   }
 
-    /// 🧩 For CustomTableGrid
+  /// 🧩 For CustomTableGrid
   Map<String, dynamic> toTableRow() {
     return {
       'Approval ID': approvalId,
@@ -140,35 +231,32 @@ class ApprovalSequenceViewModel {
       'Approved At': approvedAt,
       'Created At': createdAt,
       'Is Active': isActive,
-
       'Approval Status ID': approvalStatus,
       'Approval Status Key': approvalStatusKey,
       'Approval Status EN': approvalStatusEn,
       'Approval Status AR': approvalStatusAr,
-
       'Role ID': roleId,
       'Role Name EN': roleNameEn,
       'Role Name AR': roleNameAr,
-
       'Approver User ID': approverUserId,
       'Approver Name EN': approverNameEn,
       'Approver Name AR': approverNameAr,
       'Approver Email': approverEmail,
-
       'Users Under Role EN': usersUnderRoleEn,
       'Users Under Role AR': usersUnderRoleAr,
       'Users Under Role IDs': usersUnderRoleIds,
       'Users Under Role Emails': usersUnderRoleEmails,
-
+      'Approved By User ID': approvedBy,
+      'Approved By Name EN': approvedByNameEn,
+      'Approved By Name AR': approvedByNameAr,
+      'Approved By Email': approvedByEmail,
       'Request Status ID': requestStatusId,
       'Request Status Key': requestStatusKey,
       'Request Status EN': requestStatusEn,
       'Request Status AR': requestStatusAr,
-
       'Service ID': serviceId,
       'Service Name EN': serviceNameEn,
       'Service Name AR': serviceNameAr,
-
       'Request User ID': requestUserId,
       'Request User Name EN': requestUserNameEn,
       'Request User Name AR': requestUserNameAr,
