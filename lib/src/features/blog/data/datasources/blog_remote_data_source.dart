@@ -7,12 +7,13 @@ import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
-  Future<BlogModel> updateBlog(BlogModel blog);
-  Future<BlogsPageViewModel> approveBlog(
+  Future<BlogViewerPageEntity> updateBlog(BlogModel blog);
+  Future<BlogViewerPageEntity> approveBlog(
     ApprovalSequenceViewModel approvalSequence,
     BlogsPageViewModel blog,
   );
@@ -67,28 +68,48 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<BlogModel> updateBlog(BlogModel blog) async {
+  Future<BlogViewerPageEntity> updateBlog(BlogModel blog) async {
     try {
-      final blogData = await supabaseClient
+      await supabaseClient
           .from('blogs')
           .update(
             blog.toJson(),
           )
           .eq('id', blog.id) // Ensure you update the correct row
           .select();
-      return BlogModel.fromJson(blogData.first);
+      final blogsView = await supabaseClient
+          .from('blogs_page_view')
+          .select('*')
+          .eq('request_is_active', true)
+          .eq(
+            'request_id',
+            blog.requestId,
+          );
+      final approvalsView = await supabaseClient
+          .from('approval_sequence_view')
+          .select('*')
+          .eq(
+            'request_id',
+            blog.requestId,
+          )
+          .eq('is_active', true);
+      return BlogViewerPageEntity(
+        blogsView:
+            blogsView.map((blog) => BlogsPageViewModel.fromJson(blog)).first,
+        approval: approvalsView
+            .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
+            .toList(),
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }
   }
 
   @override
-  Future<BlogsPageViewModel> approveBlog(
+  Future<BlogViewerPageEntity> approveBlog(
       ApprovalSequenceViewModel approvalSequence,
       BlogsPageViewModel blog) async {
     try {
-      print(approvalSequence.approvedBy);
-
       final approval = await supabaseClient
           .from('approval_sequence')
           .update({
@@ -125,7 +146,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           ) // Ensure you approve the correct row
           .select();
       if (nextApproval.isEmpty && approval.isNotEmpty) {
-        final request = await supabaseClient
+        await supabaseClient
             .from('requests_master')
             .update({
               'status': LookupConstants.requestStatusCompleted,
@@ -136,7 +157,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
             )
             .select();
       }
-      final newBlog = await supabaseClient
+      final blogsView = await supabaseClient
           .from('blogs_page_view')
           .select('*')
           .eq('request_is_active', true)
@@ -144,7 +165,21 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
             'request_id',
             approvalSequence.requestId!,
           );
-      return newBlog.map((blog) => BlogsPageViewModel.fromJson(blog)).first;
+      final approvalsView = await supabaseClient
+          .from('approval_sequence_view')
+          .select('*')
+          .eq(
+            'request_id',
+            blog.requestId!,
+          )
+          .eq('is_active', true);
+      return BlogViewerPageEntity(
+        blogsView:
+            blogsView.map((blog) => BlogsPageViewModel.fromJson(blog)).first,
+        approval: approvalsView
+            .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
+            .toList(),
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

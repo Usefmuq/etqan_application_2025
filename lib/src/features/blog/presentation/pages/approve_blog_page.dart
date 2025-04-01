@@ -68,6 +68,7 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
         ],
       ),
     );
+    if (!mounted) return; // ✅ Prevent using context if widget is disposed
 
     if (confirmed != true) return;
 
@@ -175,7 +176,8 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
                         child: Chip(
                           label: Text(option),
                           backgroundColor: selected
-                              ? AppPallete.gradient1.withOpacity(0.1)
+                              ? AppPallete.gradient1
+                                  .withAlpha((0.1 * 255).toInt())
                               : null,
                           labelStyle: TextStyle(
                             color: selected

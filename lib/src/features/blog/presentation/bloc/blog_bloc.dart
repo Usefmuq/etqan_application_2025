@@ -2,6 +2,7 @@ import 'package:etqan_application_2025/src/core/data/models/approval_sequence_vi
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/approve_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all_blogs.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
@@ -71,7 +72,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     response.fold(
       (failure) => emit(BlogFailure(failure.message)),
       (blog) {
-        emit(BlogUpdateSuccess());
+        emit(BlogUpdateSuccess(blog));
       },
     );
   }
@@ -87,7 +88,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     response.fold(
       (failure) => emit(BlogFailure(failure.message)),
       (blog) {
-        emit(BlogApproveSuccess());
+        emit(BlogApproveSuccess(blog));
       },
     );
   }

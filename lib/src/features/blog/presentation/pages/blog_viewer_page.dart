@@ -85,6 +85,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         ],
       ),
     );
+    if (!mounted) return; // ✅ Prevent using context if widget is disposed
+
     if (!isUserHasPermissionsView(
           permissions ?? [],
           PermissionsConstants.approveBlog,
@@ -93,9 +95,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       return;
     }
     if (confirmed != true) return;
+
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-    print(userId);
     if (formKey.currentState!.validate()) {
       final updatedApproval = pendingApproval!.copyWith(
         approvalStatus: isApproved
@@ -104,7 +106,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         approverComment: commentController.text,
         approvedBy: userId,
       );
-      print(updatedApproval.approvedBy);
+
       context.read<BlogBloc>().add(
             BlogApproveEvent(
               approvalSequence: updatedApproval,
@@ -120,9 +122,10 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       appBar: AppBar(
         actions: [
           if (isUserHasPermissionsView(
-            permissions ?? [],
-            PermissionsConstants.updateBlog,
-          ))
+                permissions ?? [],
+                PermissionsConstants.updateBlog,
+              ) &&
+              widget.blogViewerPage.blogsView.toBlog() != null)
             IconButton(
               onPressed: () {
                 Navigator.push(
@@ -160,7 +163,13 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           } else if (state is BlogUpdateSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
-              BlogViewerPage.route(widget.blogViewerPage),
+              BlogViewerPage.route(state.blogViewerPageEntity),
+              (route) => false,
+            );
+          } else if (state is BlogApproveSuccess) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              BlogViewerPage.route(state.blogViewerPageEntity),
               (route) => false,
             );
           }

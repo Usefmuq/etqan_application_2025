@@ -50,7 +50,7 @@ class BlogsPageViewModel extends BlogsPageView {
 
   factory BlogsPageViewModel.fromJson(Map<String, dynamic> json) {
     return BlogsPageViewModel(
-      blogId: json['blog_id'],
+      blogId: json['id'],
       title: json['title'],
       content: json['content'],
       status: json['status'],
@@ -105,28 +105,16 @@ class BlogsPageViewModel extends BlogsPageView {
   }
 
   Blog? toBlog() {
-    if (blogId == null ||
-        createdById == null ||
-        blogUpdatedAt == null ||
-        status == null ||
-        requestId == null ||
-        isActive == null ||
-        title == null ||
-        content == null ||
-        topics == null) {
-      return null;
-    }
     return Blog(
-      id: blogId!,
-      createdById: createdById!,
-      updatedAt: blogUpdatedAt!,
-      status: status!,
-      requestId: requestId!,
-      isActive: isActive!,
-      title: title!,
-      content: content!,
-      topics: topics!,
-      createdByName: fullNameEn,
+      id: blogId ?? "",
+      createdById: createdById ?? "",
+      updatedAt: blogUpdatedAt ?? DateTime.now(),
+      status: status ?? "",
+      requestId: requestId ?? 0,
+      isActive: isActive ?? true,
+      title: title ?? "",
+      content: content ?? "",
+      topics: topics ?? [],
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:uuid/uuid.dart';
@@ -61,7 +62,7 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  Future<Either<Failure, Blog>> updateBlog({
+  Future<Either<Failure, BlogViewerPageEntity>> updateBlog({
     required String id,
     required String createdById,
     required String status,
@@ -93,7 +94,7 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  Future<Either<Failure, BlogsPageViewModel>> approveBlog({
+  Future<Either<Failure, BlogViewerPageEntity>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,
     required BlogsPageViewModel blogModel,
   }) async {
