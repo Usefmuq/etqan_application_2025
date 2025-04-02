@@ -11,6 +11,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class UpdateBlogPage extends StatefulWidget {
   final Blog blog;
@@ -97,11 +98,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
           if (state is BlogFailure) {
             showSnackBar(context, state.error);
           } else if (state is BlogUpdateSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              BlogViewerPage.route(state.blogViewerPageEntity),
-              (route) => false,
-            );
+            context.pop(state.blogViewerPageEntity); // Go back and return data
           }
         },
         builder: (context, state) {

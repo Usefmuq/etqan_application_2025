@@ -11,6 +11,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class BlogPage extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -41,7 +42,20 @@ class _BlogPageState extends State<BlogPage> {
         });
       }
     });
-    context.read<BlogBloc>().add(BlogGetAllBlogsEvent());
+    // context.read<BlogBloc>().add(BlogGetAllBlogsEvent());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Re-fetch blogs when this page becomes active again
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ModalRoute? route = ModalRoute.of(context);
+      if (route?.isCurrent == true) {
+        context.read<BlogBloc>().add(BlogGetAllBlogsEvent());
+      }
+    });
   }
 
   @override
@@ -56,10 +70,7 @@ class _BlogPageState extends State<BlogPage> {
           ))
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  AddNewBlogPage.route(),
-                );
+                context.push('/blog/submit/');
               },
               icon: Icon(Icons.add),
             ),
@@ -93,15 +104,13 @@ class _BlogPageState extends State<BlogPage> {
                     title: blog.title!,
                     onTap: () {
                       if (context.mounted) {
-                        Navigator.push(
-                          context,
-                          BlogViewerPage.route(
-                            BlogViewerPageEntity(
-                              blogsView: blog,
-                              approval: state.blogPage.approvalsView
-                                  .where((a) => a.requestId == blog.requestId)
-                                  .toList(),
-                            ),
+                        context.push(
+                          '/blog/${blog.blogId}',
+                          extra: BlogViewerPageEntity(
+                            blogsView: blog,
+                            approval: state.blogPage.approvalsView
+                                .where((a) => a.requestId == blog.requestId)
+                                .toList(),
                           ),
                         );
                       }
@@ -111,7 +120,10 @@ class _BlogPageState extends State<BlogPage> {
               },
             );
           }
-          return const SizedBox();
+
+          return const Scaffold(
+            body: Text('no data'),
+          );
         },
       ),
     );

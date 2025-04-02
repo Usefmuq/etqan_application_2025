@@ -17,6 +17,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class BlogViewerPage extends StatefulWidget {
@@ -128,11 +129,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
               widget.blogViewerPage.blogsView.toBlog() != null)
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  UpdateBlogPage.route(
-                    widget.blogViewerPage.blogsView.toBlog()!,
-                  ),
+                context.push(
+                  '/blog/update/${widget.blogViewerPage.blogsView.blogId}',
+                  extra: widget.blogViewerPage.blogsView.toBlog()!,
                 );
               },
               icon: Icon(Icons.edit),
@@ -160,18 +159,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         listener: (context, state) {
           if (state is BlogFailure) {
             showSnackBar(context, state.error);
-          } else if (state is BlogUpdateSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              BlogViewerPage.route(state.blogViewerPageEntity),
-              (route) => false,
-            );
-          } else if (state is BlogApproveSuccess) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              BlogViewerPage.route(state.blogViewerPageEntity),
-              (route) => false,
-            );
           }
         },
         builder: (context, state) {

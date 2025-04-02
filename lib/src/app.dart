@@ -1,11 +1,17 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/theme/theme.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_new_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 import 'features/sample_item_details_view.dart';
 import 'features/sample_item_list_view.dart';
@@ -39,10 +45,47 @@ class _MyAppState extends State<MyApp> {
     //
     // The ListenableBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
+
+    final GoRouter router = GoRouter(
+      debugLogDiagnostics: true,
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) {
+            return BlocSelector<AppUserCubit, AppUserState, bool>(
+              selector: (state) => state is AppUserSignedIn,
+              builder: (context, isSignedIn) {
+                return isSignedIn ? const BlogPage() : const SignupPage();
+              },
+            );
+          },
+        ),
+        GoRoute(
+          path: '/blog/submit',
+          builder: (context, state) {
+            return AddNewBlogPage();
+          },
+        ),
+        GoRoute(
+          path: '/blog/update/:id',
+          builder: (context, state) {
+            final entity = state.extra as Blog;
+            return UpdateBlogPage(blog: entity);
+          },
+        ),
+        GoRoute(
+          path: '/blog/:id',
+          builder: (context, state) {
+            final entity = state.extra as BlogViewerPageEntity;
+            return BlogViewerPage(blogViewerPage: entity);
+          },
+        ),
+      ],
+    );
     return ListenableBuilder(
       listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
-        return MaterialApp(
+        return MaterialApp.router(
           //hide top right banner
           debugShowCheckedModeBanner: false,
 
@@ -82,32 +125,7 @@ class _MyAppState extends State<MyApp> {
 
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                switch (routeSettings.name) {
-                  case SettingsView.routeName:
-                    return SettingsView(controller: widget.settingsController);
-                  case SampleItemDetailsView.routeName:
-                    return const SampleItemDetailsView();
-                  case SampleItemListView.routeName:
-                  default:
-                    return BlocSelector<AppUserCubit, AppUserState, bool>(
-                      selector: (state) {
-                        return state is AppUserSignedIn;
-                      },
-                      builder: (context, isSignedIn) {
-                        if (isSignedIn) {
-                          return const BlogPage();
-                        }
-                        return const SignupPage();
-                      },
-                    );
-                }
-              },
-            );
-          },
+          routerConfig: router, // ✅ Replaces onGenerateRoute with router
         );
       },
     );
