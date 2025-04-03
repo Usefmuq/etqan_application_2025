@@ -3,6 +3,6 @@
 library;
 
 class ServicesConstants {
-  // request_status
   static int blogServiceId = 1;
+  static int onboardingServiceId = 2;
 }
