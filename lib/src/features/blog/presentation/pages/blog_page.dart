@@ -2,6 +2,7 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_card_wrapper.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
@@ -58,72 +59,74 @@ class _BlogPageState extends State<BlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Blog App'),
-        actions: [
-          if (isUserHasPermissionsView(
-            permissions ?? [],
-            PermissionsConstants.addBlog,
-          ))
-            IconButton(
-              onPressed: () {
-                context.push('/blog/submit/');
-              },
-              icon: Icon(Icons.add),
-            ),
-        ],
-      ),
-      body: BlocConsumer<BlogBloc, BlogState>(
-        listener: (context, state) {
-          if (state is BlogFailure) {
-            showSnackBar(context, state.error);
-          }
-        },
-        builder: (context, state) {
-          if (state is BlogLoading ||
-              !isUserHasPermissionsView(
-                permissions ?? [],
-                PermissionsConstants.viewBlog,
-              )) {
-            return const Loader();
-          }
-          if (state is BlogShowAllSuccess) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: state.blogPage.blogsView.length,
-              itemBuilder: (context, index) {
-                final blog = state.blogPage.blogsView[index];
+    return CustomScaffold(
+      title: 'Blogs Service',
+      subtitle: "here is blog service",
+      tilteActions: [
+        if (isUserHasPermissionsView(
+          permissions ?? [],
+          PermissionsConstants.addBlog,
+        ))
+          IconButton(
+            onPressed: () {
+              context.push('/blog/submit/');
+            },
+            icon: Icon(Icons.add),
+          ),
+      ],
+      body: [
+        BlocConsumer<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogFailure) {
+              showSnackBar(context, state.error);
+            }
+          },
+          builder: (context, state) {
+            if (state is BlogLoading ||
+                !isUserHasPermissionsView(
+                  permissions ?? [],
+                  PermissionsConstants.viewBlog,
+                )) {
+              return const Loader();
+            }
+            if (state is BlogShowAllSuccess) {
+              return Column(
+                children:
+                    List.generate(state.blogPage.blogsView.length, (index) {
+                  final blog = state.blogPage.blogsView[index];
 
-                return AnimatedCardWrapper(
-                  index: index, // 👈 fade/slide stagger delay
-                  child: CustomCardWithChips(
-                    chips: blog.topics!,
-                    title: blog.title!,
-                    onTap: () {
-                      if (context.mounted) {
-                        context.push(
-                          '/blog/${blog.blogId}',
-                          extra: BlogViewerPageEntity(
-                            blogsView: blog,
-                            approval: state.blogPage.approvalsView
-                                .where((a) => a.requestId == blog.requestId)
-                                .toList(),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                );
-              },
-            );
-          }
+                  return Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: AnimatedCardWrapper(
+                      index: index,
+                      child: CustomCardWithChips(
+                        chips: blog.topics ?? [],
+                        title: blog.title ?? '',
+                        onTap: () {
+                          if (context.mounted) {
+                            context.push(
+                              '/blog/${blog.blogId}',
+                              extra: BlogViewerPageEntity(
+                                blogsView: blog,
+                                approval: state.blogPage.approvalsView
+                                    .where((a) => a.requestId == blog.requestId)
+                                    .toList(),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              );
+            }
 
-          return const Scaffold(
-            body: Text('no data'),
-          );
-        },
-      ),
+            return const SizedBox();
+          },
+        ),
+      ],
     );
   }
 }

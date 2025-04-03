@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
 
     final GoRouter router = GoRouter(
-      debugLogDiagnostics: true,
+      // debugLogDiagnostics: true,
       routes: [
         GoRoute(
           path: '/',
@@ -55,6 +55,12 @@ class _MyAppState extends State<MyApp> {
                 return isSignedIn ? const BlogPage() : const SignupPage();
               },
             );
+          },
+        ),
+        GoRoute(
+          path: '/blogs',
+          builder: (context, state) {
+            return BlogPage();
           },
         ),
         GoRoute(

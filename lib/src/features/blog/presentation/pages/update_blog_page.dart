@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
@@ -77,39 +78,40 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     selectedTopics = blog.topics;
     titleControler.text = blog.title;
     contentControler.text = blog.content;
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          if (isUserHasPermissionsView(
-            permissions ?? [],
-            PermissionsConstants.updateBlog,
-          ))
-            IconButton(
-              onPressed: () {
-                _updateBlog();
-              },
-              icon: Icon(Icons.done_rounded),
-            )
-        ],
-      ),
-      body: BlocConsumer<BlogBloc, BlogState>(
-        listener: (context, state) {
-          if (state is BlogFailure) {
-            showSnackBar(context, state.error);
-          } else if (state is BlogUpdateSuccess) {
-            context.pop(state.blogViewerPageEntity); // Go back and return data
-          }
-        },
-        builder: (context, state) {
-          if (state is BlogLoading ||
-              !isUserHasPermissionsView(
-                permissions ?? [],
-                PermissionsConstants.updateBlog,
-              )) {
-            return const Loader();
-          }
-          return SingleChildScrollView(
-            child: Padding(
+    return CustomScaffold(
+      title: 'Update Blog-${widget.blog.requestId}',
+      showDrawer: false,
+      tilteActions: [
+        if (isUserHasPermissionsView(
+          permissions ?? [],
+          PermissionsConstants.updateBlog,
+        ))
+          IconButton(
+            onPressed: () {
+              _updateBlog();
+            },
+            icon: Icon(Icons.done_rounded),
+          )
+      ],
+      body: [
+        BlocConsumer<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogFailure) {
+              showSnackBar(context, state.error);
+            } else if (state is BlogUpdateSuccess) {
+              context
+                  .pop(state.blogViewerPageEntity); // Go back and return data
+            }
+          },
+          builder: (context, state) {
+            if (state is BlogLoading ||
+                !isUserHasPermissionsView(
+                  permissions ?? [],
+                  PermissionsConstants.updateBlog,
+                )) {
+              return const Loader();
+            }
+            return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: formKey,
@@ -211,10 +213,10 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                   ],
                 ),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 

@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
@@ -67,35 +68,35 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              _submitBlog();
-            },
-            icon: Icon(Icons.done_rounded),
-          )
-        ],
-      ),
-      body: BlocConsumer<BlogBloc, BlogState>(
-        listener: (context, state) {
-          if (state is BlogFailure) {
-            showSnackBar(context, state.error);
-          } else if (state is BlogSubmitSuccess) {
-            context.pop(); // Go back and return data
-          }
-        },
-        builder: (context, state) {
-          if (state is BlogLoading ||
-              !isUserHasPermissionsView(
-                permissions ?? [],
-                PermissionsConstants.addBlog,
-              )) {
-            return const Loader();
-          }
-          return SingleChildScrollView(
-            child: Padding(
+    return CustomScaffold(
+      title: 'Submit New Blog',
+      showDrawer: false,
+      tilteActions: [
+        IconButton(
+          onPressed: () {
+            _submitBlog();
+          },
+          icon: Icon(Icons.done_rounded),
+        )
+      ],
+      body: [
+        BlocConsumer<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogFailure) {
+              showSnackBar(context, state.error);
+            } else if (state is BlogSubmitSuccess) {
+              context.pop(); // Go back and return data
+            }
+          },
+          builder: (context, state) {
+            if (state is BlogLoading ||
+                !isUserHasPermissionsView(
+                  permissions ?? [],
+                  PermissionsConstants.addBlog,
+                )) {
+              return const Loader();
+            }
+            return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: formKey,
@@ -184,6 +185,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                     ),
                     CustomTextFormField(
                       controller: titleControler,
+                      readOnly: false,
                       hintText: 'Blog title',
                     ),
                     SizedBox(
@@ -192,15 +194,16 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                     CustomTextFormField(
                       controller: contentControler,
                       hintText: 'Blog content',
+                      readOnly: false,
                       maxLines: null,
                     ),
                   ],
                 ),
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

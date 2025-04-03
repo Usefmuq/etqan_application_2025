@@ -2,6 +2,7 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
@@ -113,40 +114,39 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
     titleControler.text = blog.title ?? "";
     contentControler.text = blog.content ?? "";
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Approve Blog"),
-        actions: [
-          // if (isUserHasPermissionsView(
-          //   permissions ?? [],
-          //   PermissionsConstants.approveBlog,
-          // ))
-          //   IconButton(
-          //     onPressed: _approveBlog,
-          //     icon: const Icon(Icons.done_rounded),
-          //   )
-        ],
-      ),
-      body: BlocConsumer<BlogBloc, BlogState>(
-        listener: (context, state) {
-          if (state is BlogFailure) {
-            showSnackBar(context, state.error);
-          } else if (state is BlogApproveSuccess) {
-            context.pop(state.blogViewerPageEntity); // Go back and return data
-          }
-        },
-        builder: (context, state) {
-          if (state is BlogLoading ||
-              !isUserHasPermissionsView(
-                permissions ?? [],
-                PermissionsConstants.approveBlog,
-              )) {
-            return const Loader();
-          }
+    return CustomScaffold(
+      title: 'Approve Blog-${widget.blog.requestId}',
+      showDrawer: false,
+      tilteActions: [
+        // if (isUserHasPermissionsView(
+        //   permissions ?? [],
+        //   PermissionsConstants.approveBlog,
+        // ))
+        //   IconButton(
+        //     onPressed: _approveBlog,
+        //     icon: const Icon(Icons.done_rounded),
+        //   )
+      ],
+      body: [
+        BlocConsumer<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogFailure) {
+              showSnackBar(context, state.error);
+            } else if (state is BlogApproveSuccess) {
+              context
+                  .pop(state.blogViewerPageEntity); // Go back and return data
+            }
+          },
+          builder: (context, state) {
+            if (state is BlogLoading ||
+                !isUserHasPermissionsView(
+                  permissions ?? [],
+                  PermissionsConstants.approveBlog,
+                )) {
+              return const Loader();
+            }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Form(
+            return Form(
               key: formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,10 +245,10 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/constants/uuid_lookup_constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class CustomKeyValueGrid extends StatelessWidget {
@@ -47,56 +48,59 @@ class CustomKeyValueGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeCode = Localizations.localeOf(context).languageCode;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final availableWidth = screenWidth - (spacing * 2);
-    final calculatedColumns =
-        (availableWidth / minColumnWidth).floor().clamp(1, 4);
-    final columnWidth = (availableWidth -
-            (spacing * (calculatedColumns > 1 ? calculatedColumns - 1 : 0))) /
-        calculatedColumns;
-
     final items = data.entries.toList();
 
-    return Wrap(
-      spacing: spacing,
-      runSpacing: spacing,
-      children: items.map((entry) {
-        final meta = _getLookupMeta(entry.value, localeCode);
-        final label = meta['label'] ?? '—';
-        final color = meta['color'] as Color?;
-        final isChip = meta['isChip'] == true;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+        final calculatedColumns =
+            (availableWidth / minColumnWidth).floor().clamp(1, 4);
+        final columnWidth = (availableWidth -
+                (spacing *
+                    (calculatedColumns > 1 ? calculatedColumns - 1 : 0))) /
+            calculatedColumns;
 
-        Widget valueWidget = Text(label, style: const TextStyle(fontSize: 14));
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: items.map((entry) {
+            final meta = _getLookupMeta(entry.value, localeCode);
+            final label = meta['label'] ?? '—';
+            final color = meta['color'] as Color?;
+            final isChip = meta['isChip'] == true;
 
-        if (isChip && color != null) {
-          valueWidget = Chip(
-            label: Text(label),
-            backgroundColor: color.withAlpha(30),
-            labelStyle: TextStyle(
-              fontWeight: FontWeight.w500,
-            ),
-            shape: const StadiumBorder(),
-          );
-        }
+            Widget valueWidget =
+                Text(label, style: const TextStyle(fontSize: 14));
 
-        return SizedBox(
-          width: columnWidth,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                entry.key,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
+            if (isChip && color != null) {
+              valueWidget = Chip(
+                label: Text(label),
+                backgroundColor: color.withAlpha(30),
+                labelStyle: const TextStyle(fontWeight: FontWeight.w500),
+                shape: const StadiumBorder(),
+              );
+            }
+
+            return SizedBox(
+              width: columnWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.key,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  valueWidget,
+                ],
               ),
-              const SizedBox(height: 4),
-              valueWidget,
-            ],
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
     );
   }
 }
