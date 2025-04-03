@@ -119,10 +119,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        // title: 'Blog111- ${widget.blogViewerPage.blogsView.requestId}',
-        appBar: AppBar(
-      actions: [
+    return CustomScaffold(
+      title: 'Blog111- ${widget.blogViewerPage.blogsView.requestId}',
+      tilteActions: [
         if (isUserHasPermissionsView(
               permissions ?? [],
               PermissionsConstants.updateBlog,
@@ -137,23 +136,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
             },
             icon: Icon(Icons.edit),
           ),
-      ],
-    )
-        // [
-        // if (isUserHasPermissionsView(
-        //       permissions ?? [],
-        //       PermissionsConstants.updateBlog,
-        //     ) &&
-        //     widget.blogViewerPage.blogsView.toBlog() != null)
-        //   IconButton(
-        //     onPressed: () {
-        //       context.push(
-        //         '/blog/update/${widget.blogViewerPage.blogsView.blogId}',
-        //         extra: widget.blogViewerPage.blogsView.toBlog()!,
-        //       );
-        //     },
-        //     icon: Icon(Icons.edit),
-        //   ),
         // if (isUserHasPermissionsView(
         //       permissions ?? [],
         //       PermissionsConstants.approveBlog,
@@ -171,136 +153,136 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         //     },
         //     icon: Icon(Icons.check),
         //   ),
-        // ],
-        // body: [
-        //   BlocConsumer<BlogBloc, BlogState>(
-        //     listener: (context, state) {
-        //       if (state is BlogFailure) {
-        //         showSnackBar(context, state.error);
-        //       }
-        //     },
-        //     builder: (context, state) {
-        //       if (state is BlogLoading ||
-        //           !isUserHasPermissionsView(
-        //             permissions ?? [],
-        //             PermissionsConstants.viewBlog,
-        //           )) {
-        //         return const Loader();
-        //       }
-        //       return Card(
-        //         elevation: 2,
-        //         shape: RoundedRectangleBorder(
-        //             borderRadius: BorderRadius.circular(12)),
-        //         child: Padding(
-        //           padding: const EdgeInsets.all(16.0),
-        //           child: Column(
-        //             crossAxisAlignment: CrossAxisAlignment.start,
-        //             children: [
-        //               // CustomSectionTitle(
-        //               //   title: "Blog details",
-        //               // ),
-        //               // CustomKeyValueGrid(
-        //               //   data: {
-        //               //     'Title': widget.blogViewerPage.blogsView.title,
-        //               //     'Request ID':
-        //               //         "blog-${widget.blogViewerPage.blogsView.requestId}",
-        //               //     'Status':
-        //               //         widget.blogViewerPage.blogsView.requestStatusId,
-        //               //     'Topics':
-        //               //         widget.blogViewerPage.blogsView.topics!.join(', '),
-        //               //     'Created By Ar':
-        //               //         widget.blogViewerPage.blogsView.fullNameAr,
-        //               //     'Priority': widget.blogViewerPage.blogsView.priorityId,
-        //               //     'Request Details':
-        //               //         widget.blogViewerPage.blogsView.requestDetails,
-        //               //     'Created At': DateFormat.yMMMd().add_jm().format(
-        //               //         widget.blogViewerPage.blogsView.requestCreatedAt!),
-        //               //     'Updated':
-        //               //         widget.blogViewerPage.blogsView.blogUpdatedAt,
-        //               //     'Approved At':
-        //               //         widget.blogViewerPage.blogsView.requestApprovedAt !=
-        //               //                 null
-        //               //             ? DateFormat.yMMMd().add_jm().format(widget
-        //               //                 .blogViewerPage
-        //               //                 .blogsView
-        //               //                 .requestApprovedAt!)
-        //               //             : "Not yet",
-        //               //   },
-        //               // ),
-        //               // const Divider(),
-        //               // const SizedBox(height: 12),
-        //               // CustomSectionTitle(
-        //               //   title: "Approval Sequence",
-        //               // ),
-        //               // CustomTableGrid(
-        //               //   headers: [
-        //               //     'Approval ID',
-        //               //     'Request ID',
-        //               //     'Approval Status EN',
-        //               //     'Approver Name EN',
-        //               //     'Role Name EN',
-        //               //     'Approved At',
-        //               //     'Created At',
-        //               //     'Request User Name EN',
-        //               //     'Service Name EN',
-        //               //   ],
-        //               //   rows: widget.blogViewerPage.approval!
-        //               //       .map((e) => e.toTableRow())
-        //               //       .toList(),
-        //               //   useChipsForStatus: true,
-        //               // ),
-        //               // const SizedBox(height: 30),
-        //               // if (isUserHasPermissionsView(
-        //               //       permissions ?? [],
-        //               //       PermissionsConstants.approveBlog,
-        //               //     ) &&
-        //               //     !pendingApproval.isNullOrEmpty)
-        //               //   Form(
-        //               //     key: formKey,
-        //               //     child: Column(
-        //               //       children: [
-        //               //         CustomTextFormField(
-        //               //           controller: commentController,
-        //               //           hintText: 'Approval comment',
-        //               //           maxLines: null,
-        //               //           readOnly: false,
-        //               //         ),
-        //               //         const SizedBox(height: 20),
-        //               //         Row(
-        //               //           children: [
-        //               //             Expanded(
-        //               //               child: CustomButton(
-        //               //                 text: 'Approve',
-        //               //                 icon: Icons.check_circle_outline,
-        //               //                 onPressed: () {
-        //               //                   _approveBlog(isApproved: true);
-        //               //                 },
-        //               //               ),
-        //               //             ),
-        //               //             const SizedBox(width: 12),
-        //               //             Expanded(
-        //               //               child: CustomButton(
-        //               //                 text: 'Reject',
-        //               //                 icon: Icons.cancel_outlined,
-        //               //                 backgroundColor: AppPallete.errorColor,
-        //               //                 onPressed: () {
-        //               //                   _approveBlog(isApproved: false);
-        //               //                 },
-        //               //               ),
-        //               //             ),
-        //               //           ],
-        //               //         ),
-        //               //       ],
-        //               //     ),
-        //               //   ),
-        //             ],
-        //           ),
-        //         ),
-        //       );
-        //     },
-        //   ),
-        // ],
-        );
+      ],
+      body: [
+        BlocConsumer<BlogBloc, BlogState>(
+          listener: (context, state) {
+            if (state is BlogFailure) {
+              showSnackBar(context, state.error);
+            }
+          },
+          builder: (context, state) {
+            if (state is BlogLoading ||
+                !isUserHasPermissionsView(
+                  permissions ?? [],
+                  PermissionsConstants.viewBlog,
+                )) {
+              return const Loader();
+            }
+            return Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomSectionTitle(
+                      title: "Blog details",
+                    ),
+                    CustomKeyValueGrid(
+                      data: {
+                        'Title': widget.blogViewerPage.blogsView.title,
+                        'Request ID':
+                            "blog-${widget.blogViewerPage.blogsView.requestId}",
+                        'Status':
+                            widget.blogViewerPage.blogsView.requestStatusId,
+                        'Topics':
+                            widget.blogViewerPage.blogsView.topics!.join(', '),
+                        'Created By Ar':
+                            widget.blogViewerPage.blogsView.fullNameAr,
+                        'Priority': widget.blogViewerPage.blogsView.priorityId,
+                        'Request Details':
+                            widget.blogViewerPage.blogsView.requestDetails,
+                        'Created At': DateFormat.yMMMd().add_jm().format(
+                            widget.blogViewerPage.blogsView.requestCreatedAt!),
+                        'Updated':
+                            widget.blogViewerPage.blogsView.blogUpdatedAt,
+                        'Approved At':
+                            widget.blogViewerPage.blogsView.requestApprovedAt !=
+                                    null
+                                ? DateFormat.yMMMd().add_jm().format(widget
+                                    .blogViewerPage
+                                    .blogsView
+                                    .requestApprovedAt!)
+                                : "Not yet",
+                      },
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 12),
+                    CustomSectionTitle(
+                      title: "Approval Sequence",
+                    ),
+                    CustomTableGrid(
+                      headers: [
+                        'Approval ID',
+                        'Request ID',
+                        'Approval Status EN',
+                        'Approver Name EN',
+                        'Role Name EN',
+                        'Approved At',
+                        'Created At',
+                        'Request User Name EN',
+                        'Service Name EN',
+                      ],
+                      rows: widget.blogViewerPage.approval!
+                          .map((e) => e.toTableRow())
+                          .toList(),
+                      useChipsForStatus: true,
+                    ),
+                    const SizedBox(height: 30),
+                    if (isUserHasPermissionsView(
+                          permissions ?? [],
+                          PermissionsConstants.approveBlog,
+                        ) &&
+                        !pendingApproval.isNullOrEmpty)
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            CustomTextFormField(
+                              controller: commentController,
+                              hintText: 'Approval comment',
+                              maxLines: null,
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: CustomButton(
+                                    text: 'Approve',
+                                    icon: Icons.check_circle_outline,
+                                    onPressed: () {
+                                      _approveBlog(isApproved: true);
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: CustomButton(
+                                    text: 'Reject',
+                                    icon: Icons.cancel_outlined,
+                                    backgroundColor: AppPallete.errorColor,
+                                    onPressed: () {
+                                      _approveBlog(isApproved: false);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 
   @override
