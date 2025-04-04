@@ -4,42 +4,40 @@ part of 'onboarding_bloc.dart';
 sealed class OnboardingEvent {}
 
 final class OnboardingSubmitEvent extends OnboardingEvent {
-  final String createdById;
-  // final String status;
-  // final String requestId;
-  final String title;
-  final String content;
-  final List<String> topics;
+  final String createdBy;
+  final String firstNameEn;
+  final String lastNameEn;
+  final String firstNameAr;
+  final String lastNameAr;
+  final String email;
+  final String phone;
+  final String departmentId;
+  final String positionId;
+  final String reportTo;
+  final DateTime startDate;
+  final String notes;
 
   OnboardingSubmitEvent({
-    required this.createdById,
-    // required this.status,
-    // required this.requestId,
-    required this.title,
-    required this.content,
-    required this.topics,
+    required this.createdBy,
+    required this.firstNameEn,
+    required this.lastNameEn,
+    required this.firstNameAr,
+    required this.lastNameAr,
+    required this.email,
+    required this.phone,
+    required this.departmentId,
+    required this.positionId,
+    required this.reportTo,
+    required this.startDate,
+    required this.notes,
   });
 }
 
 final class OnboardingUpdateEvent extends OnboardingEvent {
-  final String id;
-  final String createdById;
-  final String status;
-  final int requestId;
-  final bool isActive;
-  final String title;
-  final String content;
-  final List<String> topics;
+  final OnboardingsPageViewModel onboardingsPageViewModel;
 
   OnboardingUpdateEvent({
-    required this.id,
-    required this.createdById,
-    required this.status,
-    required this.requestId,
-    required this.isActive,
-    required this.title,
-    required this.content,
-    required this.topics,
+    required this.onboardingsPageViewModel,
   });
 }
 

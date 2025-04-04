@@ -185,6 +185,13 @@ class _CustomScaffoldState extends State<CustomScaffold> {
         },
       ),
       ListTile(
+        leading: Icon(Icons.add),
+        title: Text('Onboardings'),
+        onTap: () {
+          context.push('/onboardings');
+        },
+      ),
+      ListTile(
         leading: Icon(Icons.settings),
         title: Text('Settings'),
         onTap: () {

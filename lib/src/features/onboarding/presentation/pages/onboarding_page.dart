@@ -102,8 +102,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     child: AnimatedCardWrapper(
                       index: index,
                       child: CustomCardWithChips(
-                        chips: onboarding.topics ?? [],
-                        title: onboarding.title ?? '',
+                        title:
+                            'Employee name: ${onboarding.firstNameEn} ${onboarding.lastNameEn}',
+                        description: 'Position: ${onboarding.positionNameEn}',
                         onTap: () {
                           if (context.mounted) {
                             context.push(

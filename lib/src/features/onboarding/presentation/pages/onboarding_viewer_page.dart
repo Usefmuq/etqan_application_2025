@@ -125,16 +125,14 @@ class _OnboardingViewerPageState extends State<OnboardingViewerPage> {
           'Onboarding111- ${widget.onboardingViewerPage.onboardingsView.requestId}',
       tilteActions: [
         if (isUserHasPermissionsView(
-              permissions ?? [],
-              PermissionsConstants.updateOnboarding,
-            ) &&
-            widget.onboardingViewerPage.onboardingsView.toOnboarding() != null)
+          permissions ?? [],
+          PermissionsConstants.updateOnboarding,
+        ))
           IconButton(
             onPressed: () {
               context.push(
                 '/onboarding/update/${widget.onboardingViewerPage.onboardingsView.onboardingId}',
-                extra:
-                    widget.onboardingViewerPage.onboardingsView.toOnboarding()!,
+                extra: widget.onboardingViewerPage.onboardingsView,
               );
             },
             icon: Icon(Icons.edit),
@@ -186,35 +184,34 @@ class _OnboardingViewerPageState extends State<OnboardingViewerPage> {
                     ),
                     CustomKeyValueGrid(
                       data: {
-                        'Title':
-                            widget.onboardingViewerPage.onboardingsView.title,
+                        'Employee Name English':
+                            '${widget.onboardingViewerPage.onboardingsView.firstNameEn} ${widget.onboardingViewerPage.onboardingsView.lastNameEn}',
                         'Request ID':
                             "onboarding-${widget.onboardingViewerPage.onboardingsView.requestId}",
+                        'Employee Name Arabic':
+                            '${widget.onboardingViewerPage.onboardingsView.firstNameAr} ${widget.onboardingViewerPage.onboardingsView.lastNameAr}',
                         'Status': widget.onboardingViewerPage.onboardingsView
                             .requestStatusId,
-                        'Topics': widget
-                            .onboardingViewerPage.onboardingsView.topics!
-                            .join(', '),
-                        'Created By Ar': widget
-                            .onboardingViewerPage.onboardingsView.fullNameAr,
-                        'Priority': widget
-                            .onboardingViewerPage.onboardingsView.priorityId,
-                        'Request Details': widget.onboardingViewerPage
-                            .onboardingsView.requestDetails,
+                        'Departmet': widget.onboardingViewerPage.onboardingsView
+                            .departmentNameEn,
+                        'Created By Ar': widget.onboardingViewerPage
+                            .onboardingsView.createdByNameEn,
+                        'Position': widget.onboardingViewerPage.onboardingsView
+                            .positionNameEn,
+                        'Onboarding Notes':
+                            widget.onboardingViewerPage.onboardingsView.notes,
                         'Created At': DateFormat.yMMMd().add_jm().format(widget
-                            .onboardingViewerPage
-                            .onboardingsView
-                            .requestCreatedAt!),
-                        'Updated': widget.onboardingViewerPage.onboardingsView
-                            .onboardingUpdatedAt,
-                        'Approved At': widget.onboardingViewerPage
-                                    .onboardingsView.requestApprovedAt !=
-                                null
-                            ? DateFormat.yMMMd().add_jm().format(widget
-                                .onboardingViewerPage
-                                .onboardingsView
-                                .requestApprovedAt!)
-                            : "Not yet",
+                            .onboardingViewerPage.onboardingsView.createdAt!),
+                        'Updated': widget
+                            .onboardingViewerPage.onboardingsView.updatedAt,
+                        // 'Approved At': widget.onboardingViewerPage
+                        //             .onboardingsView.requestApprovedAt !=
+                        //         null
+                        //     ? DateFormat.yMMMd().add_jm().format(widget
+                        //         .onboardingViewerPage
+                        //         .onboardingsView
+                        //         .requestApprovedAt!)
+                        //     : "Not yet",
                       },
                     ),
                     const Divider(),

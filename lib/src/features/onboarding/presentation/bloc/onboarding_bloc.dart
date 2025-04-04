@@ -40,12 +40,18 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     Emitter<OnboardingState> emit,
   ) async {
     final response = await _submitOnboarding(SubmitOnboardingParams(
-      createdById: event.createdById,
-      // status: event.status,
-      // requestId: event.requestId,
-      title: event.title,
-      content: event.content,
-      topics: event.topics,
+      firstNameEn: event.firstNameEn,
+      lastNameEn: event.lastNameEn,
+      firstNameAr: event.firstNameAr,
+      lastNameAr: event.lastNameAr,
+      email: event.email,
+      phone: event.phone,
+      departmentId: event.departmentId,
+      positionId: event.positionId,
+      reportTo: event.reportTo,
+      startDate: event.startDate,
+      createdBy: event.createdBy,
+      notes: event.notes,
     ));
     response.fold(
       (failure) => emit(OnboardingFailure(failure.message)),
@@ -60,14 +66,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     Emitter<OnboardingState> emit,
   ) async {
     final response = await _updateOnboarding(UpdateOnboardingParams(
-      id: event.id,
-      createdById: event.createdById,
-      status: event.status,
-      requestId: event.requestId,
-      isActive: event.isActive,
-      title: event.title,
-      content: event.content,
-      topics: event.topics,
+      onboardingsPageViewModel: event.onboardingsPageViewModel,
     ));
     response.fold(
       (failure) => emit(OnboardingFailure(failure.message)),

@@ -1,67 +1,64 @@
 class OnboardingsPageView {
-  final String? onboardingId;
-  final String? createdById;
-  final DateTime? onboardingUpdatedAt;
-  final String? status;
-  final bool? isActive;
-  final String? title;
-  final String? content;
-  final List<String>? topics;
-
-  final String? fullNameEn;
-  final String? fullNameAr;
-  final String? email;
+  final int onboardingId;
+  final String firstNameEn;
+  final String lastNameEn;
+  final String? firstNameAr;
+  final String? lastNameAr;
+  final String email;
   final String? phone;
+
+  // Department Info
   final String? departmentId;
   final String? departmentNameEn;
   final String? departmentNameAr;
 
+  // Position Info
   final String? positionId;
   final String? positionNameEn;
   final String? positionNameAr;
 
+  // Manager Info
   final String? reportTo;
   final String? reportToNameEn;
   final String? reportToNameAr;
 
-  final int? requestId;
-  final int? serviceId;
-  final String? serviceNameEn;
-  final String? serviceNameAr;
+  final DateTime startDate;
+  final String? notes;
 
+  // Status
+  final String? statusId;
+  final String? statusKey;
+  final String? statusEn;
+  final String? statusAr;
+
+  final String? createdBy;
+  final String? createdByNameEn;
+  final String? createdByNameAr;
+
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final bool isActive;
+
+  // Request Info
+  final int? requestId;
   final String? requestStatusId;
   final String? requestStatusKey;
   final String? requestStatusEn;
   final String? requestStatusAr;
-
-  final String? priorityId;
-  final String? priorityKey;
-  final String? priorityEn;
-  final String? priorityAr;
-
-  final String? requestDetails;
-  final DateTime? requestCreatedAt;
-  final DateTime? requestUpdatedAt;
-  final DateTime? requestApprovedAt;
-  final bool? requestIsActive;
-
   final int? numberOfManagerApprovalsNeeded;
   final int? numberOfApprovalsNeeded;
-  final int? numberOfApprovalsDone;
-  final int? numberOfApprovalsPending;
+
+  // Approval Summary
+  final int numberOfApprovalsDone;
+  final int numberOfApprovalsPending;
 
   OnboardingsPageView({
-    this.onboardingId,
-    this.title,
-    this.content,
-    this.status,
-    this.isActive,
-    this.topics,
-    this.onboardingUpdatedAt,
-    this.createdById,
-    this.fullNameEn,
-    this.fullNameAr,
-    this.email,
+    required this.onboardingId,
+    required this.firstNameEn,
+    required this.lastNameEn,
+    this.firstNameAr,
+    this.lastNameAr,
+    required this.email,
     this.phone,
     this.departmentId,
     this.departmentNameEn,
@@ -72,26 +69,26 @@ class OnboardingsPageView {
     this.reportTo,
     this.reportToNameEn,
     this.reportToNameAr,
+    required this.startDate,
+    this.notes,
+    this.statusId,
+    this.statusKey,
+    this.statusEn,
+    this.statusAr,
+    this.createdBy,
+    this.createdByNameEn,
+    this.createdByNameAr,
+    this.createdAt,
+    this.updatedAt,
+    required this.isActive,
     this.requestId,
-    this.serviceId,
-    this.serviceNameEn,
-    this.serviceNameAr,
     this.requestStatusId,
     this.requestStatusKey,
     this.requestStatusEn,
     this.requestStatusAr,
-    this.priorityId,
-    this.priorityKey,
-    this.priorityEn,
-    this.priorityAr,
-    this.requestDetails,
-    this.requestCreatedAt,
-    this.requestUpdatedAt,
-    this.requestApprovedAt,
-    this.requestIsActive,
     this.numberOfManagerApprovalsNeeded,
     this.numberOfApprovalsNeeded,
-    this.numberOfApprovalsDone,
-    this.numberOfApprovalsPending,
+    required this.numberOfApprovalsDone,
+    required this.numberOfApprovalsPending,
   });
 }

@@ -1,72 +1,155 @@
+// onboarding_model.dart
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding.dart';
 
 class OnboardingModel extends Onboarding {
   OnboardingModel({
-    required super.id,
-    required super.createdById,
-    required super.updatedAt,
-    required super.status,
-    required super.requestId,
-    required super.isActive,
-    required super.title,
-    required super.content,
-    required super.topics,
-    super.createdByName,
+    super.onboardingId,
+    required super.firstNameEn,
+    required super.lastNameEn,
+    super.firstNameAr,
+    super.lastNameAr,
+    required super.email,
+    super.phone,
+    super.departmentId,
+    super.positionId,
+    super.reportTo,
+    required super.startDate,
+    super.status,
+    super.createdBy,
+    super.createdAt,
+    super.updatedAt,
+    super.isActive,
+    super.requestId,
+    super.notes,
   });
 
-  Map<String, dynamic> toJson() {
-    return <String, dynamic>{
-      'id': id,
-      'created_by_id': createdById,
-      'updated_at': updatedAt.toIso8601String(),
-      'status': status,
-      'request_id': requestId,
-      'is_active': isActive,
-      'title': title,
-      'content': content,
-      'topics': topics,
-    };
-  }
-
-  factory OnboardingModel.fromJson(Map<String, dynamic> map) {
+  factory OnboardingModel.fromJson(Map<String, dynamic> json) {
     return OnboardingModel(
-      id: map['id'] as String,
-      createdById: map['created_by_id'] as String,
-      updatedAt: map['updated_at'] == null
-          ? DateTime.now()
-          : DateTime.parse(map['updated_at']),
-      status: map['status'] as String,
-      requestId: map['request_id'] as int,
-      isActive: map['is_active'] as bool,
-      title: map['title'] as String,
-      content: map['content'] as String,
-      topics: List<String>.from(map['topics'] ?? []),
+      onboardingId: json['onboarding_id'],
+      firstNameEn: json['first_name_en'],
+      lastNameEn: json['last_name_en'],
+      firstNameAr: json['first_name_ar'],
+      lastNameAr: json['last_name_ar'],
+      email: json['email'],
+      phone: json['phone'],
+      departmentId: json['department_id'],
+      positionId: json['position_id'],
+      reportTo: json['report_to'],
+      startDate: DateTime.parse(json['start_date']),
+      status: json['status'],
+      createdBy: json['created_by'],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : null,
+      isActive: json['is_active'] ?? true,
+      requestId: json['request_id'],
+      notes: json['notes'],
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'onboarding_id': onboardingId,
+      'first_name_en': firstNameEn,
+      'last_name_en': lastNameEn,
+      'first_name_ar': firstNameAr,
+      'last_name_ar': lastNameAr,
+      'email': email,
+      'phone': phone,
+      'department_id': departmentId,
+      'position_id': positionId,
+      'report_to': reportTo,
+      'start_date': startDate.toIso8601String(),
+      'status': status,
+      'created_by': createdBy,
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+      'is_active': isActive,
+      'request_id': requestId,
+      'notes': notes,
+    };
+  }
+
+  Onboarding toEntity() {
+    return Onboarding(
+      onboardingId: onboardingId,
+      firstNameEn: firstNameEn,
+      lastNameEn: lastNameEn,
+      firstNameAr: firstNameAr,
+      lastNameAr: lastNameAr,
+      email: email,
+      phone: phone,
+      departmentId: departmentId,
+      positionId: positionId,
+      reportTo: reportTo,
+      startDate: startDate,
+      status: status,
+      createdBy: createdBy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      isActive: isActive,
+      requestId: requestId,
+      notes: notes,
+    );
+  }
+
+  Map<String, dynamic> toTableRow() {
+    return {
+      'Full Name': '$firstNameEn $lastNameEn',
+      'Email': email,
+      'Phone': phone ?? 'N/A',
+      'Department': departmentId ?? 'N/A',
+      'Position': positionId ?? 'N/A',
+      'Manager': reportTo ?? 'N/A',
+      'Start Date': startDate.toLocal().toString(),
+      'Status': status ?? 'N/A',
+      'Created By': createdBy ?? 'N/A',
+      'Active Status': isActive ? 'Active' : 'Inactive',
+    };
+  }
+
   OnboardingModel copyWith({
-    String? id,
-    String? createdById,
-    DateTime? updatedAt,
+    int? onboardingId,
+    String? firstNameEn,
+    String? lastNameEn,
+    String? firstNameAr,
+    String? lastNameAr,
+    String? email,
+    String? phone,
+    String? departmentId,
+    String? positionId,
+    String? reportTo,
+    DateTime? startDate,
     String? status,
-    int? requestId,
+    String? createdBy,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     bool? isActive,
-    String? title,
-    String? content,
-    List<String>? topics,
-    String? createdByName,
+    int? requestId,
+    String? notes,
   }) {
     return OnboardingModel(
-      id: id ?? this.id,
-      createdById: createdById ?? this.createdById,
-      updatedAt: updatedAt ?? this.updatedAt,
+      onboardingId: onboardingId ?? this.onboardingId,
+      firstNameEn: firstNameEn ?? this.firstNameEn,
+      lastNameEn: lastNameEn ?? this.lastNameEn,
+      firstNameAr: firstNameAr ?? this.firstNameAr,
+      lastNameAr: lastNameAr ?? this.lastNameAr,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      departmentId: departmentId ?? this.departmentId,
+      positionId: positionId ?? this.positionId,
+      reportTo: reportTo ?? this.reportTo,
+      startDate: startDate ?? this.startDate,
       status: status ?? this.status,
-      requestId: requestId ?? this.requestId,
+      createdBy: createdBy ?? this.createdBy,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       isActive: isActive ?? this.isActive,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      topics: topics ?? this.topics,
-      createdByName: createdByName ?? this.createdByName,
+      requestId: requestId ?? this.requestId,
+      notes: notes ?? this.notes,
     );
   }
 }

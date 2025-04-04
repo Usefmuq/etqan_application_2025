@@ -1,10 +1,8 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
-import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
@@ -23,10 +21,18 @@ class AddNewOnboardingPage extends StatefulWidget {
 
 class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
   List<String>? permissions;
-  final TextEditingController titleControler = TextEditingController();
-  final TextEditingController contentControler = TextEditingController();
+  final TextEditingController firstNameEnControler = TextEditingController();
+  final TextEditingController lastNameEnControler = TextEditingController();
+  final TextEditingController firstNameArControler = TextEditingController();
+  final TextEditingController lastNameArControler = TextEditingController();
+  final TextEditingController emailControler = TextEditingController();
+  final TextEditingController phoneControler = TextEditingController();
+  final String departmentId = '';
+  final String positionId = '';
+  final String reportTo = '';
+  final DateTime startDate = DateTime.now();
+  final TextEditingController notesControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  List<String> selectedTopics = [];
   @override
   void initState() {
     super.initState();
@@ -45,15 +51,23 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
   }
 
   void _submitOnboarding() {
-    if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
-      final createdById =
+    if (formKey.currentState!.validate()) {
+      final createdBy =
           (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
       context.read<OnboardingBloc>().add(
             OnboardingSubmitEvent(
-              createdById: createdById,
-              title: titleControler.text.trim(),
-              content: contentControler.text.trim(),
-              topics: selectedTopics,
+              firstNameEn: firstNameEnControler.text.trim(),
+              lastNameEn: lastNameEnControler.text.trim(),
+              firstNameAr: firstNameArControler.text.trim(),
+              lastNameAr: lastNameArControler.text.trim(),
+              email: emailControler.text.trim(),
+              phone: phoneControler.text.trim(),
+              departmentId: departmentId,
+              positionId: positionId,
+              reportTo: reportTo,
+              startDate: startDate,
+              createdBy: createdBy,
+              notes: notesControler.text.trim(),
             ),
           );
     }
@@ -62,8 +76,13 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
   @override
   void dispose() {
     super.dispose();
-    titleControler.dispose();
-    contentControler.dispose();
+    firstNameEnControler.dispose();
+    lastNameEnControler.dispose();
+    firstNameArControler.dispose();
+    lastNameArControler.dispose();
+    emailControler.dispose();
+    phoneControler.dispose();
+    notesControler.dispose();
   }
 
   @override
@@ -102,98 +121,51 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    DottedBorder(
-                      color: AppPallete.borderColor,
-                      dashPattern: const [
-                        10,
-                        4,
-                      ],
-                      radius: const Radius.circular(10),
-                      borderType: BorderType.RRect,
-                      strokeCap: StrokeCap.round,
-                      child: SizedBox(
-                        height: 150,
-                        width: double.infinity,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.folder_open,
-                              size: 40,
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Text(
-                              'Select your image',
-                              style: TextStyle(
-                                fontSize: 15,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          'Option 1',
-                          'Option 2',
-                          'Option 3',
-                          'Option 4',
-                          'Option 5',
-                        ]
-                            .map(
-                              (_) => Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (selectedTopics.contains(_)) {
-                                      selectedTopics.remove(_);
-                                    } else {
-                                      selectedTopics.add(_);
-                                    }
-                                    setState(() {});
-                                  },
-                                  child: Chip(
-                                    label: Text(
-                                      _,
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                    color: selectedTopics.contains(_)
-                                        ? const WidgetStatePropertyAll(
-                                            AppPallete.gradient1,
-                                          )
-                                        : null,
-                                    side: selectedTopics.contains(_)
-                                        ? null
-                                        : const BorderSide(
-                                            color: AppPallete.borderColor),
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
                     CustomTextFormField(
-                      controller: titleControler,
+                      controller: firstNameEnControler,
                       readOnly: false,
-                      hintText: 'Onboarding title',
+                      hintText: 'Employee first name English',
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     CustomTextFormField(
-                      controller: contentControler,
-                      hintText: 'Onboarding content',
+                      controller: lastNameEnControler,
+                      hintText: 'Employee last name English',
+                      readOnly: false,
+                    ),
+                    CustomTextFormField(
+                      controller: firstNameArControler,
+                      readOnly: false,
+                      hintText: 'Employee first name Arabic',
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextFormField(
+                      controller: lastNameArControler,
+                      hintText: 'Employee last name Arabic',
+                      readOnly: false,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextFormField(
+                      controller: emailControler,
+                      hintText: 'Employee E-mail',
+                      readOnly: false,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextFormField(
+                      controller: phoneControler,
+                      hintText: 'Employee Phone',
+                      readOnly: false,
+                    ),
+                    CustomTextFormField(
+                      controller: notesControler,
+                      hintText: 'Onboarding Notes',
                       readOnly: false,
                       maxLines: null,
                     ),

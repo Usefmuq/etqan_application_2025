@@ -1,22 +1,20 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
-import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
-import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding.dart';
+import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class UpdateOnboardingPage extends StatefulWidget {
-  final Onboarding onboarding;
+  final OnboardingsPageViewModel onboarding;
   const UpdateOnboardingPage({super.key, required this.onboarding});
-  static route(Onboarding onboarding) => MaterialPageRoute(
+  static route(OnboardingsPageViewModel onboarding) => MaterialPageRoute(
         builder: (context) => UpdateOnboardingPage(
           onboarding: onboarding,
         ),
@@ -29,29 +27,25 @@ class UpdateOnboardingPage extends StatefulWidget {
 class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
   List<String>? permissions;
 
-  late Onboarding
+  late OnboardingsPageViewModel
       onboarding; // Declare a variable to hold the Onboarding object
 
-  final TextEditingController titleControler = TextEditingController();
-  final TextEditingController contentControler = TextEditingController();
+  final TextEditingController firstNameEnControler = TextEditingController();
+  final TextEditingController lastNameEnControler = TextEditingController();
+  final TextEditingController firstNameArControler = TextEditingController();
+  final TextEditingController lastNameArControler = TextEditingController();
+  final TextEditingController emailControler = TextEditingController();
+  final TextEditingController phoneControler = TextEditingController();
+  final TextEditingController notesControler = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
-  List<String> selectedTopics = [];
 
   void _updateOnboarding() {
-    if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
+    if (formKey.currentState!.validate()) {
       // final createdById =
       //     (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
       context.read<OnboardingBloc>().add(
-            OnboardingUpdateEvent(
-              id: onboarding.id,
-              createdById: onboarding.createdById,
-              status: onboarding.status,
-              requestId: onboarding.requestId,
-              isActive: onboarding.isActive,
-              title: titleControler.text.trim(),
-              content: contentControler.text.trim(),
-              topics: selectedTopics,
-            ),
+            OnboardingUpdateEvent(onboardingsPageViewModel: onboarding),
           );
     }
   }
@@ -76,9 +70,13 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    selectedTopics = onboarding.topics;
-    titleControler.text = onboarding.title;
-    contentControler.text = onboarding.content;
+    firstNameEnControler.text = onboarding.firstNameEn;
+    lastNameEnControler.text = onboarding.lastNameEn;
+    firstNameArControler.text = onboarding.firstNameAr ?? '';
+    lastNameArControler.text = onboarding.lastNameAr ?? '';
+    emailControler.text = onboarding.email;
+    phoneControler.text = onboarding.phone ?? '';
+    notesControler.text = onboarding.notes ?? '';
     return CustomScaffold(
       title: 'Update Onboarding-${widget.onboarding.requestId}',
       showDrawer: false,
@@ -118,97 +116,52 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                 key: formKey,
                 child: Column(
                   children: [
-                    DottedBorder(
-                      color: AppPallete.borderColor,
-                      dashPattern: const [
-                        10,
-                        4,
-                      ],
-                      radius: const Radius.circular(10),
-                      borderType: BorderType.RRect,
-                      strokeCap: StrokeCap.round,
-                      child: SizedBox(
-                        height: 150,
-                        width: double.infinity,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.folder_open,
-                              size: 40,
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Text(
-                              'Select your image',
-                              style: TextStyle(
-                                fontSize: 15,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          'Option 1',
-                          'Option 2',
-                          'Option 3',
-                          'Option 4',
-                          'Option 5',
-                        ]
-                            .map(
-                              (_) => Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (selectedTopics.contains(_)) {
-                                      selectedTopics.remove(_);
-                                    } else {
-                                      selectedTopics.add(_);
-                                    }
-                                    setState(() {});
-                                  },
-                                  child: Chip(
-                                    label: Text(
-                                      _,
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                    color: selectedTopics.contains(_)
-                                        ? const WidgetStatePropertyAll(
-                                            AppPallete.gradient1,
-                                          )
-                                        : null,
-                                    side: selectedTopics.contains(_)
-                                        ? null
-                                        : const BorderSide(
-                                            color: AppPallete.borderColor),
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
+                    CustomTextFormField(
+                      controller: firstNameEnControler,
+                      readOnly: false,
+                      hintText: 'Employee first name English',
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     CustomTextFormField(
-                      controller: titleControler,
-                      hintText: 'Onboarding title',
+                      controller: lastNameEnControler,
+                      hintText: 'Employee last name English',
+                      readOnly: false,
+                    ),
+                    CustomTextFormField(
+                      controller: firstNameArControler,
+                      readOnly: false,
+                      hintText: 'Employee first name Arabic',
                     ),
                     SizedBox(
                       height: 10,
                     ),
                     CustomTextFormField(
-                      controller: contentControler,
-                      hintText: 'Onboarding content',
+                      controller: lastNameArControler,
+                      hintText: 'Employee last name Arabic',
+                      readOnly: false,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextFormField(
+                      controller: emailControler,
+                      hintText: 'Employee E-mail',
+                      readOnly: false,
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    CustomTextFormField(
+                      controller: phoneControler,
+                      hintText: 'Employee Phone',
+                      readOnly: false,
+                    ),
+                    CustomTextFormField(
+                      controller: notesControler,
+                      hintText: 'Onboarding Notes',
+                      readOnly: false,
                       maxLines: null,
                     ),
                   ],
@@ -224,7 +177,12 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
   @override
   void dispose() {
     super.dispose();
-    titleControler.dispose();
-    contentControler.dispose();
+    firstNameEnControler.dispose();
+    lastNameEnControler.dispose();
+    firstNameArControler.dispose();
+    lastNameArControler.dispose();
+    emailControler.dispose();
+    phoneControler.dispose();
+    notesControler.dispose();
   }
 }

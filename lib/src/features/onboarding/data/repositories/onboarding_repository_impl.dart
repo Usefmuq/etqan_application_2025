@@ -13,7 +13,6 @@ import 'package:etqan_application_2025/src/features/onboarding/domain/entities/o
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/repositories/onboarding_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:uuid/uuid.dart';
 
 class OnboardingRepositoryImpl implements OnboardingRepository {
   final OnboardingRemoteDataSource onboardingRemoteDataSource;
@@ -24,32 +23,46 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
   );
   @override
   Future<Either<Failure, Onboarding>> submitOnboarding({
-    required String createdById,
-    // required String status,
-    // required String requestId,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required String createdBy,
+    required String firstNameEn,
+    required String lastNameEn,
+    required String firstNameAr,
+    required String lastNameAr,
+    required String email,
+    required String phone,
+    required String departmentId,
+    required String positionId,
+    required String reportTo,
+    required DateTime startDate,
+    required String notes,
   }) async {
     try {
       RequestMasterModel requestMasterModel = RequestMasterModel(
         // requestId: 0,
-        userId: createdById,
+        userId: createdBy,
         serviceId: ServicesConstants.onboardingServiceId,
         status: LookupConstants.requestStatusPending,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
       OnboardingModel onboardingModel = OnboardingModel(
-        id: Uuid().v1(),
-        createdById: createdById,
+        // onboardingId: onboardingId,
+        firstNameEn: firstNameEn,
+        lastNameEn: lastNameEn,
+        firstNameAr: firstNameAr,
+        lastNameAr: lastNameAr,
+        email: email,
+        phone: phone,
+        departmentId: departmentId,
+        positionId: positionId,
+        reportTo: reportTo,
+        startDate: startDate,
         updatedAt: DateTime.now(),
         status: LookupConstants.requestStatusPending,
-        requestId: 1,
         isActive: true,
-        title: title,
-        content: content,
-        topics: topics,
+        createdBy: createdBy,
+        createdAt: DateTime.now(),
+        notes: notes,
       );
       final insertedOnboarding = await onboardingRemoteDataSource
           .submitOnboarding(onboardingModel, requestMasterModel);
@@ -63,26 +76,27 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
 
   @override
   Future<Either<Failure, OnboardingViewerPageEntity>> updateOnboarding({
-    required String id,
-    required String createdById,
-    required String status,
-    required int requestId,
-    required bool isActive,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required OnboardingsPageViewModel onboardingsPageViewModel,
   }) async {
     try {
       OnboardingModel onboardingModel = OnboardingModel(
-        id: id,
-        createdById: createdById,
+        onboardingId: onboardingsPageViewModel.onboardingId,
+        firstNameEn: onboardingsPageViewModel.firstNameEn,
+        lastNameEn: onboardingsPageViewModel.lastNameEn,
+        firstNameAr: onboardingsPageViewModel.firstNameAr,
+        lastNameAr: onboardingsPageViewModel.lastNameAr,
+        email: onboardingsPageViewModel.email,
+        phone: onboardingsPageViewModel.phone,
+        departmentId: onboardingsPageViewModel.departmentId,
+        positionId: onboardingsPageViewModel.positionId,
+        reportTo: onboardingsPageViewModel.reportTo,
+        startDate: onboardingsPageViewModel.startDate,
         updatedAt: DateTime.now(),
-        status: status,
-        requestId: requestId,
-        isActive: isActive,
-        title: title,
-        content: content,
-        topics: topics,
+        status: onboardingsPageViewModel.statusId,
+        isActive: onboardingsPageViewModel.isActive,
+        createdBy: onboardingsPageViewModel.createdBy,
+        createdAt: onboardingsPageViewModel.createdAt,
+        notes: onboardingsPageViewModel.notes,
       );
       final updatedOnboarding =
           await onboardingRemoteDataSource.updateOnboarding(onboardingModel);

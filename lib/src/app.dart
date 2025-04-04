@@ -7,6 +7,12 @@ import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
+import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/add_new_onboarding_page.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/onboarding_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/update_onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -81,6 +87,32 @@ class _MyAppState extends State<MyApp> {
           builder: (context, state) {
             final entity = state.extra as BlogViewerPageEntity;
             return BlogViewerPage(blogViewerPage: entity);
+          },
+        ),
+        GoRoute(
+          path: '/onboardings',
+          builder: (context, state) {
+            return OnboardingPage();
+          },
+        ),
+        GoRoute(
+          path: '/onboarding/submit',
+          builder: (context, state) {
+            return AddNewOnboardingPage();
+          },
+        ),
+        GoRoute(
+          path: '/onboarding/update/:id',
+          builder: (context, state) {
+            final entity = state.extra as OnboardingsPageViewModel;
+            return UpdateOnboardingPage(onboarding: entity);
+          },
+        ),
+        GoRoute(
+          path: '/onboarding/:id',
+          builder: (context, state) {
+            final entity = state.extra as OnboardingViewerPageEntity;
+            return OnboardingViewerPage(onboardingViewerPage: entity);
           },
         ),
       ],

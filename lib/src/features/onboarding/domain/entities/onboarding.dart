@@ -1,25 +1,47 @@
 class Onboarding {
-  final String id;
-  final String createdById;
-  final DateTime updatedAt;
-  final String status;
-  final int requestId;
+  final int? onboardingId;
+  final String firstNameEn;
+  final String lastNameEn;
+  final String? firstNameAr;
+  final String? lastNameAr;
+  final String email;
+  final String? phone;
+
+  // Job Info
+  final String? departmentId;
+  final String? positionId;
+  final String? reportTo;
+  final DateTime startDate;
+
+  // Meta
+  final String? status;
+  final String? createdBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final bool isActive;
-  final String title;
-  final String content;
-  final List<String> topics;
-  final String? createdByName;
+
+  // Request / Approval flow
+  final int? requestId;
+  final String? notes;
 
   Onboarding({
-    required this.id,
-    required this.createdById,
-    required this.updatedAt,
-    required this.status,
-    required this.requestId,
-    required this.isActive,
-    required this.title,
-    required this.content,
-    required this.topics,
-    this.createdByName,
+    this.onboardingId,
+    required this.firstNameEn,
+    required this.lastNameEn,
+    this.firstNameAr,
+    this.lastNameAr,
+    required this.email,
+    this.phone,
+    this.departmentId,
+    this.positionId,
+    this.reportTo,
+    required this.startDate,
+    this.status,
+    this.createdBy,
+    this.createdAt,
+    this.updatedAt,
+    this.isActive = true,
+    this.requestId,
+    this.notes,
   });
 }

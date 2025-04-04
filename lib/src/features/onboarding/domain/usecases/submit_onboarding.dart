@@ -11,30 +11,48 @@ class SubmitOnboarding implements Usecase<Onboarding, SubmitOnboardingParams> {
   Future<Either<Failure, Onboarding>> call(
       SubmitOnboardingParams params) async {
     return await onboardingRepostory.submitOnboarding(
-      createdById: params.createdById,
-      // status: params.status,
-      // requestId: params.requestId,
-      title: params.title,
-      content: params.content,
-      topics: params.topics,
+      firstNameEn: params.firstNameEn,
+      lastNameEn: params.lastNameEn,
+      firstNameAr: params.firstNameAr,
+      lastNameAr: params.lastNameAr,
+      email: params.email,
+      phone: params.phone,
+      departmentId: params.departmentId,
+      positionId: params.positionId,
+      reportTo: params.reportTo,
+      startDate: params.startDate,
+      createdBy: params.createdBy,
+      notes: params.notes,
     );
   }
 }
 
 class SubmitOnboardingParams {
-  final String createdById;
-  // final String status;
-  // final String requestId;
-  final String title;
-  final String content;
-  final List<String> topics;
+  final String createdBy;
+  final String firstNameEn;
+  final String lastNameEn;
+  final String firstNameAr;
+  final String lastNameAr;
+  final String email;
+  final String phone;
+  final String departmentId;
+  final String positionId;
+  final String reportTo;
+  final DateTime startDate;
+  final String notes;
 
   SubmitOnboardingParams({
-    required this.createdById,
-    // required this.status,
-    // required this.requestId,
-    required this.title,
-    required this.content,
-    required this.topics,
+    required this.createdBy,
+    required this.firstNameEn,
+    required this.lastNameEn,
+    required this.firstNameAr,
+    required this.lastNameAr,
+    required this.email,
+    required this.phone,
+    required this.departmentId,
+    required this.positionId,
+    required this.reportTo,
+    required this.startDate,
+    required this.notes,
   });
 }

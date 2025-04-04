@@ -78,7 +78,8 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           .update(
             onboarding.toJson(),
           )
-          .eq('id', onboarding.id) // Ensure you update the correct row
+          .eq('id',
+              onboarding.onboardingId!) // Ensure you update the correct row
           .select();
       final onboardingsView = await supabaseClient
           .from('onboardings_page_view')
@@ -86,14 +87,14 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           .eq('request_is_active', true)
           .eq(
             'request_id',
-            onboarding.requestId,
+            onboarding.requestId!,
           );
       final approvalsView = await supabaseClient
           .from('approval_sequence_view')
           .select('*')
           .eq(
             'request_id',
-            onboarding.requestId,
+            onboarding.requestId!,
           )
           .eq('is_active', true);
       return OnboardingViewerPageEntity(

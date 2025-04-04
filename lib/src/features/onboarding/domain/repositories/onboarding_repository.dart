@@ -8,22 +8,21 @@ import 'package:fpdart/fpdart.dart';
 
 abstract interface class OnboardingRepository {
   Future<Either<Failure, Onboarding>> submitOnboarding({
-    required String createdById,
-    // required String status,
-    // required String requestId,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required String createdBy,
+    required String firstNameEn,
+    required String lastNameEn,
+    required String firstNameAr,
+    required String lastNameAr,
+    required String email,
+    required String phone,
+    required String departmentId,
+    required String positionId,
+    required String reportTo,
+    required DateTime startDate,
+    required String notes,
   });
   Future<Either<Failure, OnboardingViewerPageEntity>> updateOnboarding({
-    required String id,
-    required String createdById,
-    required String status,
-    required int requestId,
-    required bool isActive,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required OnboardingsPageViewModel onboardingsPageViewModel,
   });
   Future<Either<Failure, OnboardingViewerPageEntity>> approveOnboarding({
     required ApprovalSequenceViewModel approvalSequenceModel,
