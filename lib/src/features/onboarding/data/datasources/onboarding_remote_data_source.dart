@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
@@ -5,6 +6,7 @@ import 'package:etqan_application_2025/src/core/data/models/request_master_model
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/features/auth/domain/usecase/user_sign_up.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
@@ -43,7 +45,13 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
       final requestData = await supabaseClient
           .from('requests_master')
           .insert(
-            request.toJson(),
+            request
+                .copyWith(
+                  status: serviceApprovalUsers.isNotEmpty
+                      ? request.status
+                      : LookupConstants.requestStatusCompleted,
+                )
+                .toJson(),
           )
           .select();
       final req = RequestMasterModel.fromJson(requestData.first);
@@ -60,9 +68,45 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
       final onboardingData = await supabaseClient
           .from('employee_onboarding')
           .insert(
-            onboarding.copyWith(requestId: req.requestId).toJson(),
+            onboarding
+                .copyWith(
+                  requestId: req.requestId,
+                  status: serviceApprovalUsers.isNotEmpty
+                      ? request.status
+                      : LookupConstants.requestStatusCompleted,
+                )
+                .toJson(),
           )
           .select();
+      if (req.status == LookupConstants.requestStatusCompleted) {
+        final UserSignUp signUpWithEmailPassword =
+            serviceLocator<UserSignUp>(); // ✅ Get use case from service locator
+        final user = await signUpWithEmailPassword.call(
+          UserSignUpParams(
+            email: onboarding.email,
+            password: onboarding.phone ?? '123456',
+          ),
+        );
+        user.fold((failure) {}, (user) async {
+          await supabaseClient
+              .from('users')
+              .update(
+                {
+                  'first_name_en': onboarding.firstNameEn,
+                  'first_name_ar': onboarding.firstNameAr,
+                  'last_name_en': onboarding.lastNameEn,
+                  'last_name_ar': onboarding.lastNameAr,
+                  'phone': onboarding.phone,
+                  'department_id': onboarding.departmentId,
+                  'position_id': onboarding.positionId,
+                  'status_id': LookupConstants.userStatusActive,
+                  'report_to': onboarding.reportTo,
+                },
+              )
+              .eq('id', user.id)
+              .select();
+        });
+      }
       return OnboardingModel.fromJson(onboardingData.first);
     } catch (e) {
       throw ServerException(e.toString());

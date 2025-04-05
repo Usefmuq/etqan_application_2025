@@ -45,7 +45,7 @@ class BlogRepositoryImpl implements BlogRepository {
         createdById: createdById,
         updatedAt: DateTime.now(),
         status: LookupConstants.requestStatusPending,
-        requestId: 1,
+        requestId: -1,
         isActive: true,
         title: title,
         content: content,

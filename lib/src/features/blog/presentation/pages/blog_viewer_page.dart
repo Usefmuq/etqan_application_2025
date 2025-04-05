@@ -120,7 +120,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Blog111- ${widget.blogViewerPage.blogsView.requestId}',
+      title: 'Blog- ${widget.blogViewerPage.blogsView.requestId}',
       tilteActions: [
         if (isUserHasPermissionsView(
               permissions ?? [],

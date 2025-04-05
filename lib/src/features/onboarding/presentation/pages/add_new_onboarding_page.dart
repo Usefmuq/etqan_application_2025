@@ -1,7 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/entities/departments.dart';
 import 'package:etqan_application_2025/src/core/common/entities/positions.dart';
-import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_dropdown_list.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
@@ -188,7 +187,7 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
                     CustomDropdownList<Departments>(
                       label: "Department",
                       hint: "Select department",
-                      items: departments ?? [],
+                      items: departments,
                       selectedItem: selectedDepartment,
                       onChanged: (value) async {
                         final deptId = value?.id;

@@ -52,7 +52,7 @@ class OnboardingModel extends Onboarding {
 
   Map<String, dynamic> toJson() {
     return {
-      'onboarding_id': onboardingId,
+      // 'onboarding_id': onboardingId,
       'first_name_en': firstNameEn,
       'last_name_en': lastNameEn,
       'first_name_ar': firstNameAr,
