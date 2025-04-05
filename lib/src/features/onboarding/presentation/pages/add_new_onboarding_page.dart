@@ -1,10 +1,16 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/departments.dart';
+import 'package:etqan_application_2025/src/core/common/entities/positions.dart';
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_dropdown_list.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
+import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,16 +27,22 @@ class AddNewOnboardingPage extends StatefulWidget {
 
 class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
   List<String>? permissions;
+  List<Departments> departments = [];
+  Departments? selectedDepartment;
+  List<Positions> positions = [];
+  Positions? selectedPosition;
+  List<UserModel> managers = [];
+  UserModel? selectedManager;
   final TextEditingController firstNameEnControler = TextEditingController();
   final TextEditingController lastNameEnControler = TextEditingController();
   final TextEditingController firstNameArControler = TextEditingController();
   final TextEditingController lastNameArControler = TextEditingController();
   final TextEditingController emailControler = TextEditingController();
   final TextEditingController phoneControler = TextEditingController();
-  final String departmentId = '';
-  final String positionId = '';
-  final String reportTo = '';
-  final DateTime startDate = DateTime.now();
+  String? departmentId = '';
+  String? positionId = '';
+  String? reportTo = '';
+  DateTime? startDate = DateTime.now();
   final TextEditingController notesControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
   @override
@@ -41,10 +53,14 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetchedDepartments = await fetchDepartments();
+      // final fetchedPositions = await fetchPositions();
 
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
+          departments = fetchedDepartments;
+          // positions = fetchedPositions;
         });
       }
     });
@@ -62,10 +78,10 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
               lastNameAr: lastNameArControler.text.trim(),
               email: emailControler.text.trim(),
               phone: phoneControler.text.trim(),
-              departmentId: departmentId,
-              positionId: positionId,
-              reportTo: reportTo,
-              startDate: startDate,
+              departmentId: departmentId!,
+              positionId: positionId!,
+              reportTo: reportTo!,
+              startDate: startDate!,
               createdBy: createdBy,
               notes: notesControler.text.trim(),
             ),
@@ -168,6 +184,59 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
                       hintText: 'Onboarding Notes',
                       readOnly: false,
                       maxLines: null,
+                    ),
+                    CustomDropdownList<Departments>(
+                      label: "Department",
+                      hint: "Select department",
+                      items: departments ?? [],
+                      selectedItem: selectedDepartment,
+                      onChanged: (value) async {
+                        final deptId = value?.id;
+                        final newPositions =
+                            await fetchPositions(deptId ?? '-1');
+                        final newManagers =
+                            await fetchUsersByDepartment(deptId ?? '-1');
+
+                        setState(() {
+                          selectedDepartment = value;
+                          departmentId = value?.id;
+                          positions = newPositions;
+                          managers = newManagers;
+                        });
+                      },
+                      getLabel: (dept) => dept.nameEn,
+                      validator: (value) =>
+                          value == null ? 'Please select a department' : null,
+                    ),
+                    CustomDropdownList<Positions>(
+                      label: "Position",
+                      hint: "Select position",
+                      items: positions,
+                      selectedItem: selectedPosition,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedPosition = value;
+                          positionId = value?.id;
+                        });
+                      },
+                      getLabel: (dept) => dept.nameEn,
+                      validator: (value) =>
+                          value == null ? 'Please select a position' : null,
+                    ),
+                    CustomDropdownList<UserModel>(
+                      label: "Manager",
+                      hint: "Select manager",
+                      items: managers,
+                      selectedItem: selectedManager,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedManager = value;
+                          reportTo = value?.id;
+                        });
+                      },
+                      getLabel: (usr) => usr.firstNameEn + usr.lastNameEn,
+                      validator: (value) =>
+                          value == null ? 'Please select a manager' : null,
                     ),
                   ],
                 ),

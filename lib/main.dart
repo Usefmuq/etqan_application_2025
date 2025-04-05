@@ -3,6 +3,7 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,6 +39,9 @@ void main() async {
       ),
       BlocProvider(
         create: (_) => serviceLocator<BlogBloc>(),
+      ),
+      BlocProvider(
+        create: (_) => serviceLocator<OnboardingBloc>(),
       ),
     ],
     child: MyApp(settingsController: settingsController),

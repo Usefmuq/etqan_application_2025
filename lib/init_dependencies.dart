@@ -24,6 +24,14 @@ import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/update_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:etqan_application_2025/src/features/onboarding/data/datasources/onboarding_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/repositories/onboarding_repository.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/approve_onboarding.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/get_all_onboardings.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/submit_onboarding.dart';
+import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/update_onboarding.dart';
+import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -32,6 +40,7 @@ final serviceLocator = GetIt.instance;
 Future<void> initdependencies() async {
   _intitAuth();
   _intitBlog();
+  _intitOnboarding();
   final supabase = await Supabase.initialize(
     url: SupabaseConf.supabaseUrl,
     anonKey: SupabaseConf.supabaseAnonKey,
@@ -164,6 +173,53 @@ void _intitBlog() {
         updateBlog: serviceLocator(),
         approveBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
+      ),
+    );
+}
+
+void _intitOnboarding() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<OnboardingRemoteDataSource>(
+      () => OnboardingRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<OnboardingRepository>(
+      () => OnboardingRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitOnboarding(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateOnboarding(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllOnboardings(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveOnboarding(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => OnboardingBloc(
+        submitOnboarding: serviceLocator(),
+        updateOnboarding: serviceLocator(),
+        approveOnboarding: serviceLocator(),
+        getAllOnboardings: serviceLocator(),
       ),
     );
 }

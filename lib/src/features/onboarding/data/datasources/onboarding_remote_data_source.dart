@@ -58,7 +58,7 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           )
           .select();
       final onboardingData = await supabaseClient
-          .from('onboardings')
+          .from('employee_onboarding')
           .insert(
             onboarding.copyWith(requestId: req.requestId).toJson(),
           )
@@ -74,7 +74,7 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
       OnboardingModel onboarding) async {
     try {
       await supabaseClient
-          .from('onboardings')
+          .from('employee_onboarding')
           .update(
             onboarding.toJson(),
           )
@@ -82,9 +82,9 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
               onboarding.onboardingId!) // Ensure you update the correct row
           .select();
       final onboardingsView = await supabaseClient
-          .from('onboardings_page_view')
+          .from('employee_onboarding_view')
           .select('*')
-          .eq('request_is_active', true)
+          .eq('is_active', true)
           .eq(
             'request_id',
             onboarding.requestId!,
@@ -163,9 +163,9 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
             .select();
       }
       final onboardingsView = await supabaseClient
-          .from('onboardings_page_view')
+          .from('employee_onboarding_view')
           .select('*')
-          .eq('request_is_active', true)
+          .eq('is_active', true)
           .eq(
             'request_id',
             approvalSequence.requestId!,
@@ -195,9 +195,9 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   Future<List<OnboardingsPageViewModel>> getAllOnboardingsView() async {
     try {
       final onboardings = await supabaseClient
-          .from('onboardings_page_view')
+          .from('employee_onboarding_view')
           .select('*')
-          .eq('request_is_active', true);
+          .eq('is_active', true);
       return onboardings
           .map((onboarding) => OnboardingsPageViewModel.fromJson(onboarding))
           .toList();
