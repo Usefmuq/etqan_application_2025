@@ -1,14 +1,10 @@
-import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
-import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
-import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
-import 'package:etqan_application_2025/src/features/auth/domain/usecase/user_sign_up.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
@@ -318,10 +314,8 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
       throw ServerException('Create user failed: $error');
     }
 
-    final user = response.data;
     final userId = response.data['user']?['id'];
 
-    print('✅ User created: $user');
     return userId;
   }
 }
