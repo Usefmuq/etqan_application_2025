@@ -16,8 +16,13 @@ class PermissionRemoteDataSourceImpl implements PermissionRemoteDataSource {
     required String userId,
   }) async {
     try {
-      final permissions =
-          await supabaseClient.from('user_permissions_view').select('*');
+      final permissions = await supabaseClient
+          .from('user_permissions_view')
+          .select('*')
+          .eq('user_id', userId)
+          .or(
+            'end_date.gt.${DateTime.now().toIso8601String()},end_date.is.null',
+          );
       return permissions
           .map((permissions) => PermissionModel.fromJson(permissions))
           .toList();

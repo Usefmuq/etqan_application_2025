@@ -16,7 +16,7 @@ Future<List<String>?> fetchUserPermissions(String userId) async {
 
   final response =
       await getUserPermissions.call(GetUserPermissionsParams(userId: userId));
-
+  print(response.toString());
   return response.fold((failure) {
     return [];
   }, (permissionsList) {

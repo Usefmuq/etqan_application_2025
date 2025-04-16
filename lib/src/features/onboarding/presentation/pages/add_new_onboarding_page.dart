@@ -106,12 +106,12 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
       title: 'Submit New Onboarding',
       showDrawer: false,
       tilteActions: [
-        IconButton(
-          onPressed: () {
-            _submitOnboarding();
-          },
-          icon: Icon(Icons.done_rounded),
-        )
+        // IconButton(
+        //   onPressed: () {
+        //     _submitOnboarding();
+        //   },
+        //   icon: Icon(Icons.done_rounded),
+        // )
       ],
       body: [
         BlocConsumer<OnboardingBloc, OnboardingState>(
@@ -131,112 +131,161 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
               return const Loader();
             }
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
               child: Form(
                 key: formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomTextFormField(
-                      controller: firstNameEnControler,
-                      readOnly: false,
-                      hintText: 'Employee first name English',
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            CustomTextFormField(
+                              controller: firstNameEnControler,
+                              hintText: 'First name (EN)',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: lastNameEnControler,
+                              hintText: 'Last name (EN)',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: firstNameArControler,
+                              hintText: 'First name (AR)',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: lastNameArControler,
+                              hintText: 'Last name (AR)',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: emailControler,
+                              hintText: 'Email',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: phoneControler,
+                              hintText: 'Phone',
+                              readOnly: false,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomTextFormField(
+                              controller: notesControler,
+                              hintText: 'Onboarding Notes',
+                              readOnly: false,
+                              maxLines: null,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: lastNameEnControler,
-                      hintText: 'Employee last name English',
-                      readOnly: false,
-                    ),
-                    CustomTextFormField(
-                      controller: firstNameArControler,
-                      readOnly: false,
-                      hintText: 'Employee first name Arabic',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: lastNameArControler,
-                      hintText: 'Employee last name Arabic',
-                      readOnly: false,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: emailControler,
-                      hintText: 'Employee E-mail',
-                      readOnly: false,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: phoneControler,
-                      hintText: 'Employee Phone',
-                      readOnly: false,
-                    ),
-                    CustomTextFormField(
-                      controller: notesControler,
-                      hintText: 'Onboarding Notes',
-                      readOnly: false,
-                      maxLines: null,
-                    ),
-                    CustomDropdownList<Departments>(
-                      label: "Department",
-                      hint: "Select department",
-                      items: departments,
-                      selectedItem: selectedDepartment,
-                      onChanged: (value) async {
-                        final deptId = value?.id;
-                        final newPositions =
-                            await fetchPositions(deptId ?? '-1');
-                        final newManagers =
-                            await fetchUsersByDepartment(deptId ?? '-1');
+                    const SizedBox(height: 20),
+                    Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            CustomDropdownList<Departments>(
+                              label: "Department",
+                              hint: "Select department",
+                              items: departments,
+                              selectedItem: selectedDepartment,
+                              onChanged: (value) async {
+                                final deptId = value?.id;
+                                final newPositions =
+                                    await fetchPositions(deptId ?? '-1');
+                                final newManagers =
+                                    await fetchUsersByDepartment(
+                                        deptId ?? '-1');
 
-                        setState(() {
-                          selectedDepartment = value;
-                          departmentId = value?.id;
-                          positions = newPositions;
-                          managers = newManagers;
-                        });
-                      },
-                      getLabel: (dept) => dept.nameEn,
-                      validator: (value) =>
-                          value == null ? 'Please select a department' : null,
+                                setState(() {
+                                  selectedDepartment = value;
+                                  departmentId = value?.id;
+                                  positions = newPositions;
+                                  managers = newManagers;
+                                  selectedPosition = null;
+                                  selectedManager = null;
+                                });
+                              },
+                              getLabel: (dept) => dept.nameEn,
+                              validator: (value) => value == null
+                                  ? 'Please select a department'
+                                  : null,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomDropdownList<Positions>(
+                              label: "Position",
+                              hint: "Select position",
+                              items: positions,
+                              selectedItem: selectedPosition,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedPosition = value;
+                                  positionId = value?.id;
+                                });
+                              },
+                              getLabel: (pos) => pos.nameEn,
+                              validator: (value) => value == null
+                                  ? 'Please select a position'
+                                  : null,
+                            ),
+                            const SizedBox(height: 12),
+                            CustomDropdownList<UserModel>(
+                              label: "Manager",
+                              hint: "Select manager",
+                              items: managers,
+                              selectedItem: selectedManager,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedManager = value;
+                                  reportTo = value?.id;
+                                });
+                              },
+                              getLabel: (usr) =>
+                                  '${usr.firstNameEn} ${usr.lastNameEn}',
+                              validator: (value) => value == null
+                                  ? 'Please select a manager'
+                                  : null,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    CustomDropdownList<Positions>(
-                      label: "Position",
-                      hint: "Select position",
-                      items: positions,
-                      selectedItem: selectedPosition,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedPosition = value;
-                          positionId = value?.id;
-                        });
-                      },
-                      getLabel: (dept) => dept.nameEn,
-                      validator: (value) =>
-                          value == null ? 'Please select a position' : null,
+                    const SizedBox(height: 32),
+
+                    // 👇 Submit Button at the bottom
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _submitOnboarding,
+                        icon: const Icon(Icons.send),
+                        label: const Text("Submit Onboarding"),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          textStyle: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
                     ),
-                    CustomDropdownList<UserModel>(
-                      label: "Manager",
-                      hint: "Select manager",
-                      items: managers,
-                      selectedItem: selectedManager,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedManager = value;
-                          reportTo = value?.id;
-                        });
-                      },
-                      getLabel: (usr) => usr.firstNameEn + usr.lastNameEn,
-                      validator: (value) =>
-                          value == null ? 'Please select a manager' : null,
-                    ),
+
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),

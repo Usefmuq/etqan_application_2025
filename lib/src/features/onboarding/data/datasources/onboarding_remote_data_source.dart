@@ -5,7 +5,9 @@ import 'package:etqan_application_2025/src/core/data/models/approval_sequence_vi
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
+import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:etqan_application_2025/src/features/auth/domain/usecase/user_sign_up.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
@@ -55,6 +57,30 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           )
           .select();
       final req = RequestMasterModel.fromJson(requestData.first);
+      if (req.status == LookupConstants.requestStatusCompleted) {
+        final userId = await _createUserViaFunction(
+          email: onboarding.email,
+          password: onboarding.phone ?? '123456',
+          firstNameEn: onboarding.firstNameEn,
+          lastNameEn: onboarding.lastNameEn,
+          phone: onboarding.phone ?? '',
+          departmentId: onboarding.departmentId ?? '',
+          positionId: onboarding.positionId ?? '',
+        );
+        await supabaseClient.from('users').update(
+          {
+            'first_name_en': onboarding.firstNameEn,
+            'first_name_ar': onboarding.firstNameAr,
+            'last_name_en': onboarding.lastNameEn,
+            'last_name_ar': onboarding.lastNameAr,
+            'phone': onboarding.phone,
+            'department_id': onboarding.departmentId,
+            'position_id': onboarding.positionId,
+            'status_id': LookupConstants.userStatusActive,
+            'report_to': onboarding.reportTo,
+          },
+        ).eq('id', userId);
+      }
       final approvalSequence = mapServiceApproversToApprovalSequence(
         requestId: req.requestId ?? -1,
         serviceApprovers: serviceApprovalUsers,
@@ -78,35 +104,7 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
                 .toJson(),
           )
           .select();
-      if (req.status == LookupConstants.requestStatusCompleted) {
-        final UserSignUp signUpWithEmailPassword =
-            serviceLocator<UserSignUp>(); // ✅ Get use case from service locator
-        final user = await signUpWithEmailPassword.call(
-          UserSignUpParams(
-            email: onboarding.email,
-            password: onboarding.phone ?? '123456',
-          ),
-        );
-        user.fold((failure) {}, (user) async {
-          await supabaseClient
-              .from('users')
-              .update(
-                {
-                  'first_name_en': onboarding.firstNameEn,
-                  'first_name_ar': onboarding.firstNameAr,
-                  'last_name_en': onboarding.lastNameEn,
-                  'last_name_ar': onboarding.lastNameAr,
-                  'phone': onboarding.phone,
-                  'department_id': onboarding.departmentId,
-                  'position_id': onboarding.positionId,
-                  'status_id': LookupConstants.userStatusActive,
-                  'report_to': onboarding.reportTo,
-                },
-              )
-              .eq('id', user.id)
-              .select();
-        });
-      }
+
       return OnboardingModel.fromJson(onboardingData.first);
     } catch (e) {
       throw ServerException(e.toString());
@@ -205,6 +203,32 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
               approvalSequence.requestId!,
             )
             .select();
+        final userId = await _createUserViaFunction(
+          email: onboarding.email,
+          password: onboarding.phone ?? '123456',
+          firstNameEn: onboarding.firstNameEn,
+          lastNameEn: onboarding.lastNameEn,
+          phone: onboarding.phone ?? '',
+          departmentId: onboarding.departmentId ?? '',
+          positionId: onboarding.positionId ?? '',
+        );
+        await supabaseClient
+            .from('users')
+            .update(
+              {
+                'first_name_en': onboarding.firstNameEn,
+                'first_name_ar': onboarding.firstNameAr,
+                'last_name_en': onboarding.lastNameEn,
+                'last_name_ar': onboarding.lastNameAr,
+                'phone': onboarding.phone,
+                'department_id': onboarding.departmentId,
+                'position_id': onboarding.positionId,
+                'status_id': LookupConstants.userStatusActive,
+                'report_to': onboarding.reportTo,
+              },
+            )
+            .eq('id', userId)
+            .select();
       }
       final onboardingsView = await supabaseClient
           .from('employee_onboarding_view')
@@ -264,5 +288,40 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
     } catch (e) {
       throw ServerException(e.toString());
     }
+  }
+
+  Future<String> _createUserViaFunction({
+    required String email,
+    required String password,
+    required String firstNameEn,
+    required String lastNameEn,
+    required String phone,
+    required String departmentId,
+    required String positionId,
+  }) async {
+    final response = await supabaseClient.functions.invoke(
+      'create-user',
+      body: {
+        'email': email,
+        'password': password,
+        'firstNameEn': firstNameEn,
+        'lastNameEn': lastNameEn,
+        'phone': phone,
+        'departmentId': departmentId,
+        'positionId': positionId,
+      },
+    );
+
+    if (response.status != 200) {
+      // Handle error gracefully
+      final error = response.data['error'] ?? 'Unknown error';
+      throw ServerException('Create user failed: $error');
+    }
+
+    final user = response.data;
+    final userId = response.data['user']?['id'];
+
+    print('✅ User created: $user');
+    return userId;
   }
 }

@@ -4,6 +4,7 @@ import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CustomScaffold extends StatefulWidget {
   final String title;
@@ -202,10 +203,19 @@ class _CustomScaffoldState extends State<CustomScaffold> {
       ListTile(
         leading: Icon(Icons.logout),
         title: Text('Logout'),
-        onTap: () {
-          // Optional logout action
+        onTap: () async {
+          logout(context);
         },
       ),
     ];
+  }
+}
+
+void logout(BuildContext context) async {
+  await Supabase.instance.client.auth.signOut();
+
+  // Optional: Navigate to login or splash screen
+  if (context.mounted) {
+    context.go('/'); // or context.pushReplacementNamed('login')
   }
 }
