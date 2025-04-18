@@ -111,14 +111,14 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
   Future<OnboardingViewerPageEntity> updateOnboarding(
       OnboardingModel onboarding) async {
     try {
-      await supabaseClient
-          .from('employee_onboarding')
-          .update(
-            onboarding.toJson(),
-          )
-          .eq('id',
-              onboarding.onboardingId!) // Ensure you update the correct row
-          .select();
+      // await supabaseClient
+      //     .from('employee_onboarding')
+      //     .update(
+      //       onboarding.toJson(),
+      //     )
+      //     .eq('id',
+      //         onboarding.onboardingId!) // Ensure you update the correct row
+      //     .select();
       final onboardingsView = await supabaseClient
           .from('employee_onboarding_view')
           .select('*')
@@ -208,23 +208,19 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
           departmentId: onboarding.departmentId ?? '',
           positionId: onboarding.positionId ?? '',
         );
-        await supabaseClient
-            .from('users')
-            .update(
-              {
-                'first_name_en': onboarding.firstNameEn,
-                'first_name_ar': onboarding.firstNameAr,
-                'last_name_en': onboarding.lastNameEn,
-                'last_name_ar': onboarding.lastNameAr,
-                'phone': onboarding.phone,
-                'department_id': onboarding.departmentId,
-                'position_id': onboarding.positionId,
-                'status_id': LookupConstants.userStatusActive,
-                'report_to': onboarding.reportTo,
-              },
-            )
-            .eq('id', userId)
-            .select();
+        await supabaseClient.from('users').update(
+          {
+            'first_name_en': onboarding.firstNameEn,
+            'first_name_ar': onboarding.firstNameAr,
+            'last_name_en': onboarding.lastNameEn,
+            'last_name_ar': onboarding.lastNameAr,
+            'phone': onboarding.phone,
+            'department_id': onboarding.departmentId,
+            'position_id': onboarding.positionId,
+            'status_id': LookupConstants.userStatusActive,
+            'report_to': onboarding.reportTo,
+          },
+        ).eq('id', userId);
       }
       final onboardingsView = await supabaseClient
           .from('employee_onboarding_view')

@@ -18,6 +18,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/auth/presentation/pages/signup_page.dart';
 import 'settings/settings_controller.dart';
@@ -39,7 +40,29 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // ✅ Check if already signed in
     context.read<AuthBloc>().add(AuthIsUserSignedIn());
+
+    // ✅ Listen to Supabase auth state changes
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      if (!mounted) return; // ✅ safely check before using context
+
+      if (event == AuthChangeEvent.signedOut) {
+        // 🔁 Tell your Cubit to update auth state
+        context.read<AppUserCubit>().signOut(); // You must implement this
+      } else if (event == AuthChangeEvent.signedIn) {
+        final state = context.read<AppUserCubit>().state;
+        if (state is! AppUserSignedIn) {
+        } else {
+          final user = state.user;
+          // final user =
+          //     (context.read<AppUserCubit>().state as AppUserSignedIn).user;
+          context.read<AppUserCubit>().updatUser(user); // Also implement this
+        }
+      }
+    });
   }
 
   @override
@@ -117,6 +140,14 @@ class _MyAppState extends State<MyApp> {
         ),
       ],
     );
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final event = data.event;
+      if (event == AuthChangeEvent.signedOut) {
+        // Update your state or redirect globally
+        debugPrint('🔴 User signed out');
+      }
+    });
+
     return ListenableBuilder(
       listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {

@@ -129,93 +129,99 @@ class _CustomScaffoldState extends State<CustomScaffold> {
   }
 
   List<Widget> _defaultDrawerItems() {
-    final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
-
-    return [
-      UserAccountsDrawerHeader(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppPallete.gradient1,
-              AppPallete.gradient2,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    final state = context.read<AppUserCubit>().state;
+    if (state is! AppUserSignedIn) {
+      return [SizedBox()];
+    } else {
+      final user = state.user;
+      return [
+        UserAccountsDrawerHeader(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppPallete.gradient1,
+                AppPallete.gradient2,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
-        ),
-        accountName: Text(
-          "${user.firstNameEn} ${user.lastNameEn}",
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppPallete.whiteColor,
-          ),
-        ),
-        accountEmail: Text(
-          user.email,
-          style: const TextStyle(
-            fontSize: 14,
-            color: AppPallete.whiteColor,
-          ),
-        ),
-        currentAccountPicture: CircleAvatar(
-          radius: 30,
-          backgroundColor: AppPallete.whiteColor,
-          child: Text(
-            "${user.firstNameEn.isNotEmpty ? user.firstNameEn[0].toUpperCase() : ''}${user.lastNameEn.isNotEmpty ? user.lastNameEn[0].toUpperCase() : ''}",
-            style: TextStyle(
-              fontSize: 24,
+          accountName: Text(
+            "${user.firstNameEn} ${user.lastNameEn}",
+            style: const TextStyle(
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: AppPallete.gradient1,
+              color: AppPallete.whiteColor,
+            ),
+          ),
+          accountEmail: Text(
+            user.email,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppPallete.whiteColor,
+            ),
+          ),
+          currentAccountPicture: CircleAvatar(
+            radius: 30,
+            backgroundColor: AppPallete.whiteColor,
+            child: Text(
+              "${user.firstNameEn.isNotEmpty ? user.firstNameEn[0].toUpperCase() : ''}${user.lastNameEn.isNotEmpty ? user.lastNameEn[0].toUpperCase() : ''}",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppPallete.gradient1,
+              ),
             ),
           ),
         ),
-      ),
-      ListTile(
-        leading: Icon(Icons.home),
-        title: Text('Home'),
-        onTap: () {
-          context.go('/');
-        },
-      ),
-      ListTile(
-        leading: Icon(Icons.add),
-        title: Text('Blogs'),
-        onTap: () {
-          context.push('/blogs');
-        },
-      ),
-      ListTile(
-        leading: Icon(Icons.add),
-        title: Text('Onboardings'),
-        onTap: () {
-          context.push('/onboardings');
-        },
-      ),
-      ListTile(
-        leading: Icon(Icons.settings),
-        title: Text('Settings'),
-        onTap: () {
-          context.push('/settings'); // Make sure this route exists
-        },
-      ),
-      const Divider(),
-      ListTile(
-        leading: Icon(Icons.logout),
-        title: Text('Logout'),
-        onTap: () async {
-          logout(context);
-        },
-      ),
-    ];
+        ListTile(
+          leading: Icon(Icons.home),
+          title: Text('Home'),
+          onTap: () {
+            context.go('/');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.add),
+          title: Text('Blogs'),
+          onTap: () {
+            context.push('/blogs');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.add),
+          title: Text('Onboardings'),
+          onTap: () {
+            context.push('/onboardings');
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.settings),
+          title: Text('Settings'),
+          onTap: () {
+            context.push('/settings'); // Make sure this route exists
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: Icon(Icons.logout),
+          title: Text('Logout'),
+          onTap: () async {
+            logout(context);
+          },
+        ),
+      ];
+    }
   }
 }
 
 void logout(BuildContext context) async {
-  await Supabase.instance.client.auth.signOut();
+  // final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
 
-  // Optional: Navigate to login or splash screen
+  await Supabase.instance.client.auth.signOut();
+  // context.read<AppUserCubit>().updatUser(user); // You must implement this
+
   if (context.mounted) {
-    context.go('/'); // or context.pushReplacementNamed('login')
+    context.go('/'); // redirect to login or splash
   }
 }
