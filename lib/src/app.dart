@@ -57,8 +57,6 @@ class _MyAppState extends State<MyApp> {
         if (state is! AppUserSignedIn) {
         } else {
           final user = state.user;
-          // final user =
-          //     (context.read<AppUserCubit>().state as AppUserSignedIn).user;
           context.read<AppUserCubit>().updatUser(user); // Also implement this
         }
       }
@@ -109,7 +107,7 @@ class _MyAppState extends State<MyApp> {
           path: '/blog/:id',
           builder: (context, state) {
             final entity = state.extra as BlogViewerPageEntity;
-            return BlogViewerPage(blogViewerPage: entity);
+            return BlogViewerPage(initialBlogViewerPage: entity);
           },
         ),
         GoRoute(

@@ -1,6 +1,7 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
@@ -27,6 +28,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
+
   @override
   void initState() {
     super.initState();
@@ -73,9 +75,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
       showDrawer: false,
       tilteActions: [
         IconButton(
-          onPressed: () {
-            _submitBlog();
-          },
+          onPressed: _submitBlog,
           icon: Icon(Icons.done_rounded),
         )
       ],
@@ -85,7 +85,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
             if (state is BlogFailure) {
               showSnackBar(context, state.error);
             } else if (state is BlogSubmitSuccess) {
-              context.pop(); // Go back and return data
+              context.pop();
             }
           },
           builder: (context, state) {
@@ -100,104 +100,99 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: formKey,
-                child: Column(
-                  children: [
-                    DottedBorder(
-                      color: AppPallete.borderColor,
-                      dashPattern: const [
-                        10,
-                        4,
-                      ],
-                      radius: const Radius.circular(10),
-                      borderType: BorderType.RRect,
-                      strokeCap: StrokeCap.round,
-                      child: SizedBox(
-                        height: 150,
-                        width: double.infinity,
-                        child: const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide = constraints.maxWidth >= 600;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
-                            Icon(
-                              Icons.folder_open,
-                              size: 40,
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Text(
-                              'Select your image',
-                              style: TextStyle(
-                                fontSize: 15,
+                            'Option 1',
+                            'Option 2',
+                            'Option 3',
+                            'Option 4',
+                            'Option 5',
+                          ].map((topic) {
+                            final isSelected = selectedTopics.contains(topic);
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  isSelected
+                                      ? selectedTopics.remove(topic)
+                                      : selectedTopics.add(topic);
+                                });
+                              },
+                              child: Chip(
+                                label: Text(topic,
+                                    style: const TextStyle(fontSize: 15)),
+                                color: isSelected
+                                    ? const WidgetStatePropertyAll(
+                                        AppPallete.gradient1)
+                                    : null,
+                                side: isSelected
+                                    ? null
+                                    : const BorderSide(
+                                        color: AppPallete.borderColor),
                               ),
-                            )
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: [
+                            responsiveField(
+                              CustomTextFormField(
+                                controller: titleControler,
+                                readOnly: false,
+                                hintText: 'Blog title',
+                              ),
+                              isWide,
+                            ),
+                            responsiveField(
+                              CustomTextFormField(
+                                controller: contentControler,
+                                hintText: 'Blog content',
+                                readOnly: false,
+                                maxLines: null,
+                              ),
+                              isWide,
+                            ),
                           ],
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          'Option 1',
-                          'Option 2',
-                          'Option 3',
-                          'Option 4',
-                          'Option 5',
-                        ]
-                            .map(
-                              (_) => Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (selectedTopics.contains(_)) {
-                                      selectedTopics.remove(_);
-                                    } else {
-                                      selectedTopics.add(_);
-                                    }
-                                    setState(() {});
-                                  },
-                                  child: Chip(
-                                    label: Text(
-                                      _,
-                                      style: TextStyle(fontSize: 15),
-                                    ),
-                                    color: selectedTopics.contains(_)
-                                        ? const WidgetStatePropertyAll(
-                                            AppPallete.gradient1,
-                                          )
-                                        : null,
-                                    side: selectedTopics.contains(_)
-                                        ? null
-                                        : const BorderSide(
-                                            color: AppPallete.borderColor),
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: titleControler,
-                      readOnly: false,
-                      hintText: 'Blog title',
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    CustomTextFormField(
-                      controller: contentControler,
-                      hintText: 'Blog content',
-                      readOnly: false,
-                      maxLines: null,
-                    ),
-                  ],
+                        const SizedBox(height: 40),
+                        Divider(thickness: 1.5, color: Colors.grey[300]),
+                        const SizedBox(height: 24),
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 12,
+                          alignment: WrapAlignment.spaceBetween,
+                          children: [
+                            CustomButton(
+                              width: 180,
+                              icon: Icons.check_circle,
+                              text: 'Submit',
+                              onPressed: _submitBlog,
+                            ),
+                            CustomButton(
+                              width: 180,
+                              icon: Icons.cancel,
+                              text: 'Cancel',
+                              // type: ButtonType.outlined,
+                              backgroundColor: AppPallete.errorColor,
+                              onPressed: context.pop,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    );
+                  },
                 ),
               ),
             );

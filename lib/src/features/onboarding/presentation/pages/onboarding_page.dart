@@ -1,6 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_card_wrapper.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_list_requests.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
@@ -101,10 +101,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: AnimatedCardWrapper(
                       index: index,
-                      child: CustomCardWithChips(
+                      child: CustomCardListRequests(
                         title:
                             'Employee name: ${onboarding.firstNameEn} ${onboarding.lastNameEn}',
-                        description: 'Position: ${onboarding.positionNameEn}',
+                        subtitle: 'Position: ${onboarding.positionNameEn}',
+                        statusId: onboarding.requestStatusId,
+                        requestDate: onboarding.createdAt,
                         onTap: () {
                           if (context.mounted) {
                             context.push(

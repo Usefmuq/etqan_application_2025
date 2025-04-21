@@ -1,6 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_card_wrapper.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_with_chips.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_list_requests.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
@@ -99,12 +99,15 @@ class _BlogPageState extends State<BlogPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: AnimatedCardWrapper(
-                      index: index,
-                      child: CustomCardWithChips(
-                        chips: blog.topics ?? [],
-                        title: blog.title ?? '',
-                        onTap: () {
-                          if (context.mounted) {
+                        index: index,
+                        child: CustomCardListRequests(
+                          chips: blog.topics ?? [],
+                          title: blog.title ?? '',
+                          statusId: blog.requestStatusId, // Optional
+                          requestDate: blog.requestCreatedAt,
+
+                          subtitle: blog.content, // Optional
+                          onTap: () {
                             context.push(
                               '/blog/${blog.blogId}',
                               extra: BlogViewerPageEntity(
@@ -114,10 +117,8 @@ class _BlogPageState extends State<BlogPage> {
                                     .toList(),
                               ),
                             );
-                          }
-                        },
-                      ),
-                    ),
+                          },
+                        )),
                   );
                 }),
               );

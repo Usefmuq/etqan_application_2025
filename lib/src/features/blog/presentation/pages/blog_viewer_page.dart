@@ -21,20 +21,21 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class BlogViewerPage extends StatefulWidget {
+  final BlogViewerPageEntity initialBlogViewerPage;
+  const BlogViewerPage({super.key, required this.initialBlogViewerPage});
+
   static route(BlogViewerPageEntity blogViewerPage) => MaterialPageRoute(
         builder: (context) => BlogViewerPage(
-          blogViewerPage: blogViewerPage,
+          initialBlogViewerPage: blogViewerPage,
         ),
       );
-
-  final BlogViewerPageEntity blogViewerPage;
-  const BlogViewerPage({super.key, required this.blogViewerPage});
 
   @override
   State<BlogViewerPage> createState() => _BlogViewerPageState();
 }
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
+  late BlogViewerPageEntity blogViewerPage;
   List<String>? permissions;
   ApprovalSequenceViewModel? pendingApproval;
   final TextEditingController commentController = TextEditingController();
@@ -43,21 +44,19 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   void initState() {
     super.initState();
+    blogViewerPage = widget.initialBlogViewerPage;
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
 
-      final fetchPendingApproval = await widget.blogViewerPage.approval!
-          .firstWhereOrNullAsync((a) async {
+      final fetchPendingApproval =
+          await blogViewerPage.approval!.firstWhereOrNullAsync((a) async {
         return a.approvalStatus?.toLowerCase() ==
                 LookupConstants.approvalStatusApprovalPending &&
             (a.approverUserId == userId ||
-                await isUserHasRole(
-                  userId,
-                  a.roleId ?? '',
-                ));
+                await isUserHasRole(userId, a.roleId ?? ''));
       });
       if (mounted) {
         setState(() {
@@ -66,6 +65,19 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         });
       }
     });
+  }
+
+  void _handleEdit() async {
+    final updatedEntity = await context.push<BlogViewerPageEntity>(
+      '/blog/update/${blogViewerPage.blogsView.blogId}',
+      extra: blogViewerPage.blogsView.toBlog()!,
+    );
+
+    if (updatedEntity != null && mounted) {
+      setState(() {
+        blogViewerPage = updatedEntity;
+      });
+    }
   }
 
   void _approveBlog({required bool isApproved}) async {
@@ -86,7 +98,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         ],
       ),
     );
-    if (!mounted) return; // ✅ Prevent using context if widget is disposed
+    if (!mounted) return;
 
     if (!isUserHasPermissionsView(
           permissions ?? [],
@@ -111,7 +123,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       context.read<BlogBloc>().add(
             BlogApproveEvent(
               approvalSequence: updatedApproval,
-              blogModel: widget.blogViewerPage.blogsView,
+              blogModel: blogViewerPage.blogsView,
             ),
           );
     }
@@ -120,39 +132,17 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Blog- ${widget.blogViewerPage.blogsView.requestId}',
+      title: 'Blog- ${blogViewerPage.blogsView.requestId}',
       tilteActions: [
         if (isUserHasPermissionsView(
               permissions ?? [],
               PermissionsConstants.updateBlog,
             ) &&
-            widget.blogViewerPage.blogsView.toBlog() != null)
+            blogViewerPage.blogsView.toBlog() != null)
           IconButton(
-            onPressed: () {
-              context.push(
-                '/blog/update/${widget.blogViewerPage.blogsView.blogId}',
-                extra: widget.blogViewerPage.blogsView.toBlog()!,
-              );
-            },
+            onPressed: _handleEdit,
             icon: Icon(Icons.edit),
           ),
-        // if (isUserHasPermissionsView(
-        //       permissions ?? [],
-        //       PermissionsConstants.approveBlog,
-        //     ) &&
-        //     !pendingApproval.isNullOrEmpty)
-        //   IconButton(
-        //     onPressed: () {
-        //       Navigator.push(
-        //         context,
-        //         ApproveBlogPage.route(
-        //           widget.blogViewerPage.blogsView,
-        //           pendingApproval!,
-        //         ),
-        //       );
-        //     },
-        //     icon: Icon(Icons.check),
-        //   ),
       ],
       body: [
         BlocConsumer<BlogBloc, BlogState>(
@@ -183,29 +173,23 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                     ),
                     CustomKeyValueGrid(
                       data: {
-                        'Title': widget.blogViewerPage.blogsView.title,
+                        'Title': blogViewerPage.blogsView.title,
                         'Request ID':
-                            "blog-${widget.blogViewerPage.blogsView.requestId}",
-                        'Status':
-                            widget.blogViewerPage.blogsView.requestStatusId,
-                        'Topics':
-                            widget.blogViewerPage.blogsView.topics!.join(', '),
-                        'Created By Ar':
-                            widget.blogViewerPage.blogsView.fullNameAr,
-                        'Priority': widget.blogViewerPage.blogsView.priorityId,
+                            "blog-${blogViewerPage.blogsView.requestId}",
+                        'Status': blogViewerPage.blogsView.requestStatusId,
+                        'Topics': blogViewerPage.blogsView.topics!.join(', '),
+                        'Created By Ar': blogViewerPage.blogsView.fullNameAr,
+                        'Priority': blogViewerPage.blogsView.priorityId,
                         'Request Details':
-                            widget.blogViewerPage.blogsView.requestDetails,
-                        'Created At': DateFormat.yMMMd().add_jm().format(
-                            widget.blogViewerPage.blogsView.requestCreatedAt!),
-                        'Updated':
-                            widget.blogViewerPage.blogsView.blogUpdatedAt,
+                            blogViewerPage.blogsView.requestDetails,
+                        'Created At': DateFormat.yMMMd()
+                            .add_jm()
+                            .format(blogViewerPage.blogsView.requestCreatedAt!),
+                        'Updated': blogViewerPage.blogsView.blogUpdatedAt,
                         'Approved At':
-                            widget.blogViewerPage.blogsView.requestApprovedAt !=
-                                    null
-                                ? DateFormat.yMMMd().add_jm().format(widget
-                                    .blogViewerPage
-                                    .blogsView
-                                    .requestApprovedAt!)
+                            blogViewerPage.blogsView.requestApprovedAt != null
+                                ? DateFormat.yMMMd().add_jm().format(
+                                    blogViewerPage.blogsView.requestApprovedAt!)
                                 : "Not yet",
                       },
                     ),
@@ -226,7 +210,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                         'Request User Name EN',
                         'Service Name EN',
                       ],
-                      rows: widget.blogViewerPage.approval!
+                      rows: blogViewerPage.approval!
                           .map((e) => e.toTableRow())
                           .toList(),
                       useChipsForStatus: true,
