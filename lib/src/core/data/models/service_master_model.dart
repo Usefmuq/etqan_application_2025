@@ -17,7 +17,7 @@ class ServiceMasterModel extends ServiceMaster {
   /// Factory constructor to create an instance from a Map object.
   factory ServiceMasterModel.fromJson(Map<String, dynamic> map) {
     return ServiceMasterModel(
-      serviceId: map['id'] as int,
+      serviceId: map['service_id'] as int,
       serviceNameEn: map['service_name_en'] ?? '',
       serviceNameAr: map['service_name_ar'] ?? '',
       serviceDescriptionEn: map['service_description_en'],

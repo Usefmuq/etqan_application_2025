@@ -5,9 +5,9 @@ class ServiceMaster {
   final String? serviceDescriptionEn;
   final String? serviceDescriptionAr;
   final bool isActive; // ✅ Whether the service is active
-  final int
+  final int?
       numberOfManagerApprovalsNeeded; // ✅ Number of manager approvals required
-  final int numberOfApprovalsNeeded; // ✅ Total approvals required
+  final int? numberOfApprovalsNeeded; // ✅ Total approvals required
   final DateTime createdAt;
   final DateTime updatedAt;
 

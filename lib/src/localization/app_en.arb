@@ -81,6 +81,8 @@
   "employeeNameAr": "Employee name arabic",
   "onboardingDetails": "Onboarding details",
   "onboarding": "Onboarding",
+  "homeScreensService": "Sevices List",
+  "homeScreensServiceSubtitle": "You can use below services",
 
 
   "noResults": "No results found",

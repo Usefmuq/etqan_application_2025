@@ -78,6 +78,8 @@
   "employeeNameAr": "اسم الموظف بالعربية",
   "onboardingDetails": "تفاصيل التوظيف",
   "onboarding": "التوظيف",
+  "homeScreensService": "قائمة الخدمات",
+  "homeScreensServiceSubtitle": "أدناه تستطيع البدء بالتقديم على خدمة",
   "noResults": "لا توجد نتائج",
   "unexpectedError": "حدث خطأ غير متوقع، يرجى التواصل مع إدارة إتقان",
   "email": "البريد الإلكتروني"

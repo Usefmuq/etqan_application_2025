@@ -24,6 +24,11 @@ import 'package:etqan_application_2025/src/features/blog/domain/usecases/get_all
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/submit_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/update_blog.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/data/datasources/home_screen_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/data/repositories/home_screen_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/domain/repositories/home_screen_repository.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/domain/usecases/get_all_services.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/presentation/bloc/home_screen_bloc.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/datasources/onboarding_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/repositories/onboarding_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/repositories/onboarding_repository.dart';
@@ -39,6 +44,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final serviceLocator = GetIt.instance;
 Future<void> initdependencies() async {
   _intitAuth();
+  _intitHomeScreen();
   _intitBlog();
   _intitOnboarding();
   final supabase = await Supabase.initialize(
@@ -173,6 +179,34 @@ void _intitBlog() {
         updateBlog: serviceLocator(),
         approveBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
+      ),
+    );
+}
+
+void _intitHomeScreen() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<HomeScreenRemoteDataSource>(
+      () => HomeScreenRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<HomeScreenRepository>(
+      () => HomeScreenRepositoryImpl(
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => GetAllServices(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => HomeScreenBloc(
+        getAllServices: serviceLocator(),
       ),
     );
 }

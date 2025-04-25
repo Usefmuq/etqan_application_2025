@@ -7,6 +7,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/update_blog_page.dart';
+import 'package:etqan_application_2025/src/features/homeScreen/presentation/pages/home_screen_page.dart';
 import 'package:etqan_application_2025/src/features/onboarding/data/models/onboarding_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/add_new_onboarding_page.dart';
@@ -79,9 +80,15 @@ class _MyAppState extends State<MyApp> {
             return BlocSelector<AppUserCubit, AppUserState, bool>(
               selector: (state) => state is AppUserSignedIn,
               builder: (context, isSignedIn) {
-                return isSignedIn ? const BlogPage() : const SignupPage();
+                return isSignedIn ? const HomeScreenPage() : const SignupPage();
               },
             );
+          },
+        ),
+        GoRoute(
+          path: '/home',
+          builder: (context, state) {
+            return HomeScreenPage();
           },
         ),
         GoRoute(
