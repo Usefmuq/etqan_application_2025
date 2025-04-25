@@ -1,6 +1,7 @@
 import 'package:etqan_application_2025/src/core/constants/uuid_lookup_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomKeyValueGrid extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -14,7 +15,8 @@ class CustomKeyValueGrid extends StatelessWidget {
     this.spacing = 16,
   });
 
-  Map<String, dynamic> _getLookupMeta(dynamic value, String locale) {
+  Map<String, dynamic> _getLookupMeta(
+      dynamic value, String locale, BuildContext context) {
     if (value is String &&
         RegExp(r'^[0-9a-fA-F\-]{36}$').hasMatch(value) &&
         UuidLookupConstants.combinedLookup.containsKey(value)) {
@@ -34,8 +36,9 @@ class CustomKeyValueGrid extends StatelessWidget {
 
     if (value is bool) {
       return {
-        'label':
-            locale == 'ar' ? (value ? 'نعم' : 'لا') : (value ? 'Yes' : 'No')
+        'label': value
+            ? AppLocalizations.of(context)!.yes
+            : AppLocalizations.of(context)!.no
       };
     }
 
@@ -63,7 +66,7 @@ class CustomKeyValueGrid extends StatelessWidget {
           spacing: spacing,
           runSpacing: spacing,
           children: items.map((entry) {
-            final meta = _getLookupMeta(entry.value, localeCode);
+            final meta = _getLookupMeta(entry.value, localeCode, context);
             final label = meta['label'] ?? '—';
             final color = meta['color'] as Color?;
             final isChip = meta['isChip'] == true;

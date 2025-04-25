@@ -136,8 +136,8 @@ class CustomCardListRequests extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          backgroundColor:
-                              AppPallete.greyColor.withOpacity(0.2),
+                          backgroundColor: AppPallete.greyColor
+                              .withAlpha((0.1 * 255).toInt()),
                         ),
                       )
                       .toList(),

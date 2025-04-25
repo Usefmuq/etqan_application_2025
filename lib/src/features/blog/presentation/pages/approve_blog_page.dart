@@ -14,6 +14,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ApproveBlogPage extends StatefulWidget {
   final BlogsPageViewModel blog;
@@ -151,8 +152,8 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Selected Topics",
+                  Text(
+                    AppLocalizations.of(context)!.selectedTopics,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 10),
@@ -190,32 +191,32 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
                     }).toList(),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Blog Title",
+                  Text(
+                    AppLocalizations.of(context)!.blogTitle,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   CustomTextFormField(
                     controller: titleControler,
-                    hintText: 'Blog title',
+                    hintText: AppLocalizations.of(context)!.blogTitle,
                     readOnly: true,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    "Blog Content",
+                  Text(
+                    AppLocalizations.of(context)!.blogContent,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   CustomTextFormField(
                     controller: contentControler,
-                    hintText: 'Blog content',
+                    hintText: AppLocalizations.of(context)!.blogContent,
                     maxLines: null,
                     readOnly: true,
                   ),
                   const SizedBox(height: 30),
                   CustomTextFormField(
                     controller: commentController,
-                    hintText: 'Approval comment',
+                    hintText: AppLocalizations.of(context)!.approvalComment,
                     maxLines: null,
                     readOnly: false,
                   ),
@@ -223,7 +224,7 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
                     children: [
                       Expanded(
                         child: CustomButton(
-                          text: 'Approve',
+                          text: AppLocalizations.of(context)!.approve,
                           icon: Icons.check_circle_outline,
                           onPressed: () {
                             _approveBlog(isApproved: true);
@@ -233,7 +234,7 @@ class _ApproveBlogPageState extends State<ApproveBlogPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: CustomButton(
-                          text: 'Reject',
+                          text: AppLocalizations.of(context)!.reject,
                           icon: Icons.cancel_outlined,
                           backgroundColor: AppPallete.errorColor,
                           onPressed: () {

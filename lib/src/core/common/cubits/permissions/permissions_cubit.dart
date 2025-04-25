@@ -40,13 +40,4 @@ class PermissionsCubit extends Cubit<PermissionsState> {
 
     return hasPerm;
   }
-
-  // bool hasPermission(String permissionId) {
-  //   print("ss");
-
-  //   final xx =
-  //       (state as PermissionsList).permissions.first.permissionDescriptionAr;
-  //   print("hasPermission ${xx}");
-  //   return false;
-  // }
 }

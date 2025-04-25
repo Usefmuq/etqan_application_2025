@@ -18,6 +18,7 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UpdateOnboardingPage extends StatefulWidget {
   final OnboardingsPageViewModel onboarding;
@@ -128,7 +129,8 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
     notesControler.text = onboarding.notes ?? '';
 
     return CustomScaffold(
-      title: 'Update Onboarding-${widget.onboarding.requestId}',
+      title:
+          '${AppLocalizations.of(context)!.updateOnboarding}-${widget.onboarding.requestId}',
       showDrawer: false,
       tilteActions: [
         if (isUserHasPermissionsView(
@@ -184,59 +186,67 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: firstNameEnControler,
-                                      hintText: 'First name (EN)',
+                                      hintText: AppLocalizations.of(context)!
+                                          .firstNameEN,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: lastNameEnControler,
-                                      hintText: 'Last name (EN)',
+                                      hintText: AppLocalizations.of(context)!
+                                          .lastNameEN,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: firstNameArControler,
-                                      hintText: 'First name (AR)',
+                                      hintText: AppLocalizations.of(context)!
+                                          .firstNameAR,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: lastNameArControler,
-                                      hintText: 'Last name (AR)',
+                                      hintText: AppLocalizations.of(context)!
+                                          .lastNameAR,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: emailControler,
-                                      hintText: 'Email',
+                                      hintText:
+                                          AppLocalizations.of(context)!.email,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomTextFormField(
                                       readOnly: false,
                                       controller: phoneControler,
-                                      hintText: 'Phone',
+                                      hintText:
+                                          AppLocalizations.of(context)!.phone,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomDatePicker(
-                                      label: "Start Date",
+                                      label: AppLocalizations.of(context)!
+                                          .startDate,
                                       selectedDate: startDate,
                                       onChanged: (date) =>
                                           setState(() => startDate = date),
                                       validator: (val) => val == null
-                                          ? 'Please select a start date'
+                                          ? AppLocalizations.of(context)!
+                                              .startDateValid
                                           : null,
                                     ),
                                     isWide),
                                 CustomTextFormField(
                                   readOnly: false,
                                   controller: notesControler,
-                                  hintText: 'Notes',
+                                  hintText: AppLocalizations.of(context)!.notes,
                                   maxLines: null,
                                 ),
                               ],
@@ -262,8 +272,10 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                               children: [
                                 responsiveField(
                                     CustomDropdownList<Departments>(
-                                      label: "Department",
-                                      hint: "Select department",
+                                      label: AppLocalizations.of(context)!
+                                          .department,
+                                      hint: AppLocalizations.of(context)!
+                                          .selectDepartment,
                                       items: departments,
                                       selectedItem: selectedDepartment,
                                       onChanged: (value) async {
@@ -285,14 +297,17 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                       },
                                       getLabel: (dept) => dept.nameEn,
                                       validator: (value) => value == null
-                                          ? 'Please select a department'
+                                          ? AppLocalizations.of(context)!
+                                              .departmentValid
                                           : null,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomDropdownList<Positions>(
-                                      label: "Position",
-                                      hint: "Select position",
+                                      label: AppLocalizations.of(context)!
+                                          .position,
+                                      hint: AppLocalizations.of(context)!
+                                          .selectPosition,
                                       items: positions,
                                       selectedItem: selectedPosition,
                                       onChanged: (value) {
@@ -302,14 +317,17 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                       },
                                       getLabel: (pos) => pos.nameEn,
                                       validator: (value) => value == null
-                                          ? 'Please select a position'
+                                          ? AppLocalizations.of(context)!
+                                              .positionValid
                                           : null,
                                     ),
                                     isWide),
                                 responsiveField(
                                     CustomDropdownList<UserModel>(
-                                      label: "Manager",
-                                      hint: "Select manager",
+                                      label:
+                                          AppLocalizations.of(context)!.manager,
+                                      hint: AppLocalizations.of(context)!
+                                          .selectManager,
                                       items: managers,
                                       selectedItem: selectedManager,
                                       onChanged: (value) {
@@ -320,7 +338,8 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                       getLabel: (usr) =>
                                           '${usr.firstNameEn} ${usr.lastNameEn}',
                                       validator: (value) => value == null
-                                          ? 'Please select a manager'
+                                          ? AppLocalizations.of(context)!
+                                              .managerValid
                                           : null,
                                     ),
                                     isWide),
@@ -336,7 +355,7 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                       child: ElevatedButton.icon(
                         onPressed: _updateOnboarding,
                         icon: const Icon(Icons.send),
-                        label: const Text("Update Onboarding"),
+                        label: Text(AppLocalizations.of(context)!.submit),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           textStyle: const TextStyle(

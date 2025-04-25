@@ -71,21 +71,20 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     return CustomScaffold(
       title: 'Update Blog-${widget.blog.requestId}',
       showDrawer: false,
-      tilteActions: [
-        if (isUserHasPermissionsView(
-            permissions ?? [], PermissionsConstants.updateBlog))
-          IconButton(
-            onPressed: _updateBlog,
-            icon: const Icon(Icons.done_rounded),
-          )
-      ],
+      // tilteActions: [
+      //   if (isUserHasPermissionsView(
+      //       permissions ?? [], PermissionsConstants.updateBlog))
+      //     IconButton(
+      //       onPressed: _updateBlog,
+      //       icon: const Icon(Icons.done_rounded),
+      //     )
+      // ],
       body: [
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
             if (state is BlogFailure) {
               showSnackBar(context, state.error);
             } else if (state is BlogUpdateSuccess) {
-              print('sss ${state.blogViewerPageEntity.blogsView.title}');
               context.pop(state.blogViewerPageEntity);
             }
           },

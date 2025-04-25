@@ -142,7 +142,6 @@ class _MyAppState extends State<MyApp> {
       final event = data.event;
       if (event == AuthChangeEvent.signedOut) {
         // Update your state or redirect globally
-        debugPrint('🔴 User signed out');
       }
     });
 
@@ -169,9 +168,10 @@ class _MyAppState extends State<MyApp> {
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [
-            Locale('en', ''), // English, no country code
+            Locale('en'), // English, no country code
+            Locale('ar'), // English, no country code
           ],
-
+          locale: Locale('ar'),
           // Use AppLocalizations to configure the correct application title
           // depending on the user's locale.
           //

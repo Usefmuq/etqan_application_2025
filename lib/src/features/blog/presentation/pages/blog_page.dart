@@ -11,6 +11,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BlogPage extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -60,8 +61,8 @@ class _BlogPageState extends State<BlogPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Blogs Service',
-      subtitle: "here is blog service",
+      title: AppLocalizations.of(context)!.blogsService,
+      subtitle: AppLocalizations.of(context)!.blogsServiceSubtitle,
       tilteActions: [
         if (isUserHasPermissionsView(
           permissions ?? [],

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OnboardingViewerPage extends StatefulWidget {
   static route(OnboardingViewerPageEntity onboardingViewerPage) =>
@@ -180,29 +181,40 @@ class _OnboardingViewerPageState extends State<OnboardingViewerPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomSectionTitle(
-                      title: "Onboarding details",
+                      title: AppLocalizations.of(context)!.onboardingDetails,
                     ),
                     CustomKeyValueGrid(
                       data: {
-                        'Employee Name English':
+                        AppLocalizations.of(context)!.employeeNameEn:
                             '${widget.onboardingViewerPage.onboardingsView.firstNameEn} ${widget.onboardingViewerPage.onboardingsView.lastNameEn}',
-                        'Request ID':
-                            "onboarding-${widget.onboardingViewerPage.onboardingsView.requestId}",
-                        'Employee Name Arabic':
+                        AppLocalizations.of(context)!.requestId:
+                            "${AppLocalizations.of(context)!.onboarding}-${widget.onboardingViewerPage.onboardingsView.requestId}",
+                        AppLocalizations.of(context)!.employeeNameAr:
                             '${widget.onboardingViewerPage.onboardingsView.firstNameAr} ${widget.onboardingViewerPage.onboardingsView.lastNameAr}',
-                        'Status': widget.onboardingViewerPage.onboardingsView
+                        AppLocalizations.of(context)!.status: widget
+                            .onboardingViewerPage
+                            .onboardingsView
                             .requestStatusId,
-                        'Departmet': widget.onboardingViewerPage.onboardingsView
+                        AppLocalizations.of(context)!.department: widget
+                            .onboardingViewerPage
+                            .onboardingsView
                             .departmentNameEn,
-                        'Created By Ar': widget.onboardingViewerPage
-                            .onboardingsView.createdByNameEn,
-                        'Position': widget.onboardingViewerPage.onboardingsView
+                        AppLocalizations.of(context)!.createdBy: widget
+                            .onboardingViewerPage
+                            .onboardingsView
+                            .createdByNameEn,
+                        AppLocalizations.of(context)!.position: widget
+                            .onboardingViewerPage
+                            .onboardingsView
                             .positionNameEn,
-                        'Onboarding Notes':
+                        AppLocalizations.of(context)!.notes:
                             widget.onboardingViewerPage.onboardingsView.notes,
-                        'Created At': DateFormat.yMMMd().add_jm().format(widget
-                            .onboardingViewerPage.onboardingsView.createdAt!),
-                        'Updated': widget
+                        AppLocalizations.of(context)!.createdAt:
+                            DateFormat.yMMMd().add_jm().format(widget
+                                .onboardingViewerPage
+                                .onboardingsView
+                                .createdAt!),
+                        AppLocalizations.of(context)!.updatedAt: widget
                             .onboardingViewerPage.onboardingsView.updatedAt,
                         // 'Approved At': widget.onboardingViewerPage
                         //             .onboardingsView.requestApprovedAt !=
@@ -217,19 +229,17 @@ class _OnboardingViewerPageState extends State<OnboardingViewerPage> {
                     const Divider(),
                     const SizedBox(height: 12),
                     CustomSectionTitle(
-                      title: "Approval Sequence",
+                      title: AppLocalizations.of(context)!.approvalSequence,
                     ),
                     CustomTableGrid(
                       headers: [
-                        'Approval ID',
-                        'Request ID',
-                        'Approval Status EN',
-                        'Approver Name EN',
-                        'Role Name EN',
-                        'Approved At',
-                        'Created At',
-                        'Request User Name EN',
-                        'Service Name EN',
+                        AppLocalizations.of(context)!.approvalId,
+                        AppLocalizations.of(context)!.requestId,
+                        AppLocalizations.of(context)!.approvalStatus,
+                        AppLocalizations.of(context)!.approverName,
+                        AppLocalizations.of(context)!.roleName,
+                        AppLocalizations.of(context)!.approvedAt,
+                        AppLocalizations.of(context)!.createdAt,
                       ],
                       rows: widget.onboardingViewerPage.approval!
                           .map((e) => e.toTableRow())

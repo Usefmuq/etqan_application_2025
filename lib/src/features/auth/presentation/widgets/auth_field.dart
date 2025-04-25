@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AuthField extends StatelessWidget {
   final String hintText;
@@ -6,7 +7,10 @@ class AuthField extends StatelessWidget {
   final bool isObscureText;
 
   const AuthField(
-      {super.key, required this.hintText, required this.controller, this.isObscureText = false});
+      {super.key,
+      required this.hintText,
+      required this.controller,
+      this.isObscureText = false});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +19,7 @@ class AuthField extends StatelessWidget {
       decoration: InputDecoration(hintText: hintText),
       validator: (value) {
         if (value!.isEmpty) {
-          return "$hintText is empty";
+          return "$hintText ${AppLocalizations.of(context)!.isEmpty}";
         }
         return null;
       },

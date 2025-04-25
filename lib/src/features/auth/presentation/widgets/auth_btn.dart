@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AuthBtn extends StatelessWidget {
   final VoidCallback onPressed;
@@ -27,8 +28,8 @@ class AuthBtn extends StatelessWidget {
             fixedSize: const Size(395, 55),
             backgroundColor: AppPallete.transparentColor,
             shadowColor: AppPallete.transparentColor),
-        child: const Text(
-          'SIGN UP',
+        child: Text(
+          AppLocalizations.of(context)!.signIn,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
         ),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomDatePicker extends StatelessWidget {
   final String label;
@@ -21,7 +22,7 @@ class CustomDatePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final formattedDate = selectedDate != null
         ? DateFormat.yMMMd().format(selectedDate!)
-        : (hint ?? 'Select date');
+        : (hint ?? AppLocalizations.of(context)!.selectDate);
 
     final errorText = validator?.call(selectedDate);
 

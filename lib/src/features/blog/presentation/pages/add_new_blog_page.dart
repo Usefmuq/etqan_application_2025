@@ -73,12 +73,12 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
     return CustomScaffold(
       title: 'Submit New Blog',
       showDrawer: false,
-      tilteActions: [
-        IconButton(
-          onPressed: _submitBlog,
-          icon: Icon(Icons.done_rounded),
-        )
-      ],
+      // tilteActions: [
+      //   IconButton(
+      //     onPressed: _submitBlog,
+      //     icon: Icon(Icons.done_rounded),
+      //   )
+      // ],
       body: [
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BlogViewerPage extends StatefulWidget {
   final BlogViewerPageEntity initialBlogViewerPage;
@@ -84,17 +85,19 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(isApproved ? 'Confirm Approval' : 'Confirm Rejection'),
+        title: Text(isApproved
+            ? AppLocalizations.of(context)!.confirmApproval
+            : AppLocalizations.of(context)!.confirmRejection),
         content: Text(isApproved
-            ? 'Are you sure you want to approve this blog?'
-            : 'Are you sure you want to reject this blog?'),
+            ? AppLocalizations.of(context)!.confirmApprovalDesc
+            : AppLocalizations.of(context)!.confirmRejectionDesc),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text(AppLocalizations.of(context)!.cancel)),
           TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Yes')),
+              child: Text(AppLocalizations.of(context)!.yes)),
         ],
       ),
     );
@@ -132,7 +135,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Blog- ${blogViewerPage.blogsView.requestId}',
+      title:
+          '${AppLocalizations.of(context)!.blog}- ${blogViewerPage.blogsView.requestId}',
       tilteActions: [
         if (isUserHasPermissionsView(
               permissions ?? [],
@@ -169,46 +173,50 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     CustomSectionTitle(
-                      title: "Blog details",
+                      title: AppLocalizations.of(context)!.blogDetails,
                     ),
                     CustomKeyValueGrid(
                       data: {
-                        'Title': blogViewerPage.blogsView.title,
-                        'Request ID':
-                            "blog-${blogViewerPage.blogsView.requestId}",
-                        'Status': blogViewerPage.blogsView.requestStatusId,
-                        'Topics': blogViewerPage.blogsView.topics!.join(', '),
-                        'Created By Ar': blogViewerPage.blogsView.fullNameAr,
-                        'Priority': blogViewerPage.blogsView.priorityId,
-                        'Request Details':
+                        AppLocalizations.of(context)!.title:
+                            blogViewerPage.blogsView.title,
+                        AppLocalizations.of(context)!.requestId:
+                            "${AppLocalizations.of(context)!.blog}-${blogViewerPage.blogsView.requestId}",
+                        AppLocalizations.of(context)!.status:
+                            blogViewerPage.blogsView.requestStatusId,
+                        AppLocalizations.of(context)!.topics:
+                            blogViewerPage.blogsView.topics!.join(', '),
+                        AppLocalizations.of(context)!.createdBy:
+                            blogViewerPage.blogsView.fullNameAr,
+                        AppLocalizations.of(context)!.priority:
+                            blogViewerPage.blogsView.priorityId,
+                        AppLocalizations.of(context)!.requestDetails:
                             blogViewerPage.blogsView.requestDetails,
-                        'Created At': DateFormat.yMMMd()
-                            .add_jm()
-                            .format(blogViewerPage.blogsView.requestCreatedAt!),
-                        'Updated': blogViewerPage.blogsView.blogUpdatedAt,
-                        'Approved At':
+                        AppLocalizations.of(context)!.createdAt:
+                            DateFormat.yMMMd().add_jm().format(
+                                blogViewerPage.blogsView.requestCreatedAt!),
+                        AppLocalizations.of(context)!.updatedAt:
+                            blogViewerPage.blogsView.blogUpdatedAt,
+                        AppLocalizations.of(context)!.approvedAt:
                             blogViewerPage.blogsView.requestApprovedAt != null
                                 ? DateFormat.yMMMd().add_jm().format(
                                     blogViewerPage.blogsView.requestApprovedAt!)
-                                : "Not yet",
+                                : AppLocalizations.of(context)!.notYet,
                       },
                     ),
                     const Divider(),
                     const SizedBox(height: 12),
                     CustomSectionTitle(
-                      title: "Approval Sequence",
+                      title: AppLocalizations.of(context)!.approvalSequence,
                     ),
                     CustomTableGrid(
                       headers: [
-                        'Approval ID',
-                        'Request ID',
-                        'Approval Status EN',
-                        'Approver Name EN',
-                        'Role Name EN',
-                        'Approved At',
-                        'Created At',
-                        'Request User Name EN',
-                        'Service Name EN',
+                        AppLocalizations.of(context)!.approvalId,
+                        AppLocalizations.of(context)!.requestId,
+                        AppLocalizations.of(context)!.approvalStatus,
+                        AppLocalizations.of(context)!.approverName,
+                        AppLocalizations.of(context)!.roleName,
+                        AppLocalizations.of(context)!.approvedAt,
+                        AppLocalizations.of(context)!.createdAt,
                       ],
                       rows: blogViewerPage.approval!
                           .map((e) => e.toTableRow())
@@ -227,7 +235,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                           children: [
                             CustomTextFormField(
                               controller: commentController,
-                              hintText: 'Approval comment',
+                              hintText:
+                                  AppLocalizations.of(context)!.approvalComment,
                               maxLines: null,
                               readOnly: false,
                             ),
@@ -236,7 +245,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                               children: [
                                 Expanded(
                                   child: CustomButton(
-                                    text: 'Approve',
+                                    text: AppLocalizations.of(context)!.approve,
                                     icon: Icons.check_circle_outline,
                                     onPressed: () {
                                       _approveBlog(isApproved: true);
@@ -246,7 +255,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: CustomButton(
-                                    text: 'Reject',
+                                    text: AppLocalizations.of(context)!.reject,
                                     icon: Icons.cancel_outlined,
                                     backgroundColor: AppPallete.errorColor,
                                     onPressed: () {

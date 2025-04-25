@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -24,7 +25,7 @@ class CustomTextFormField extends StatelessWidget {
       maxLines: maxLines,
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return '$hintText is missing!';
+          return '$hintText ${AppLocalizations.of(context)!.isEmpty}';
         }
         return null;
       },

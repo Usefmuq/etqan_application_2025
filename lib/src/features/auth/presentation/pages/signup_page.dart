@@ -5,6 +5,7 @@ import 'package:etqan_application_2025/src/features/auth/presentation/widgets/au
 import 'package:etqan_application_2025/src/features/auth/presentation/widgets/auth_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -49,28 +50,24 @@ class _SignupPageState extends State<SignupPage> {
                 key: formKey,
                 child: Column(
                   children: <Widget>[
-                    const Text('Sign in',
+                    Text(AppLocalizations.of(context)!.signIn,
                         style: TextStyle(
                             fontSize: 50, fontWeight: FontWeight.bold)),
                     SizedBox(
                       height: 30,
                     ),
-                    // AuthField(
-                    //   hintText: "Name",
-                    //   controller: nameController,
-                    // ),
                     SizedBox(
                       height: 15,
                     ),
                     AuthField(
-                      hintText: "Email",
+                      hintText: AppLocalizations.of(context)!.email,
                       controller: emailController,
                     ),
                     SizedBox(
                       height: 15,
                     ),
                     AuthField(
-                      hintText: "Password",
+                      hintText: AppLocalizations.of(context)!.password,
                       controller: passwordController,
                       isObscureText: true,
                     ),

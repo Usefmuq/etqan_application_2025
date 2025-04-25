@@ -85,9 +85,6 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
             'request_id',
             blog.requestId,
           );
-      print(
-        blogsView.map((blog) => BlogsPageViewModel.fromJson(blog)).first.title,
-      );
       final approvalsView = await supabaseClient
           .from('approval_sequence_view')
           .select('*')

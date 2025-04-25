@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomDropdownList<T> extends StatelessWidget {
   final List<T> items;
@@ -37,7 +38,7 @@ class CustomDropdownList<T> extends StatelessWidget {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           ),
-          hint: Text(hint ?? 'Select...'),
+          hint: Text(hint ?? AppLocalizations.of(context)!.dropDownSelect),
           isExpanded: true,
           items: items.map((item) {
             return DropdownMenuItem<T>(

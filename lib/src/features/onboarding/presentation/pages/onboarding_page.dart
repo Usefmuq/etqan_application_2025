@@ -11,6 +11,7 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -60,8 +61,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Onboardings Service',
-      subtitle: "here is onboarding service",
+      title: AppLocalizations.of(context)!.onboardingsService,
+      subtitle: AppLocalizations.of(context)!.onboardingsServiceSubtitle,
       tilteActions: [
         if (isUserHasPermissionsView(
           permissions ?? [],
@@ -103,8 +104,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       index: index,
                       child: CustomCardListRequests(
                         title:
-                            'Employee name: ${onboarding.firstNameEn} ${onboarding.lastNameEn}',
-                        subtitle: 'Position: ${onboarding.positionNameEn}',
+                            '${AppLocalizations.of(context)!.employeeName}: ${onboarding.firstNameEn} ${onboarding.lastNameEn}',
+                        subtitle:
+                            '${AppLocalizations.of(context)!.position}: ${onboarding.positionNameEn}',
                         statusId: onboarding.requestStatusId,
                         requestDate: onboarding.createdAt,
                         onTap: () {

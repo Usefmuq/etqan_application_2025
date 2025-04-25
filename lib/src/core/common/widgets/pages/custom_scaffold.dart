@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomScaffold extends StatefulWidget {
   final String title;
@@ -40,6 +41,11 @@ class CustomScaffold extends StatefulWidget {
 
 class _CustomScaffoldState extends State<CustomScaffold> {
   bool _isExpanded = false;
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +116,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     return [
       IconButton(
         icon: const Icon(Icons.home),
-        tooltip: 'Home',
+        tooltip: AppLocalizations.of(context)!.homePage,
         onPressed: () {
           context.go('/');
         },
@@ -176,28 +182,28 @@ class _CustomScaffoldState extends State<CustomScaffold> {
         ),
         ListTile(
           leading: Icon(Icons.home),
-          title: Text('Home'),
+          title: Text(AppLocalizations.of(context)!.homePage),
           onTap: () {
             context.go('/');
           },
         ),
         ListTile(
           leading: Icon(Icons.add),
-          title: Text('Blogs'),
+          title: Text(AppLocalizations.of(context)!.blogsService),
           onTap: () {
             context.push('/blogs');
           },
         ),
         ListTile(
           leading: Icon(Icons.add),
-          title: Text('Onboardings'),
+          title: Text(AppLocalizations.of(context)!.onboardingsService),
           onTap: () {
             context.push('/onboardings');
           },
         ),
         ListTile(
           leading: Icon(Icons.settings),
-          title: Text('Settings'),
+          title: Text(AppLocalizations.of(context)!.settings),
           onTap: () {
             context.push('/settings'); // Make sure this route exists
           },
@@ -205,7 +211,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
         const Divider(),
         ListTile(
           leading: Icon(Icons.logout),
-          title: Text('Logout'),
+          title: Text(AppLocalizations.of(context)!.logout),
           onTap: () async {
             logout(context);
           },
@@ -213,6 +219,12 @@ class _CustomScaffoldState extends State<CustomScaffold> {
       ];
     }
   }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _isExpanded = false;
+  // }
 }
 
 void logout(BuildContext context) async {
