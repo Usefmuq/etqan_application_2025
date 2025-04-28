@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
@@ -29,5 +30,11 @@ abstract interface class BlogRepository {
     required ApprovalSequenceViewModel approvalSequenceModel,
     required BlogsPageViewModel blogModel,
   });
-  Future<Either<Failure, BlogPageEntity>> getAllBlogs();
+  Future<Either<Failure, BlogPageEntity>> getAllBlogs({
+    required User user,
+    String? departmentId,
+    required bool isManagerExpanded,
+    required bool isDepartmentManagerExpanded,
+    required bool isViewAll,
+  });
 }

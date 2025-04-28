@@ -3,6 +3,7 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_ca
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card_service.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
+import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/presentation/bloc/home_screen_bloc.dart';
@@ -96,7 +97,10 @@ class _HomeScreenPageState extends State<HomeScreenPage> {
                               : homeScreen.serviceDescriptionAr,
                           icon: Icons.people_alt,
                           onTap: () {
-                            context.push('/onboardings');
+                            context.push(
+                              ServicesConstants
+                                  .servicesRoutes[homeScreen.serviceId - 1],
+                            );
                           },
                         ),
                       ),

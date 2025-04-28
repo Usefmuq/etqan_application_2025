@@ -1,5 +1,5 @@
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
-import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -97,7 +97,13 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     BlogGetAllBlogsEvent event,
     Emitter<BlogState> emit,
   ) async {
-    final response = await _getAllBlogs(NoParams());
+    final response = await _getAllBlogs(GetAllBlogsParams(
+      user: event.user,
+      departmentId: event.departmentId,
+      isManagerExpanded: event.isManagerExpanded,
+      isDepartmentManagerExpanded: event.isDepartmentManagerExpanded,
+      isViewAll: event.isViewAll,
+    ));
     response.fold(
       (failure) => emit(BlogFailure(failure.message)),
       (blogs) {

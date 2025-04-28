@@ -17,7 +17,13 @@ abstract interface class BlogRemoteDataSource {
     ApprovalSequenceViewModel approvalSequence,
     BlogsPageViewModel blog,
   );
-  Future<List<BlogsPageViewModel>> getAllBlogsView();
+  Future<List<BlogsPageViewModel>> getAllBlogsView(
+    String userId,
+    String? departmentId,
+    bool isManagerExpanded,
+    bool isDepartmentManagerExpanded,
+    bool isViewAll,
+  );
   Future<List<ApprovalSequenceViewModel>> getAllApprovalsView();
 }
 
@@ -186,13 +192,34 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<List<BlogsPageViewModel>> getAllBlogsView() async {
+  Future<List<BlogsPageViewModel>> getAllBlogsView(
+    String userId,
+    String? departmentId,
+    bool isManagerExpanded,
+    bool isDepartmentManagerExpanded,
+    bool isViewAll,
+  ) async {
     try {
-      final blogs = await supabaseClient
+      final Map<String, Object> filters = {
+        'request_is_active': true,
+      };
+
+      if (!isViewAll) {
+        if (isDepartmentManagerExpanded) {
+          filters['department_id'] = departmentId ?? '-1';
+        } else if (isManagerExpanded) {
+          filters['report_to'] = userId;
+        } else {
+          filters['created_by_id'] = userId;
+        }
+      }
+
+      final result = await supabaseClient
           .from('blogs_page_view')
           .select('*')
-          .eq('request_is_active', true);
-      return blogs.map((blog) => BlogsPageViewModel.fromJson(blog)).toList();
+          .match(filters);
+
+      return result.map((blog) => BlogsPageViewModel.fromJson(blog)).toList();
     } catch (e) {
       throw ServerException(e.toString());
     }

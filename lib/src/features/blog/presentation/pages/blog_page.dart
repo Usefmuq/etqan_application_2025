@@ -24,36 +24,81 @@ class BlogPage extends StatefulWidget {
   State<BlogPage> createState() => _BlogPageState();
 }
 
-class _BlogPageState extends State<BlogPage> {
+class _BlogPageState extends State<BlogPage>
+    with SingleTickerProviderStateMixin {
   List<String>? permissions;
-  _BlogPageState() : super();
+  late TabController _tabController;
+  bool isManagerExpanded = false;
+  bool isDepartmentManagerExpanded = false;
+  bool isViewAll = false;
+
   @override
   void initState() {
     super.initState();
+
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
+    _tabController = TabController(length: 4, vsync: this);
+
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
-
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
         });
       }
     });
-    // context.read<BlogBloc>().add(BlogGetAllBlogsEvent());
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+
+      setState(() {
+        isManagerExpanded = false;
+        isDepartmentManagerExpanded = false;
+        isViewAll = false;
+
+        if (_tabController.index == 1) {
+          isManagerExpanded = true;
+        } else if (_tabController.index == 2) {
+          isDepartmentManagerExpanded = true;
+        } else if (_tabController.index == 3) {
+          isViewAll = true;
+        }
+      });
+
+      final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
+      context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
+            user: user,
+            departmentId: user.departmentId,
+            isManagerExpanded: isManagerExpanded,
+            isDepartmentManagerExpanded: isDepartmentManagerExpanded,
+            isViewAll: isViewAll,
+          ));
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Re-fetch blogs when this page becomes active again
+    final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final ModalRoute? route = ModalRoute.of(context);
       if (route?.isCurrent == true) {
-        context.read<BlogBloc>().add(BlogGetAllBlogsEvent());
+        context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
+              user: user,
+              departmentId: user.departmentId,
+              isManagerExpanded: isManagerExpanded,
+              isDepartmentManagerExpanded: isDepartmentManagerExpanded,
+              isViewAll: isViewAll,
+            ));
       }
     });
   }
@@ -63,6 +108,13 @@ class _BlogPageState extends State<BlogPage> {
     return CustomScaffold(
       title: AppLocalizations.of(context)!.blogsService,
       subtitle: AppLocalizations.of(context)!.blogsServiceSubtitle,
+      tabController: _tabController,
+      tabs: const [
+        Tab(text: "My Requests"),
+        Tab(text: "Employees"),
+        Tab(text: "Department"),
+        Tab(text: "All"),
+      ],
       tilteActions: [
         if (isUserHasPermissionsView(
           permissions ?? [],
@@ -72,7 +124,7 @@ class _BlogPageState extends State<BlogPage> {
             onPressed: () {
               context.push('/blog/submit/');
             },
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
           ),
       ],
       body: [
@@ -91,37 +143,41 @@ class _BlogPageState extends State<BlogPage> {
               return const Loader();
             }
             if (state is BlogShowAllSuccess) {
-              return Column(
-                children:
-                    List.generate(state.blogPage.blogsView.length, (index) {
+              if (state.blogPage.blogsView.isEmpty) {
+                return const Center(child: Text("No Blogs Found"));
+              }
+
+              return ListView.builder(
+                itemCount: state.blogPage.blogsView.length,
+                itemBuilder: (context, index) {
                   final blog = state.blogPage.blogsView[index];
 
                   return Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: AnimatedCardWrapper(
-                        index: index,
-                        child: CustomCardListRequests(
-                          chips: blog.topics ?? [],
-                          title: blog.title ?? '',
-                          statusId: blog.requestStatusId, // Optional
-                          requestDate: blog.requestCreatedAt,
-
-                          subtitle: blog.content, // Optional
-                          onTap: () {
-                            context.push(
-                              '/blog/${blog.blogId}',
-                              extra: BlogViewerPageEntity(
-                                blogsView: blog,
-                                approval: state.blogPage.approvalsView
-                                    .where((a) => a.requestId == blog.requestId)
-                                    .toList(),
-                              ),
-                            );
-                          },
-                        )),
+                      index: index,
+                      child: CustomCardListRequests(
+                        chips: blog.topics ?? [],
+                        title: blog.title ?? '',
+                        statusId: blog.requestStatusId,
+                        requestDate: blog.requestCreatedAt,
+                        subtitle: blog.content,
+                        onTap: () {
+                          context.push(
+                            '/blog/${blog.blogId}',
+                            extra: BlogViewerPageEntity(
+                              blogsView: blog,
+                              approval: state.blogPage.approvalsView
+                                  .where((a) => a.requestId == blog.requestId)
+                                  .toList(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   );
-                }),
+                },
               );
             }
 

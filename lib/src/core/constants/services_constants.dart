@@ -3,6 +3,10 @@
 library;
 
 class ServicesConstants {
+  static List<String> servicesRoutes = [
+    '/blogs',
+    '/onboardings',
+  ];
   static int blogServiceId = 1;
   static int onboardingServiceId = 2;
 }

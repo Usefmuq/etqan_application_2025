@@ -59,4 +59,17 @@ final class BlogApproveEvent extends BlogEvent {
   });
 }
 
-final class BlogGetAllBlogsEvent extends BlogEvent {}
+final class BlogGetAllBlogsEvent extends BlogEvent {
+  final User user;
+  final String? departmentId;
+  final bool isManagerExpanded;
+  final bool isDepartmentManagerExpanded;
+  final bool isViewAll;
+  BlogGetAllBlogsEvent({
+    required this.user,
+    this.departmentId,
+    required this.isManagerExpanded,
+    required this.isDepartmentManagerExpanded,
+    required this.isViewAll,
+  });
+}

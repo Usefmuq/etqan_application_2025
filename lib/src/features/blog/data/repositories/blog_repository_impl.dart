@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
@@ -112,9 +113,21 @@ class BlogRepositoryImpl implements BlogRepository {
   }
 
   @override
-  Future<Either<Failure, BlogPageEntity>> getAllBlogs() async {
+  Future<Either<Failure, BlogPageEntity>> getAllBlogs({
+    required User user,
+    String? departmentId,
+    required bool isManagerExpanded,
+    required bool isDepartmentManagerExpanded,
+    required bool isViewAll,
+  }) async {
     try {
-      final blogsVeiw = await blogRemoteDataSource.getAllBlogsView();
+      final blogsVeiw = await blogRemoteDataSource.getAllBlogsView(
+        user.id,
+        departmentId,
+        isManagerExpanded,
+        isDepartmentManagerExpanded,
+        isViewAll,
+      );
       final approvalsView = await blogRemoteDataSource.getAllApprovalsView();
       return right(BlogPageEntity(
         blogsView: blogsVeiw,
