@@ -1,11 +1,11 @@
-import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_header.dart';
-import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_header.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomScaffold extends StatefulWidget {
   final String title;
@@ -13,16 +13,15 @@ class CustomScaffold extends StatefulWidget {
   final Widget? titleIcon;
   final List<Widget>? tilteActions;
   final List<Widget>? body;
+  final List<Tab>? tabs;
+  final TabController? tabController;
+  final List<List<Widget>>? bodyPerTab;
   final List<Widget>? extraActions;
   final List<Widget>? extraDrawerItems;
   final Widget? floatingActionButton;
   final bool showExpandableBar;
   final bool showDrawer;
   final Widget? expandableBarContent;
-
-  // 👉 new fields
-  final TabController? tabController;
-  final List<Tab>? tabs;
 
   const CustomScaffold({
     super.key,
@@ -31,14 +30,15 @@ class CustomScaffold extends StatefulWidget {
     this.titleIcon,
     this.tilteActions,
     this.body,
+    this.tabs,
+    this.tabController,
+    this.bodyPerTab,
     this.extraActions,
     this.extraDrawerItems,
     this.floatingActionButton,
     this.showExpandableBar = false,
     this.showDrawer = true,
     this.expandableBarContent,
-    this.tabController,
-    this.tabs,
   });
 
   @override
@@ -49,21 +49,15 @@ class _CustomScaffoldState extends State<CustomScaffold> {
   bool _isExpanded = false;
 
   @override
-  void initState() {
-    super.initState();
-    _isExpanded = false;
-  }
-
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: widget.tabs?.length ?? 1,
+      length: widget.tabs?.length ?? 0,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Etqan'),
+          title: Text('Etqan'),
           leading: ModalRoute.of(context)?.canPop == true && !widget.showDrawer
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back),
                   onPressed: () => Navigator.of(context).pop(),
                 )
               : null,
@@ -71,10 +65,19 @@ class _CustomScaffoldState extends State<CustomScaffold> {
             ..._defaultActions(),
             if (widget.extraActions != null) ...widget.extraActions!,
           ],
-          bottom: widget.tabs != null
-              ? TabBar(
-                  controller: widget.tabController,
-                  tabs: widget.tabs!,
+          bottom: (widget.tabs != null && widget.tabController != null)
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(48),
+                  child: Container(
+                    color: Colors.white, // 👈 New background color
+                    child: TabBar(
+                      controller: widget.tabController,
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.grey,
+                      indicatorColor: Colors.blue,
+                      tabs: widget.tabs!,
+                    ),
+                  ),
                 )
               : widget.showExpandableBar
                   ? PreferredSize(
@@ -91,21 +94,32 @@ class _CustomScaffoldState extends State<CustomScaffold> {
                     )
                   : null,
         ),
-        drawer: widget.showDrawer
-            ? Drawer(
-                child: ListView(
-                  children: [
-                    _buildDrawer(context),
-                    if (widget.extraDrawerItems != null)
-                      ...widget.extraDrawerItems!,
-                  ],
-                ),
-              )
-            : null,
-        body: widget.tabs != null && widget.tabController != null
+        drawer: widget.showDrawer ? _buildDrawer(context) : null,
+        body: (widget.tabs != null && widget.tabController != null)
             ? TabBarView(
                 controller: widget.tabController,
-                children: widget.body ?? [],
+                children: List.generate(
+                  widget.tabs!.length,
+                  (index) => SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomHeader(
+                          title: widget.title,
+                          subtitle: widget.subtitle != null
+                              ? Text(widget.subtitle!)
+                              : null,
+                          leading: widget.titleIcon,
+                          actions: widget.tilteActions,
+                        ),
+                        if (widget.bodyPerTab != null &&
+                            widget.bodyPerTab!.length > index)
+                          ...widget.bodyPerTab![index],
+                      ],
+                    ),
+                  ),
+                ),
               )
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
@@ -154,7 +168,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
   Widget _buildDrawer(BuildContext context) {
     final state = context.read<AppUserCubit>().state;
     if (state is! AppUserSignedIn) {
-      return const SizedBox();
+      return SizedBox();
     } else {
       final user = state.user;
       return Drawer(
@@ -167,30 +181,24 @@ class _CustomScaffoldState extends State<CustomScaffold> {
                     AppPallete.gradient1,
                     AppPallete.gradient2,
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
                 ),
               ),
               accountName: Text(
                 "${user.firstNameEn} ${user.lastNameEn}",
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppPallete.whiteColor,
-                ),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppPallete.whiteColor),
               ),
               accountEmail: Text(
                 user.email,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppPallete.whiteColor,
-                ),
+                style:
+                    const TextStyle(fontSize: 14, color: AppPallete.whiteColor),
               ),
               currentAccountPicture: CircleAvatar(
-                radius: 30,
                 backgroundColor: AppPallete.whiteColor,
                 child: Text(
-                  "${user.firstNameEn.isNotEmpty ? user.firstNameEn[0].toUpperCase() : ''}${user.lastNameEn.isNotEmpty ? user.lastNameEn[0].toUpperCase() : ''}",
+                  "${user.firstNameEn.isNotEmpty ? user.firstNameEn[0] : ''}${user.lastNameEn.isNotEmpty ? user.lastNameEn[0] : ''}",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -206,28 +214,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
                 context.go('/');
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: Text(AppLocalizations.of(context)!.blogsService),
-              onTap: () {
-                context.push('/blogs');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: Text(AppLocalizations.of(context)!.onboardingsService),
-              onTap: () {
-                context.push('/onboardings');
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: Text(AppLocalizations.of(context)!.settings),
-              onTap: () {
-                context.push('/settings');
-              },
-            ),
-            const Divider(),
+            if (widget.extraDrawerItems != null) ...widget.extraDrawerItems!,
             ListTile(
               leading: const Icon(Icons.logout),
               title: Text(AppLocalizations.of(context)!.logout),
