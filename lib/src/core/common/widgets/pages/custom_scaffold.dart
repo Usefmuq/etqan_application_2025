@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/app.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
@@ -212,6 +213,17 @@ class _CustomScaffoldState extends State<CustomScaffold> {
               title: Text(AppLocalizations.of(context)!.homePage),
               onTap: () {
                 context.go('/');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.language),
+              title: Text(AppLocalizations.of(context)!.appTitle),
+              onTap: () {
+                final isArabic =
+                    Localizations.localeOf(context).languageCode == 'ar';
+                final newLocale =
+                    isArabic ? const Locale('en') : const Locale('ar');
+                MyApp.of(context)?.changeLanguage(newLocale);
               },
             ),
             if (widget.extraDrawerItems != null) ...widget.extraDrawerItems!,

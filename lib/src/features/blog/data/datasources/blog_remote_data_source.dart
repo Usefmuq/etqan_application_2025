@@ -206,7 +206,10 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
 
       if (!isViewAll) {
         if (isDepartmentManagerExpanded) {
-          filters['department_id'] = departmentId ?? '-1';
+          if (departmentId == null) {
+            return [];
+          }
+          filters['department_id'] = departmentId;
         } else if (isManagerExpanded) {
           filters['report_to'] = userId;
         } else {

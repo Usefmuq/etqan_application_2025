@@ -26,18 +26,18 @@ import 'settings/settings_controller.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatefulWidget {
-  const MyApp({
-    super.key,
-    required this.settingsController,
-  });
+  const MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
 
+  static MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<MyAppState>();
+
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<MyApp> createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
@@ -61,6 +61,14 @@ class _MyAppState extends State<MyApp> {
           context.read<AppUserCubit>().updatUser(user); // Also implement this
         }
       }
+    });
+  }
+
+  Locale _locale = const Locale('ar'); // default locale
+
+  void changeLanguage(Locale locale) {
+    setState(() {
+      _locale = locale;
     });
   }
 
@@ -178,7 +186,8 @@ class _MyAppState extends State<MyApp> {
             Locale('en'), // English, no country code
             Locale('ar'), // English, no country code
           ],
-          locale: Locale('ar'),
+          locale: _locale,
+
           // Use AppLocalizations to configure the correct application title
           // depending on the user's locale.
           //
