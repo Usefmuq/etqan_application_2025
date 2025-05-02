@@ -133,67 +133,7 @@ class _BlogPageState extends State<BlogPage>
             icon: const Icon(Icons.add),
           ),
       ],
-      body: [
-        BlocConsumer<BlogBloc, BlogState>(
-          listener: (context, state) {
-            if (state is BlogFailure) {
-              showSnackBar(context, state.error);
-            }
-          },
-          builder: (context, state) {
-            if (state is BlogLoading ||
-                !isUserHasPermissionsView(
-                  permissions ?? [],
-                  PermissionsConstants.viewBlog,
-                )) {
-              return const Loader();
-            }
-            if (state is BlogShowAllSuccess) {
-              if (state.blogPage.blogsView.isEmpty) {
-                return const Center(child: Text("No Blogs Found"));
-              }
-
-              return ListView.builder(
-                shrinkWrap: true, // 👈 Important
-                physics:
-                    const NeverScrollableScrollPhysics(), // 👈 Prevent inner scroll
-                itemCount: state.blogPage.blogsView.length,
-                itemBuilder: (context, index) {
-                  final blog = state.blogPage.blogsView[index];
-
-                  return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: AnimatedCardWrapper(
-                      index: index,
-                      child: CustomCardListRequests(
-                        chips: blog.topics ?? [],
-                        title: blog.title ?? '',
-                        statusId: blog.requestStatusId,
-                        requestDate: blog.requestCreatedAt,
-                        subtitle: blog.content,
-                        onTap: () {
-                          context.push(
-                            '/blog/${blog.blogId}',
-                            extra: BlogViewerPageEntity(
-                              blogsView: blog,
-                              approval: state.blogPage.approvalsView
-                                  .where((a) => a.requestId == blog.requestId)
-                                  .toList(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              );
-            }
-
-            return const SizedBox();
-          },
-        ),
-      ],
+      body: [],
     );
   }
 
