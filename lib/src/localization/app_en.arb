@@ -5,6 +5,11 @@
   "cancel": "Cancel",
   "submit": "Submit",
     "homePage": "Home Page",
+      "changeLang": "العربية",
+      "myRequests": "My Requests",
+      "employees": "Employees",
+      "all": "All",
+
   "back": "Back",
   "settings": "Settings",
       "logout": "Logout",

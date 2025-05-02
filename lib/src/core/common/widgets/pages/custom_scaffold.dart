@@ -55,7 +55,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
       length: widget.tabs?.length ?? 0,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Etqan'),
+          title: Text(AppLocalizations.of(context)!.appTitle),
           leading: ModalRoute.of(context)?.canPop == true && !widget.showDrawer
               ? IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -217,7 +217,7 @@ class _CustomScaffoldState extends State<CustomScaffold> {
             ),
             ListTile(
               leading: const Icon(Icons.language),
-              title: Text(AppLocalizations.of(context)!.appTitle),
+              title: Text(AppLocalizations.of(context)!.changeLang),
               onTap: () {
                 final isArabic =
                     Localizations.localeOf(context).languageCode == 'ar';

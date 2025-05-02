@@ -109,11 +109,11 @@ class _BlogPageState extends State<BlogPage>
       title: AppLocalizations.of(context)!.blogsService,
       subtitle: AppLocalizations.of(context)!.blogsServiceSubtitle,
       tabController: _tabController,
-      tabs: const [
-        Tab(text: "My Requests"),
-        Tab(text: "Employees"),
-        Tab(text: "Department"),
-        Tab(text: "All"),
+      tabs: [
+        Tab(text: AppLocalizations.of(context)!.myRequests),
+        Tab(text: AppLocalizations.of(context)!.employees),
+        Tab(text: AppLocalizations.of(context)!.department),
+        Tab(text: AppLocalizations.of(context)!.all),
       ],
       bodyPerTab: [
         [_blogTab()],

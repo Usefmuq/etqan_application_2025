@@ -5,6 +5,11 @@
   "cancel": "إلغاء",
   "submit": "إرسال",
   "homePage": "الصفحة الرئيسية",
+  "changeLang": "English",
+        "myRequests": "طلباتي",
+      "employees": "موظفيني",
+      "all": "الكل",
+
   "back": "رجوع",
     "settings": "الاعدادات",
     "logout": "تسجيل خروج",
