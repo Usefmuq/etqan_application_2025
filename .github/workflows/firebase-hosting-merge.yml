@@ -3,7 +3,7 @@ name: Deploy to Firebase Hosting on merge
 on:
   push:
     branches:
-      - main  # 👈 or 'master', depending on your repo
+      - main  # 👈 or 'master', depending on your repo 
 
 jobs:
   build_and_deploy:
