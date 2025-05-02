@@ -3,7 +3,7 @@ name: Deploy to Firebase Hosting on merge
 on:
   push:
     branches:
-      - main  # 👈 or 'master', depending on your repo 
+      - main  # 👈 or 'master', depending on your repo  
 
 jobs:
   build_and_deploy:
@@ -29,4 +29,4 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ETQAN1 }}'
           channelId: live
-          projectId: etqan1
+          projectId: etqan1-40e46
