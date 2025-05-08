@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
@@ -14,6 +15,7 @@ import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/usecases/fetch_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,10 +24,11 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BlogViewerPage extends StatefulWidget {
-  final BlogViewerPageEntity initialBlogViewerPage;
-  const BlogViewerPage({super.key, required this.initialBlogViewerPage});
+  final BlogViewerPageEntity? initialBlogViewerPage;
+  final int? requestId;
+  const BlogViewerPage({super.key, this.initialBlogViewerPage, this.requestId});
 
-  static route(BlogViewerPageEntity blogViewerPage) => MaterialPageRoute(
+  static route(BlogViewerPageEntity? blogViewerPage) => MaterialPageRoute(
         builder: (context) => BlogViewerPage(
           initialBlogViewerPage: blogViewerPage,
         ),
@@ -36,7 +39,7 @@ class BlogViewerPage extends StatefulWidget {
 }
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
-  late BlogViewerPageEntity blogViewerPage;
+  BlogViewerPageEntity? blogViewerPage;
   List<String>? permissions;
   ApprovalSequenceViewModel? pendingApproval;
   final TextEditingController commentController = TextEditingController();
@@ -45,7 +48,13 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   void initState() {
     super.initState();
-    blogViewerPage = widget.initialBlogViewerPage;
+
+    if (widget.initialBlogViewerPage != null) {
+      blogViewerPage = widget.initialBlogViewerPage!;
+      _initializeApprovals();
+    } else if (widget.requestId != null) {
+      _fetchBlogViewerData(widget.requestId!);
+    }
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
@@ -53,7 +62,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       final fetchedPermissions = await fetchUserPermissions(userId);
 
       final fetchPendingApproval =
-          await blogViewerPage.approval!.firstWhereOrNullAsync((a) async {
+          await blogViewerPage?.approval!.firstWhereOrNullAsync((a) async {
         return a.approvalStatus?.toLowerCase() ==
                 LookupConstants.approvalStatusApprovalPending &&
             (a.approverUserId == userId ||
@@ -68,10 +77,50 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     });
   }
 
+  void _fetchBlogViewerData(int requestId) async {
+    final FetchBlogPage fetchBlogPage =
+        serviceLocator<FetchBlogPage>(); // ✅ Get use case from service locator
+
+    final fetched = await fetchBlogPage.call(
+        FetchBlogPageParams(requestId: requestId)); // Implement this fetch
+    fetched.fold((failure) {
+      return;
+    }, (fetch) {
+      if (mounted) {
+        setState(() {
+          blogViewerPage = fetch;
+        });
+        _initializeApprovals();
+      }
+    });
+  }
+
+  void _initializeApprovals() async {
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+
+    final fetchedPermissions = await fetchUserPermissions(userId);
+
+    final fetchPendingApproval =
+        await blogViewerPage!.approval!.firstWhereOrNullAsync((a) async {
+      return a.approvalStatus?.toLowerCase() ==
+              LookupConstants.approvalStatusApprovalPending &&
+          (a.approverUserId == userId ||
+              await isUserHasRole(userId, a.roleId ?? ''));
+    });
+
+    if (mounted) {
+      setState(() {
+        permissions = fetchedPermissions;
+        pendingApproval = fetchPendingApproval;
+      });
+    }
+  }
+
   void _handleEdit() async {
     final updatedEntity = await context.push<BlogViewerPageEntity>(
-      '/blog/update/${blogViewerPage.blogsView.blogId}',
-      extra: blogViewerPage.blogsView.toBlog()!,
+      '/blog/update/${blogViewerPage!.blogsView.blogId}',
+      extra: blogViewerPage!.blogsView.toBlog()!,
     );
 
     if (updatedEntity != null && mounted) {
@@ -126,7 +175,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       context.read<BlogBloc>().add(
             BlogApproveEvent(
               approvalSequence: updatedApproval,
-              blogModel: blogViewerPage.blogsView,
+              blogModel: blogViewerPage!.blogsView,
             ),
           );
     }
@@ -135,14 +184,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title:
-          '${AppLocalizations.of(context)!.blog}- ${blogViewerPage.blogsView.requestId}',
+      title: blogViewerPage != null
+          ? '${AppLocalizations.of(context)!.blog}- ${blogViewerPage!.blogsView.requestId}'
+          : AppLocalizations.of(context)!.blog,
       tilteActions: [
         if (isUserHasPermissionsView(
               permissions ?? [],
               PermissionsConstants.updateBlog,
             ) &&
-            blogViewerPage.blogsView.toBlog() != null)
+            blogViewerPage != null &&
+            blogViewerPage!.blogsView.toBlog() != null)
           IconButton(
             onPressed: _handleEdit,
             icon: Icon(Icons.edit),
@@ -157,6 +208,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           },
           builder: (context, state) {
             if (state is BlogLoading ||
+                blogViewerPage == null ||
                 !isUserHasPermissionsView(
                   permissions ?? [],
                   PermissionsConstants.viewBlog,
@@ -178,28 +230,29 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                     CustomKeyValueGrid(
                       data: {
                         AppLocalizations.of(context)!.title:
-                            blogViewerPage.blogsView.title,
+                            blogViewerPage!.blogsView.title,
                         AppLocalizations.of(context)!.requestId:
-                            "${AppLocalizations.of(context)!.blog}-${blogViewerPage.blogsView.requestId}",
+                            "${AppLocalizations.of(context)!.blog}-${blogViewerPage!.blogsView.requestId}",
                         AppLocalizations.of(context)!.status:
-                            blogViewerPage.blogsView.requestStatusId,
+                            blogViewerPage!.blogsView.requestStatusId,
                         AppLocalizations.of(context)!.topics:
-                            blogViewerPage.blogsView.topics!.join(', '),
+                            blogViewerPage!.blogsView.topics!.join(', '),
                         AppLocalizations.of(context)!.createdBy:
-                            blogViewerPage.blogsView.fullNameAr,
+                            blogViewerPage!.blogsView.fullNameAr,
                         AppLocalizations.of(context)!.priority:
-                            blogViewerPage.blogsView.priorityId,
+                            blogViewerPage!.blogsView.priorityId,
                         AppLocalizations.of(context)!.requestDetails:
-                            blogViewerPage.blogsView.requestDetails,
+                            blogViewerPage!.blogsView.requestDetails,
                         AppLocalizations.of(context)!.createdAt:
                             DateFormat.yMMMd().add_jm().format(
-                                blogViewerPage.blogsView.requestCreatedAt!),
+                                blogViewerPage!.blogsView.requestCreatedAt!),
                         AppLocalizations.of(context)!.updatedAt:
-                            blogViewerPage.blogsView.blogUpdatedAt,
+                            blogViewerPage!.blogsView.blogUpdatedAt,
                         AppLocalizations.of(context)!.approvedAt:
-                            blogViewerPage.blogsView.requestApprovedAt != null
+                            blogViewerPage!.blogsView.requestApprovedAt != null
                                 ? DateFormat.yMMMd().add_jm().format(
-                                    blogViewerPage.blogsView.requestApprovedAt!)
+                                    blogViewerPage!
+                                        .blogsView.requestApprovedAt!)
                                 : AppLocalizations.of(context)!.notYet,
                       },
                     ),
@@ -218,7 +271,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                         AppLocalizations.of(context)!.approvedAt,
                         AppLocalizations.of(context)!.createdAt,
                       ],
-                      rows: blogViewerPage.approval!
+                      rows: blogViewerPage!.approval!
                           .map((e) => e.toTableRow())
                           .toList(),
                       useChipsForStatus: true,

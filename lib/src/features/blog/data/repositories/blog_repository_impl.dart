@@ -139,4 +139,23 @@ class BlogRepositoryImpl implements BlogRepository {
       return left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, BlogViewerPageEntity>> fetchBlogViewerPage(
+      {required int requestId}) async {
+    try {
+      final blogsVeiw =
+          await blogRemoteDataSource.getBlogViewByRequestId(requestId);
+      final approvalsView =
+          await blogRemoteDataSource.getApprovalViewByRequestId(requestId);
+      return right(BlogViewerPageEntity(
+        blogsView: blogsVeiw,
+        approval: approvalsView,
+      ));
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
 }

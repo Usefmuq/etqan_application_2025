@@ -1,4 +1,4 @@
-import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/domain/entities/home_screen_page_entity.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/domain/usecases/get_all_services.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,8 @@ class HomeScreenBloc extends Bloc<HomeScreenEvent, HomeScreenState> {
     HomeScreenGetAllHomeScreensEvent event,
     Emitter<HomeScreenState> emit,
   ) async {
-    final response = await _getAllServices(NoParams());
+    final response =
+        await _getAllServices(GetAllServicesParams(user: event.user));
     response.fold(
       (failure) => emit(HomeScreenFailure(failure.message)),
       (homeScreens) {

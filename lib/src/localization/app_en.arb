@@ -20,6 +20,8 @@
   "no": "No",
   "confirm": "Confirm",
   "approve": "Approve",
+  "pendingApproval": "Pending Approvals",
+  "approveRequestFor": "Approve request for",
   "reject": "Reject",
   "status": "Status",
   "dropDownSelect": "Select...",

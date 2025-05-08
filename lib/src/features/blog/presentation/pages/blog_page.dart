@@ -178,7 +178,7 @@ class _BlogPageState extends State<BlogPage>
                     subtitle: blog.content,
                     onTap: () {
                       context.push(
-                        '/blog/${blog.blogId}',
+                        '/blog/${blog.requestId}',
                         extra: BlogViewerPageEntity(
                           blogsView: blog,
                           approval: state.blogPage.approvalsView

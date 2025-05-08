@@ -24,7 +24,10 @@ abstract interface class BlogRemoteDataSource {
     bool isDepartmentManagerExpanded,
     bool isViewAll,
   );
+  Future<BlogsPageViewModel> getBlogViewByRequestId(int requestId);
   Future<List<ApprovalSequenceViewModel>> getAllApprovalsView();
+  Future<List<ApprovalSequenceViewModel>> getApprovalViewByRequestId(
+      int requestId);
 }
 
 class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
@@ -229,12 +232,48 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
+  Future<BlogsPageViewModel> getBlogViewByRequestId(int requestId) async {
+    try {
+      final Map<String, Object> filters = {
+        'request_is_active': true,
+        'request_id': requestId,
+      };
+
+      final result = await supabaseClient
+          .from('blogs_page_view')
+          .select('*')
+          .match(filters);
+
+      return result.map((blog) => BlogsPageViewModel.fromJson(blog)).first;
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
   Future<List<ApprovalSequenceViewModel>> getAllApprovalsView() async {
     try {
       final approvalsView = await supabaseClient
           .from('approval_sequence_view')
           .select('*')
           .eq('service_id', ServicesConstants.blogServiceId)
+          .select('*');
+      return approvalsView
+          .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
+          .toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<List<ApprovalSequenceViewModel>> getApprovalViewByRequestId(
+      int requestId) async {
+    try {
+      final approvalsView = await supabaseClient
+          .from('approval_sequence_view')
+          .select('*')
+          .eq('request_id', requestId)
           .select('*');
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))

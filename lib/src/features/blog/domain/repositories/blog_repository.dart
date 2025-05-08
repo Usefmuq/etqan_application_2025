@@ -37,4 +37,7 @@ abstract interface class BlogRepository {
     required bool isDepartmentManagerExpanded,
     required bool isViewAll,
   });
+  Future<Either<Failure, BlogViewerPageEntity>> fetchBlogViewerPage({
+    required int requestId,
+  });
 }

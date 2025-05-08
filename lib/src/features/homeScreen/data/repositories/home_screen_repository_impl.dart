@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/data/datasources/home_screen_remote_data_source.dart';
@@ -12,10 +13,12 @@ class HomeScreenRepositoryImpl implements HomeScreenRepository {
   );
 
   @override
-  Future<Either<Failure, HomeScreenPageEntity>> getAllHomeScreens() async {
+  Future<Either<Failure, HomeScreenPageEntity>> getAllHomeScreens(
+    User user,
+  ) async {
     try {
       final homeScreensVeiw =
-          await homeScreenRemoteDataSource.getAllHomeScreensView();
+          await homeScreenRemoteDataSource.getAllHomeScreensView(user);
       return right(homeScreensVeiw);
     } on ServerException catch (e) {
       return left(Failure(e.message));

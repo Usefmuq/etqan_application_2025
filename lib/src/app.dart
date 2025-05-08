@@ -121,8 +121,12 @@ class MyAppState extends State<MyApp> {
         GoRoute(
           path: '/blog/:id',
           builder: (context, state) {
-            final entity = state.extra as BlogViewerPageEntity;
-            return BlogViewerPage(initialBlogViewerPage: entity);
+            if (state.extra != null) {
+              final entity = state.extra as BlogViewerPageEntity;
+              return BlogViewerPage(initialBlogViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return BlogViewerPage(requestId: requestId!);
           },
         ),
         GoRoute(
