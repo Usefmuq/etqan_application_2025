@@ -24,6 +24,7 @@
     "approveRequestFor": "الموافقة على طلب",
 
   "reject": "رفض",
+  "returnForCorrection": "إرجاع الطلب للتصحيح",
   "status": "الحالة",
   "dropDownSelect": "اختر...",
   "createdBy": "أنشئ بواسطة",

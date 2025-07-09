@@ -333,6 +333,90 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                     },
                                   ),
                                 ),
+                                Expanded(
+                                  child: CustomButton(
+                                      text: AppLocalizations.of(context)!
+                                          .returnForCorrection,
+                                      icon: Icons.cancel_outlined,
+                                      backgroundColor: AppPallete.textSecondary,
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text('Edit Fields'),
+                                              content: StatefulBuilder(
+                                                builder: (context, setState) {
+                                                  return SizedBox(
+                                                    width: double.maxFinite,
+                                                    child:
+                                                        SingleChildScrollView(
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          CustomMultiDropdownList<
+                                                              String>(
+                                                            label:
+                                                                "Select Tags",
+                                                            items: [
+                                                              'Tech',
+                                                              'Science',
+                                                              'Art'
+                                                            ],
+                                                            selectedItems:
+                                                                selectedUnlockFields,
+                                                            onChanged:
+                                                                (newSelection) {
+                                                              setState(() {
+                                                                fieldsController
+                                                                    .add(
+                                                                        TextEditingController());
+                                                                selectedUnlockFields =
+                                                                    newSelection;
+                                                              });
+                                                            },
+                                                            getLabel: (item) =>
+                                                                item,
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 10),
+                                                          if (!selectedUnlockFields
+                                                              .isNullOrEmpty)
+                                                            ...List.generate(
+                                                                selectedUnlockFields
+                                                                    .length,
+                                                                (index) {
+                                                              return CustomTextFormField(
+                                                                controller:
+                                                                    fieldsController[
+                                                                        index],
+                                                                hintText:
+                                                                    selectedUnlockFields[
+                                                                        index],
+                                                                maxLines: null,
+                                                                readOnly: false,
+                                                              );
+                                                            }),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                  child: Text('Close'),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      }),
+                                ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: CustomButton(
