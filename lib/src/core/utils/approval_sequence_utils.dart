@@ -1,7 +1,9 @@
 import 'package:etqan_application_2025/src/core/common/entities/approval_sequence.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 List<ApprovalSequenceModel> mapServiceApproversToApprovalSequence({
   required int requestId,
@@ -36,5 +38,18 @@ extension ApprovalSequenceRowFormatter on ApprovalSequence {
       'Order': approvalOrder,
       'Created At': createdAt,
     };
+  }
+
+  Future<List<RequestUnlockedFieldModel>> fetchUnlockedFields(
+      int requestId) async {
+    final response = await Supabase.instance.client
+        .from('request_unlocked_fields')
+        .select()
+        .eq('request_id', requestId);
+
+    final data = response as List;
+    return data
+        .map((json) => RequestUnlockedFieldModel.fromJson(json))
+        .toList();
   }
 }

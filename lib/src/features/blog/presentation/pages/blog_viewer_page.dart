@@ -3,6 +3,7 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_dropdown_multi_select.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
@@ -41,7 +42,9 @@ class BlogViewerPage extends StatefulWidget {
 class _BlogViewerPageState extends State<BlogViewerPage> {
   BlogViewerPageEntity? blogViewerPage;
   List<String>? permissions;
+  List<String> selectedUnlockFields = [];
   ApprovalSequenceViewModel? pendingApproval;
+  List<TextEditingController> fieldsController = [];
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -215,6 +218,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 )) {
               return const Loader();
             }
+
             return Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -293,6 +297,30 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                               maxLines: null,
                               readOnly: false,
                             ),
+                            const SizedBox(height: 10),
+                            CustomMultiDropdownList<String>(
+                              label: "Select Tags",
+                              items: ['Tech', 'Science', 'Art'],
+                              selectedItems: selectedUnlockFields,
+                              onChanged: (newSelection) {
+                                setState(() {
+                                  fieldsController.add(TextEditingController());
+                                  selectedUnlockFields = newSelection;
+                                });
+                              },
+                              getLabel: (item) => item,
+                            ),
+                            const SizedBox(height: 10),
+                            if (!selectedUnlockFields.isNullOrEmpty)
+                              ...List.generate(selectedUnlockFields.length,
+                                  (index) {
+                                return CustomTextFormField(
+                                  controller: fieldsController[index],
+                                  hintText: selectedUnlockFields[index],
+                                  maxLines: null,
+                                  readOnly: false,
+                                );
+                              }),
                             const SizedBox(height: 20),
                             Row(
                               children: [
