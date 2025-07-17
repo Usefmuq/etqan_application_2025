@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
@@ -23,6 +24,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class BlogViewerPage extends StatefulWidget {
   final BlogViewerPageEntity? initialBlogViewerPage;
@@ -297,138 +300,317 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                               maxLines: null,
                               readOnly: false,
                             ),
-                            const SizedBox(height: 10),
-                            CustomMultiDropdownList<String>(
-                              label: "Select Tags",
-                              items: ['Tech', 'Science', 'Art'],
-                              selectedItems: selectedUnlockFields,
-                              onChanged: (newSelection) {
-                                setState(() {
-                                  fieldsController.add(TextEditingController());
-                                  selectedUnlockFields = newSelection;
-                                });
-                              },
-                              getLabel: (item) => item,
-                            ),
-                            const SizedBox(height: 10),
-                            if (!selectedUnlockFields.isNullOrEmpty)
-                              ...List.generate(selectedUnlockFields.length,
-                                  (index) {
-                                return CustomTextFormField(
-                                  controller: fieldsController[index],
-                                  hintText: selectedUnlockFields[index],
-                                  maxLines: null,
-                                  readOnly: false,
-                                );
-                              }),
                             const SizedBox(height: 20),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomButton(
-                                    text: AppLocalizations.of(context)!.approve,
-                                    icon: Icons.check_circle_outline,
-                                    onPressed: () {
-                                      _approveBlog(isApproved: true);
-                                    },
-                                  ),
-                                ),
-                                Expanded(
-                                  child: CustomButton(
-                                      text: AppLocalizations.of(context)!
-                                          .returnForCorrection,
-                                      icon: Icons.cancel_outlined,
-                                      backgroundColor: AppPallete.textSecondary,
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: Text('Edit Fields'),
-                                              content: StatefulBuilder(
-                                                builder: (context, setState) {
-                                                  return SizedBox(
-                                                    width: double.maxFinite,
-                                                    child:
-                                                        SingleChildScrollView(
-                                                      child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          CustomMultiDropdownList<
-                                                              String>(
-                                                            label:
-                                                                "Select Tags",
-                                                            items: [
-                                                              'Tech',
-                                                              'Science',
-                                                              'Art'
-                                                            ],
-                                                            selectedItems:
-                                                                selectedUnlockFields,
-                                                            onChanged:
-                                                                (newSelection) {
-                                                              setState(() {
-                                                                fieldsController
-                                                                    .add(
-                                                                        TextEditingController());
-                                                                selectedUnlockFields =
-                                                                    newSelection;
-                                                              });
-                                                            },
-                                                            getLabel: (item) =>
-                                                                item,
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 10),
-                                                          if (!selectedUnlockFields
-                                                              .isNullOrEmpty)
-                                                            ...List.generate(
-                                                                selectedUnlockFields
-                                                                    .length,
-                                                                (index) {
-                                                              return CustomTextFormField(
-                                                                controller:
-                                                                    fieldsController[
-                                                                        index],
-                                                                hintText:
-                                                                    selectedUnlockFields[
-                                                                        index],
-                                                                maxLines: null,
-                                                                readOnly: false,
-                                                              );
-                                                            }),
-                                                        ],
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final isSmallScreen = constraints.maxWidth <
+                                    800; // adjust breakpoint as needed
+
+                                if (isSmallScreen) {
+                                  // 📱 Small screen: stack vertically
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      CustomButton(
+                                        text: AppLocalizations.of(context)!
+                                            .approve,
+                                        icon: Icons.check_circle_outline,
+                                        onPressed: () {
+                                          _approveBlog(isApproved: true);
+                                        },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomButton(
+                                        text: AppLocalizations.of(context)!
+                                            .returnForCorrection,
+                                        icon: Icons.cancel_outlined,
+                                        backgroundColor:
+                                            AppPallete.textSecondary,
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text('Edit Fields'),
+                                                content: StatefulBuilder(
+                                                  builder: (context, setState) {
+                                                    return SizedBox(
+                                                      width: double.maxFinite,
+                                                      child:
+                                                          SingleChildScrollView(
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            MultiSelectDialogField<
+                                                                String>(
+                                                              items: [
+                                                                'Tech',
+                                                                'Science',
+                                                                'Art'
+                                                              ]
+                                                                  .map((e) =>
+                                                                      MultiSelectItem(
+                                                                          e, e))
+                                                                  .toList(),
+                                                              initialValue: [
+                                                                'Tech'
+                                                              ],
+                                                              title: const Text(
+                                                                  "Select Tags"),
+                                                              onConfirm:
+                                                                  (values) {
+                                                                print(
+                                                                    values); // list of selected values
+                                                              },
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 10),
+                                                            if (!selectedUnlockFields
+                                                                .isNullOrEmpty)
+                                                              ...List.generate(
+                                                                  selectedUnlockFields
+                                                                      .length,
+                                                                  (index) {
+                                                                return CustomTextFormField(
+                                                                  controller:
+                                                                      fieldsController[
+                                                                          index],
+                                                                  hintText:
+                                                                      selectedUnlockFields[
+                                                                          index],
+                                                                  maxLines:
+                                                                      null,
+                                                                  readOnly:
+                                                                      false,
+                                                                );
+                                                              }),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(),
-                                                  child: Text('Close'),
+                                                    );
+                                                  },
                                                 ),
-                                              ],
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.of(context)
+                                                            .pop(),
+                                                    child: Text('Close'),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      CustomButton(
+                                        text: AppLocalizations.of(context)!
+                                            .reject,
+                                        icon: Icons.cancel_outlined,
+                                        backgroundColor: AppPallete.errorColor,
+                                        onPressed: () {
+                                          _approveBlog(isApproved: false);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  // 💻 Large screen: keep them in a row
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: CustomButton(
+                                          text: AppLocalizations.of(context)!
+                                              .approve,
+                                          icon: Icons.check_circle_outline,
+                                          onPressed: () {
+                                            _approveBlog(isApproved: true);
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: CustomButton(
+                                          text: AppLocalizations.of(context)!
+                                              .returnForCorrection,
+                                          icon: Icons.cancel_outlined,
+                                          backgroundColor:
+                                              AppPallete.textSecondary,
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: Text('Edit Fields'),
+                                                  content: StatefulBuilder(
+                                                    builder:
+                                                        (context, setState) {
+                                                      return SizedBox(
+                                                        width: double.maxFinite,
+                                                        child:
+                                                            SingleChildScrollView(
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              MultiSelectDialogField<
+                                                                  String>(
+                                                                items: [
+                                                                  'Tech',
+                                                                  'Science',
+                                                                  'Art'
+                                                                ]
+                                                                    .map((e) =>
+                                                                        MultiSelectItem(
+                                                                            e,
+                                                                            e))
+                                                                    .toList(),
+                                                                initialValue: [
+                                                                  'Tech'
+                                                                ],
+                                                                title: const Text(
+                                                                    "Select Tags"),
+                                                                onConfirm:
+                                                                    (values) {
+                                                                  selectedUnlockFields =
+                                                                      values; // list of selected values
+                                                                  fieldsController
+                                                                      .add(
+                                                                          TextEditingController());
+                                                                  selectedUnlockFields =
+                                                                      values;
+                                                                },
+                                                              ),
+                                                              DropdownSearch<
+                                                                  String>.multiSelection(
+                                                                items: const [
+                                                                  'Tech',
+                                                                  'Science',
+                                                                  'Art'
+                                                                ],
+                                                                selectedItems:
+                                                                    selectedUnlockFields,
+                                                                popupProps:
+                                                                    const PopupPropsMultiSelection
+                                                                        .menu(
+                                                                  showSearchBox:
+                                                                      true,
+                                                                  showSelectedItems:
+                                                                      true,
+                                                                ),
+                                                                dropdownDecoratorProps:
+                                                                    const DropDownDecoratorProps(
+                                                                  dropdownSearchDecoration:
+                                                                      InputDecoration(
+                                                                    labelText:
+                                                                        "Select Tags",
+                                                                    border:
+                                                                        OutlineInputBorder(),
+                                                                  ),
+                                                                ),
+                                                                onChanged:
+                                                                    (values) {
+                                                                  setState(() {
+                                                                    selectedUnlockFields =
+                                                                        values;
+                                                                    fieldsController
+                                                                        .clear();
+                                                                    for (var _
+                                                                        in selectedUnlockFields) {
+                                                                      fieldsController
+                                                                          .add(
+                                                                              TextEditingController());
+                                                                    }
+                                                                  });
+                                                                },
+                                                              ),
+                                                              CustomMultiDropdownList<
+                                                                  String>(
+                                                                label:
+                                                                    "Select Tags",
+                                                                items: [
+                                                                  'Tech',
+                                                                  'Science',
+                                                                  'Art'
+                                                                ],
+                                                                selectedItems:
+                                                                    selectedUnlockFields,
+                                                                onChanged:
+                                                                    (newSelection) {
+                                                                  setState(() {
+                                                                    fieldsController
+                                                                        .add(
+                                                                            TextEditingController());
+                                                                    selectedUnlockFields =
+                                                                        newSelection;
+                                                                  });
+                                                                },
+                                                                getLabel:
+                                                                    (item) =>
+                                                                        item,
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 10),
+                                                              if (!selectedUnlockFields
+                                                                  .isNullOrEmpty)
+                                                                ...List.generate(
+                                                                    selectedUnlockFields
+                                                                        .length,
+                                                                    (index) {
+                                                                  return CustomTextFormField(
+                                                                    controller:
+                                                                        fieldsController[
+                                                                            index],
+                                                                    hintText:
+                                                                        selectedUnlockFields[
+                                                                            index],
+                                                                    maxLines:
+                                                                        null,
+                                                                    readOnly:
+                                                                        false,
+                                                                  );
+                                                                }),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.of(context)
+                                                              .pop(),
+                                                      child: Text('Close'),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      }),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: CustomButton(
-                                    text: AppLocalizations.of(context)!.reject,
-                                    icon: Icons.cancel_outlined,
-                                    backgroundColor: AppPallete.errorColor,
-                                    onPressed: () {
-                                      _approveBlog(isApproved: false);
-                                    },
-                                  ),
-                                ),
-                              ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: CustomButton(
+                                          text: AppLocalizations.of(context)!
+                                              .reject,
+                                          icon: Icons.cancel_outlined,
+                                          backgroundColor:
+                                              AppPallete.errorColor,
+                                          onPressed: () {
+                                            _approveBlog(isApproved: false);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),

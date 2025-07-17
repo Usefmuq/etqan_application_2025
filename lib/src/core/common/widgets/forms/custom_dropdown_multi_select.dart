@@ -25,95 +25,163 @@ class CustomMultiDropdownList<T> extends StatefulWidget {
 
 class _CustomMultiDropdownListState<T>
     extends State<CustomMultiDropdownList<T>> {
-  bool _isDropdownOpen = false;
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isOpen = false;
+  late List<T> _localSelected;
+
+  @override
+  void initState() {
+    super.initState();
+    _localSelected = List<T>.from(widget.selectedItems);
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomMultiDropdownList<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // keep local selection in sync with parent when parent updates
+    _localSelected = List<T>.from(widget.selectedItems);
+  }
 
   void _toggleDropdown() {
-    setState(() {
-      _isDropdownOpen = !_isDropdownOpen;
-    });
+    if (_isOpen) {
+      _removeOverlay();
+    } else {
+      _showOverlay();
+    }
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    _isOpen = false;
+  }
+
+  void _showOverlay() {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry!);
+    _isOpen = true;
   }
 
   void _onItemTapped(T item) {
     setState(() {
-      final newList = List<T>.from(widget.selectedItems);
-      if (newList.contains(item)) {
-        newList.remove(item);
+      if (_localSelected.contains(item)) {
+        _localSelected.remove(item);
       } else {
-        newList.add(item);
+        _localSelected.add(item); // no duplicates
       }
-      widget.onChanged(newList);
     });
+    widget.onChanged(List<T>.from(_localSelected));
+    // rebuild overlay so highlight updates instantly
+    _overlayEntry?.markNeedsBuild();
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    return OverlayEntry(
+      builder: (context) {
+        return GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: _removeOverlay, // tap outside closes
+          child: Stack(
+            children: [
+              Positioned(
+                width: size.width,
+                left: offset.dx,
+                top: offset.dy + size.height + 5,
+                child: CompositedTransformFollower(
+                  link: _layerLink,
+                  showWhenUnlinked: false,
+                  offset: Offset(0, size.height + 5),
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(8),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 250),
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        children: widget.items.map((item) {
+                          final isSelected = _localSelected.contains(item);
+                          return InkWell(
+                            onTap: () => _onItemTapped(item),
+                            child: Container(
+                              color: isSelected
+                                  ? Colors.blue.shade50
+                                  : Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              child: Text(
+                                widget.getLabel(item),
+                                style: TextStyle(
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color:
+                                      isSelected ? Colors.blue : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final displayText = widget.selectedItems.isNotEmpty
-        ? widget.selectedItems.map(widget.getLabel).join(', ')
-        : widget.hint ?? 'Select options';
+    final displayText = _localSelected.isNotEmpty
+        ? _localSelected.map(widget.getLabel).join(', ')
+        : (widget.hint ?? 'Select options');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.label, style: Theme.of(context).textTheme.labelLarge),
-        const SizedBox(height: 6),
-        GestureDetector(
-          onTap: _toggleDropdown,
-          child: InputDecorator(
-            decoration: InputDecoration(
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              suffixIcon: Icon(
-                _isDropdownOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(widget.label, style: Theme.of(context).textTheme.labelLarge),
+          const SizedBox(height: 6),
+          GestureDetector(
+            onTap: _toggleDropdown,
+            child: InputDecorator(
+              decoration: InputDecoration(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                suffixIcon: Icon(
+                  _isOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                ),
               ),
-            ),
-            child: Text(
-              displayText,
-              style: TextStyle(
-                color: widget.selectedItems.isNotEmpty
-                    ? Colors.black
-                    : Colors.grey[600],
+              child: Text(
+                displayText,
+                style: TextStyle(
+                  color: _localSelected.isNotEmpty
+                      ? Colors.black
+                      : Colors.grey[600],
+                ),
               ),
             ),
           ),
-        ),
-        if (_isDropdownOpen)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              children: widget.items.map((item) {
-                final isSelected = widget.selectedItems.contains(item);
-                return InkWell(
-                  onTap: () => _onItemTapped(item),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected ? Colors.blue.shade50 : Colors.transparent,
-                    ),
-                    child: Text(
-                      widget.getLabel(item),
-                      style: TextStyle(
-                        fontWeight:
-                            isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? Colors.blue : Colors.black87,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-      ],
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
   }
 }
