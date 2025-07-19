@@ -1,10 +1,9 @@
-import 'package:dropdown_search/dropdown_search.dart';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_dropdown_multi_select.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
@@ -24,8 +23,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:multi_select_flutter/util/multi_select_item.dart';
 
 class BlogViewerPage extends StatefulWidget {
   final BlogViewerPageEntity? initialBlogViewerPage;
@@ -343,49 +340,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                                           mainAxisSize:
                                                               MainAxisSize.min,
                                                           children: [
-                                                            MultiSelectDialogField<
-                                                                String>(
-                                                              items: [
-                                                                'Tech',
-                                                                'Science',
-                                                                'Art'
-                                                              ]
-                                                                  .map((e) =>
-                                                                      MultiSelectItem(
-                                                                          e, e))
-                                                                  .toList(),
-                                                              initialValue: [
-                                                                'Tech'
-                                                              ],
-                                                              title: const Text(
-                                                                  "Select Tags"),
-                                                              onConfirm:
-                                                                  (values) {
-                                                                print(
-                                                                    values); // list of selected values
-                                                              },
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 10),
-                                                            if (!selectedUnlockFields
-                                                                .isNullOrEmpty)
-                                                              ...List.generate(
-                                                                  selectedUnlockFields
-                                                                      .length,
-                                                                  (index) {
-                                                                return CustomTextFormField(
-                                                                  controller:
-                                                                      fieldsController[
-                                                                          index],
-                                                                  hintText:
-                                                                      selectedUnlockFields[
-                                                                          index],
-                                                                  maxLines:
-                                                                      null,
-                                                                  readOnly:
-                                                                      false,
-                                                                );
-                                                              }),
+                                                            ..._returnBtbDialog(),
                                                           ],
                                                         ),
                                                       ),
@@ -394,9 +349,12 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                                 ),
                                                 actions: [
                                                   TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.of(context)
-                                                            .pop(),
+                                                    onPressed: () => {
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                      selectedUnlockFields = [],
+                                                      fieldsController = []
+                                                    },
                                                     child: Text('Close'),
                                                   ),
                                                 ],
@@ -457,123 +415,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                                                 MainAxisSize
                                                                     .min,
                                                             children: [
-                                                              MultiSelectDialogField<
-                                                                  String>(
-                                                                items: [
-                                                                  'Tech',
-                                                                  'Science',
-                                                                  'Art'
-                                                                ]
-                                                                    .map((e) =>
-                                                                        MultiSelectItem(
-                                                                            e,
-                                                                            e))
-                                                                    .toList(),
-                                                                initialValue: [
-                                                                  'Tech'
-                                                                ],
-                                                                title: const Text(
-                                                                    "Select Tags"),
-                                                                onConfirm:
-                                                                    (values) {
-                                                                  selectedUnlockFields =
-                                                                      values; // list of selected values
-                                                                  fieldsController
-                                                                      .add(
-                                                                          TextEditingController());
-                                                                  selectedUnlockFields =
-                                                                      values;
-                                                                },
-                                                              ),
-                                                              DropdownSearch<
-                                                                  String>.multiSelection(
-                                                                items: const [
-                                                                  'Tech',
-                                                                  'Science',
-                                                                  'Art'
-                                                                ],
-                                                                selectedItems:
-                                                                    selectedUnlockFields,
-                                                                popupProps:
-                                                                    const PopupPropsMultiSelection
-                                                                        .menu(
-                                                                  showSearchBox:
-                                                                      true,
-                                                                  showSelectedItems:
-                                                                      true,
-                                                                ),
-                                                                dropdownDecoratorProps:
-                                                                    const DropDownDecoratorProps(
-                                                                  dropdownSearchDecoration:
-                                                                      InputDecoration(
-                                                                    labelText:
-                                                                        "Select Tags",
-                                                                    border:
-                                                                        OutlineInputBorder(),
-                                                                  ),
-                                                                ),
-                                                                onChanged:
-                                                                    (values) {
-                                                                  setState(() {
-                                                                    selectedUnlockFields =
-                                                                        values;
-                                                                    fieldsController
-                                                                        .clear();
-                                                                    for (var _
-                                                                        in selectedUnlockFields) {
-                                                                      fieldsController
-                                                                          .add(
-                                                                              TextEditingController());
-                                                                    }
-                                                                  });
-                                                                },
-                                                              ),
-                                                              CustomMultiDropdownList<
-                                                                  String>(
-                                                                label:
-                                                                    "Select Tags",
-                                                                items: [
-                                                                  'Tech',
-                                                                  'Science',
-                                                                  'Art'
-                                                                ],
-                                                                selectedItems:
-                                                                    selectedUnlockFields,
-                                                                onChanged:
-                                                                    (newSelection) {
-                                                                  setState(() {
-                                                                    fieldsController
-                                                                        .add(
-                                                                            TextEditingController());
-                                                                    selectedUnlockFields =
-                                                                        newSelection;
-                                                                  });
-                                                                },
-                                                                getLabel:
-                                                                    (item) =>
-                                                                        item,
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 10),
-                                                              if (!selectedUnlockFields
-                                                                  .isNullOrEmpty)
-                                                                ...List.generate(
-                                                                    selectedUnlockFields
-                                                                        .length,
-                                                                    (index) {
-                                                                  return CustomTextFormField(
-                                                                    controller:
-                                                                        fieldsController[
-                                                                            index],
-                                                                    hintText:
-                                                                        selectedUnlockFields[
-                                                                            index],
-                                                                    maxLines:
-                                                                        null,
-                                                                    readOnly:
-                                                                        false,
-                                                                  );
-                                                                }),
+                                                              ..._returnBtbDialog(),
                                                             ],
                                                           ),
                                                         ),
@@ -623,6 +465,70 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         ),
       ],
     );
+  }
+
+  List<Widget> _returnBtbDialog() {
+    const List<String> list = [
+      'Developer',
+      'Designer',
+      'Consultant',
+      'Student',
+    ];
+
+    return [
+      StatefulBuilder(
+        builder: (context, setStateSB) {
+          // <- use setStateSB for dialog rebuild
+          return SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CustomDropdown<String>.multiSelect(
+                    hintText: 'Choose one or more…',
+                    items: list,
+                    decoration: CustomDropdownDecoration(
+                      closedFillColor: Colors.white,
+                      closedBorderRadius: BorderRadius.circular(6),
+                      closedBorder: Border.all(
+                        color: Colors.grey.shade300,
+                        width: 1,
+                      ),
+                      listItemDecoration: ListItemDecoration(
+                        selectedColor: Colors.blue.shade50,
+                      ),
+                    ),
+                    onListChanged: (value) {
+                      // 👇 update both state holders
+                      setStateSB(() {
+                        selectedUnlockFields = value;
+                        fieldsController = List.generate(
+                          selectedUnlockFields.length,
+                          (index) => TextEditingController(),
+                        );
+                      });
+                    },
+                  ),
+                  if (selectedUnlockFields.isNotEmpty)
+                    ...List.generate(selectedUnlockFields.length, (index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: CustomTextFormField(
+                          controller: fieldsController[index],
+                          hintText: selectedUnlockFields[index],
+                          maxLines: null,
+                          readOnly: false,
+                        ),
+                      );
+                    }),
+                ],
+              ),
+            ),
+          );
+        },
+      )
+    ];
   }
 
   @override
