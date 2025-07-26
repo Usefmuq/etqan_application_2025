@@ -1,6 +1,7 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
@@ -10,9 +11,11 @@ import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
+import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -42,9 +45,9 @@ class BlogViewerPage extends StatefulWidget {
 class _BlogViewerPageState extends State<BlogViewerPage> {
   BlogViewerPageEntity? blogViewerPage;
   List<String>? permissions;
-  List<String> selectedUnlockFields = [];
   ApprovalSequenceViewModel? pendingApproval;
-  List<TextEditingController> fieldsController = [];
+  List<ServiceField> serviceFields = [];
+  Map<String, TextEditingController> fieldControllers = {};
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -63,6 +66,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetcheServiceFields =
+          await fetchFieldsByServiceId(ServicesConstants.blogServiceId);
 
       final fetchPendingApproval =
           await blogViewerPage?.approval!.firstWhereOrNullAsync((a) async {
@@ -75,6 +80,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         setState(() {
           permissions = fetchedPermissions;
           pendingApproval = fetchPendingApproval;
+          serviceFields = fetcheServiceFields;
         });
       }
     });
@@ -290,6 +296,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                         key: formKey,
                         child: Column(
                           children: [
+                            const SizedBox(height: 20),
+                            const Divider(),
                             CustomTextFormField(
                               controller: commentController,
                               hintText:
@@ -297,6 +305,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                               maxLines: null,
                               readOnly: false,
                             ),
+                            const SizedBox(height: 20),
+                            ..._returnBtbDialog(),
                             const SizedBox(height: 20),
                             LayoutBuilder(
                               builder: (context, constraints) {
@@ -324,44 +334,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                         icon: Icons.cancel_outlined,
                                         backgroundColor:
                                             AppPallete.textSecondary,
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                title: Text('Edit Fields'),
-                                                content: StatefulBuilder(
-                                                  builder: (context, setState) {
-                                                    return SizedBox(
-                                                      width: double.maxFinite,
-                                                      child:
-                                                          SingleChildScrollView(
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          children: [
-                                                            ..._returnBtbDialog(),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () => {
-                                                      Navigator.of(context)
-                                                          .pop(),
-                                                      selectedUnlockFields = [],
-                                                      fieldsController = []
-                                                    },
-                                                    child: Text('Close'),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
+                                        onPressed: () {},
                                       ),
                                       const SizedBox(height: 12),
                                       CustomButton(
@@ -397,43 +370,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                           icon: Icons.cancel_outlined,
                                           backgroundColor:
                                               AppPallete.textSecondary,
-                                          onPressed: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: Text('Edit Fields'),
-                                                  content: StatefulBuilder(
-                                                    builder:
-                                                        (context, setState) {
-                                                      return SizedBox(
-                                                        width: double.maxFinite,
-                                                        child:
-                                                            SingleChildScrollView(
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              ..._returnBtbDialog(),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.of(context)
-                                                              .pop(),
-                                                      child: Text('Close'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          },
+                                          onPressed: () {},
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -468,12 +405,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   }
 
   List<Widget> _returnBtbDialog() {
-    const List<String> list = [
-      'Developer',
-      'Designer',
-      'Consultant',
-      'Student',
-    ];
+    List<String?> list = serviceFields
+        .map(
+          (e) => e.fieldKey,
+        )
+        .toList();
 
     return [
       StatefulBuilder(
@@ -487,7 +423,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 children: [
                   CustomDropdown<String>.multiSelect(
                     hintText: 'Choose one or more…',
-                    items: list,
+                    items: (list).map((e) => e ?? '').toList(),
                     decoration: CustomDropdownDecoration(
                       closedFillColor: Colors.white,
                       closedBorderRadius: BorderRadius.circular(6),
@@ -502,21 +438,23 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                     onListChanged: (value) {
                       // 👇 update both state holders
                       setStateSB(() {
-                        selectedUnlockFields = value;
-                        fieldsController = List.generate(
-                          selectedUnlockFields.length,
-                          (index) => TextEditingController(),
-                        );
+                        // Clear previous
+                        fieldControllers.clear();
+
+                        // For every selected key, create a controller
+                        for (final key in value) {
+                          fieldControllers[key] = TextEditingController();
+                        }
                       });
                     },
                   ),
-                  if (selectedUnlockFields.isNotEmpty)
-                    ...List.generate(selectedUnlockFields.length, (index) {
+                  if (fieldControllers.isNotEmpty)
+                    ...fieldControllers.entries.map((entry) {
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
                         child: CustomTextFormField(
-                          controller: fieldsController[index],
-                          hintText: selectedUnlockFields[index],
+                          controller: entry.value,
+                          hintText: entry.key,
                           maxLines: null,
                           readOnly: false,
                         ),
