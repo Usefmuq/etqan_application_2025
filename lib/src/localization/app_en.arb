@@ -37,8 +37,11 @@
   "approverName": "Approver Name",
       "confirmApproval": "Confirm Approval",
     "confirmRejection": "Confirm Rejection",
+      "confirmReturnForCorrection": "Confirm Return For Correction",
+
     "confirmApprovalDesc": "Are you sure you want to approve this request?",
     "confirmRejectionDesc": "Are you sure you want to reject this request?",
+  "confirmReturnForCorrectionDesc": "Are you sure you want to Return this request For Correction?",
 
   "roleName": "Role Name",
   "notYet": "Not yet",

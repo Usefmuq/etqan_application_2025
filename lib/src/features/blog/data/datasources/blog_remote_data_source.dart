@@ -1,7 +1,7 @@
-import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
@@ -15,6 +15,7 @@ abstract interface class BlogRemoteDataSource {
   Future<BlogViewerPageEntity> updateBlog(BlogModel blog);
   Future<BlogViewerPageEntity> approveBlog(
     ApprovalSequenceViewModel approvalSequence,
+    List<RequestUnlockedFieldModel>? requestUnlockedFields,
     BlogsPageViewModel blog,
   );
   Future<List<BlogsPageViewModel>> getAllBlogsView(
@@ -116,56 +117,16 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
 
   @override
   Future<BlogViewerPageEntity> approveBlog(
-      ApprovalSequenceViewModel approvalSequence,
-      BlogsPageViewModel blog) async {
+    ApprovalSequenceViewModel approvalSequence,
+    List<RequestUnlockedFieldModel>? requestUnlockedFields,
+    BlogsPageViewModel blog,
+  ) async {
     try {
-      final approval = await supabaseClient
-          .from('approval_sequence')
-          .update({
-            'approver_comment': approvalSequence.approverComment,
-            'approval_status': approvalSequence.approvalStatus,
-            'approved_by': approvalSequence.approvedBy,
-            'approved_at': DateTime.now().toIso8601String(),
-          })
-          .eq(
-              'approval_id',
-              approvalSequence
-                  .approvalId!) // Ensure you approve the correct row
-          .select();
-      final nextApproval = await supabaseClient
-          .from('approval_sequence')
-          .update({
-            'approval_status': LookupConstants.approvalStatusApprovalPending,
-          })
-          .eq(
-            'request_id',
-            approvalSequence.requestId!,
-          ) // Ensure you approve the correct row
-          .eq(
-            'approval_order',
-            approvalSequence.approvalOrder! + 1,
-          ) // Ensure you approve the correct row
-          .eq(
-            'approval_status',
-            LookupConstants.approvalStatusApprovalQueued,
-          ) // Ensure you approve the correct row
-          .eq(
-            'is_active',
-            true,
-          ) // Ensure you approve the correct row
-          .select();
-      if (nextApproval.isEmpty && approval.isNotEmpty) {
-        await supabaseClient
-            .from('requests_master')
-            .update({
-              'status': LookupConstants.requestStatusCompleted,
-            })
-            .eq(
-              'request_id',
-              approvalSequence.requestId!,
-            )
-            .select();
-      }
+      updateApprovalSequenceDS(
+        approvalSequence: approvalSequence,
+        requestUnlockedFields: requestUnlockedFields,
+        supabaseClient: supabaseClient,
+      );
       final blogsView = await supabaseClient
           .from('blogs_page_view')
           .select('*')

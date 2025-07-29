@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/request_unlocked_field.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
@@ -21,10 +22,13 @@ class ApproveBlog implements Usecase<BlogViewerPageEntity, ApproveBlogParams> {
 
 class ApproveBlogParams {
   final ApprovalSequenceViewModel approvalSequenceModel;
+  final List<RequestUnlockedField>? requestUnlockedFields;
+
   final BlogsPageViewModel blogModel;
 
   ApproveBlogParams({
     required this.approvalSequenceModel,
+    this.requestUnlockedFields,
     required this.blogModel,
   });
 }

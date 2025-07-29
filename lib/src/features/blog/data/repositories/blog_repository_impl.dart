@@ -4,6 +4,7 @@ import 'package:etqan_application_2025/src/core/constants/services_constants.dar
 import 'package:etqan_application_2025/src/core/data/datasources/permission_remote_data_source.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
@@ -97,11 +98,13 @@ class BlogRepositoryImpl implements BlogRepository {
   @override
   Future<Either<Failure, BlogViewerPageEntity>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,
+    List<RequestUnlockedFieldModel>? requestUnlockedFields,
     required BlogsPageViewModel blogModel,
   }) async {
     try {
       final approvedBlog = await blogRemoteDataSource.approveBlog(
         approvalSequenceModel,
+        requestUnlockedFields,
         blogModel,
       );
       return right(approvedBlog);

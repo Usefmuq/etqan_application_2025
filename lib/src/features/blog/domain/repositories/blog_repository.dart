@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
@@ -28,6 +29,7 @@ abstract interface class BlogRepository {
   });
   Future<Either<Failure, BlogViewerPageEntity>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,
+    List<RequestUnlockedFieldModel>? requestUnlockedFields,
     required BlogsPageViewModel blogModel,
   });
   Future<Either<Failure, BlogPageEntity>> getAllBlogs({

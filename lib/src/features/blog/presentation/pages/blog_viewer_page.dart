@@ -13,6 +13,7 @@ import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart'
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 class BlogViewerPage extends StatefulWidget {
   final BlogViewerPageEntity? initialBlogViewerPage;
@@ -47,7 +49,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   List<String>? permissions;
   ApprovalSequenceViewModel? pendingApproval;
   List<ServiceField> serviceFields = [];
-  Map<String, TextEditingController> fieldControllers = {};
+  List<RequestUnlockedFieldModel> requestUnlockedFields = [];
+  Map<RequestUnlockedFieldModel, TextEditingController> fieldControllers = {};
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
@@ -139,16 +142,26 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     }
   }
 
-  void _approveBlog({required bool isApproved}) async {
+  void _approveBlog({
+    required bool isApproved,
+    List<RequestUnlockedFieldModel>? requestUnlockedFields,
+  }) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(isApproved
-            ? AppLocalizations.of(context)!.confirmApproval
-            : AppLocalizations.of(context)!.confirmRejection),
+        title: Text(
+          isApproved
+              ? AppLocalizations.of(context)!.confirmApproval
+              : (requestUnlockedFields.isNullOrEmpty
+                  ? AppLocalizations.of(context)!.confirmRejection
+                  : AppLocalizations.of(context)!.confirmReturnForCorrection),
+        ),
         content: Text(isApproved
             ? AppLocalizations.of(context)!.confirmApprovalDesc
-            : AppLocalizations.of(context)!.confirmRejectionDesc),
+            : (requestUnlockedFields.isNullOrEmpty
+                ? AppLocalizations.of(context)!.confirmRejectionDesc
+                : AppLocalizations.of(context)!
+                    .confirmReturnForCorrectionDesc)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -176,7 +189,9 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       final updatedApproval = pendingApproval!.copyWith(
         approvalStatus: isApproved
             ? LookupConstants.approvalStatusApprovalApproved
-            : LookupConstants.approvalStatusApprovalRejected,
+            : (requestUnlockedFields.isNullOrEmpty
+                ? LookupConstants.approvalStatusApprovalRejected
+                : LookupConstants.approvalStatusApprovalReturnForCorrection),
         approverComment: commentController.text,
         approvedBy: userId,
       );
@@ -184,6 +199,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       context.read<BlogBloc>().add(
             BlogApproveEvent(
               approvalSequence: updatedApproval,
+              requestUnlockedFields: requestUnlockedFields,
               blogModel: blogViewerPage!.blogsView,
             ),
           );
@@ -334,7 +350,19 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                         icon: Icons.cancel_outlined,
                                         backgroundColor:
                                             AppPallete.textSecondary,
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          requestUnlockedFields =
+                                              fieldControllers.entries
+                                                  .map((entry) {
+                                            final fieldModel = entry.key;
+                                            final controller = entry.value;
+
+                                            return fieldModel.copyWith(
+                                              reason: controller
+                                                  .text, // 👈 assuming you have `value` field in model
+                                            );
+                                          }).toList();
+                                        },
                                       ),
                                       const SizedBox(height: 12),
                                       CustomButton(
@@ -370,7 +398,19 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                           icon: Icons.cancel_outlined,
                                           backgroundColor:
                                               AppPallete.textSecondary,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            requestUnlockedFields =
+                                                fieldControllers.entries
+                                                    .map((entry) {
+                                              final fieldModel = entry.key;
+                                              final controller = entry.value;
+
+                                              return fieldModel.copyWith(
+                                                reason: controller
+                                                    .text, // 👈 assuming you have `value` field in model
+                                              );
+                                            }).toList();
+                                          },
                                         ),
                                       ),
                                       const SizedBox(width: 12),
@@ -435,31 +475,45 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                         selectedColor: Colors.blue.shade50,
                       ),
                     ),
-                    onListChanged: (value) {
-                      // 👇 update both state holders
-                      setStateSB(() {
-                        // Clear previous
+                    onListChanged: (List<String> keys) {
+                      setState(() {
                         fieldControllers.clear();
-
-                        // For every selected key, create a controller
-                        for (final key in value) {
-                          fieldControllers[key] = TextEditingController();
+                        for (final key in keys) {
+                          // Convert string key to a model
+                          final model = RequestUnlockedFieldModel(
+                            id: Uuid().v1(), // or look up the ID if you have it
+                            fieldKey: key,
+                            requestId: blogViewerPage!.blogsView.requestId!,
+                            unlockedBy: (context.read<AppUserCubit>().state
+                                    as AppUserSignedIn)
+                                .user
+                                .id,
+                            unlockedAt: DateTime.now(),
+                            isActive: true,
+                          );
+                          fieldControllers[model] = TextEditingController();
                         }
                       });
                     },
                   ),
                   if (fieldControllers.isNotEmpty)
-                    ...fieldControllers.entries.map((entry) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 15),
-                        child: CustomTextFormField(
-                          controller: entry.value,
-                          hintText: entry.key,
-                          maxLines: null,
-                          readOnly: false,
-                        ),
-                      );
-                    }),
+                    Column(
+                      children: fieldControllers.entries.map((entry) {
+                        final fieldModel = entry.key;
+                        final controller = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: TextFormField(
+                            controller: controller,
+                            decoration: InputDecoration(
+                              labelText:
+                                  fieldModel.fieldKey, // or fieldModel.label
+                              border: const OutlineInputBorder(),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                 ],
               ),
             ),

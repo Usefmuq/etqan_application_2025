@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/request_unlocked_field.dart';
 import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
@@ -83,6 +84,7 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
   ) async {
     final response = await _approveBlog(ApproveBlogParams(
       approvalSequenceModel: event.approvalSequence,
+      requestUnlockedFields: event.requestUnlockedFields,
       blogModel: event.blogModel,
     ));
     response.fold(
