@@ -36,6 +36,16 @@ Future<List<UserModel>> fetchUsersByDepartment(String departmentId) async {
   return data.map((json) => UserModel.fromJson(json)).toList();
 }
 
+Future<List<UserModel>> fetchAllUsers() async {
+  final response = await Supabase.instance.client
+      .from('users')
+      .select()
+      .order('first_name_en', ascending: true);
+
+  final data = response as List;
+  return data.map((json) => UserModel.fromJson(json)).toList();
+}
+
 Future<List<ServiceField>> fetchFieldsByServiceId(int serviceId) async {
   final response = await Supabase.instance.client
       .from('service_fields')

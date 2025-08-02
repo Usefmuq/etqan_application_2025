@@ -250,8 +250,7 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
                                             await fetchPositions(
                                                 deptId ?? '-1');
                                         final newManagers =
-                                            await fetchUsersByDepartment(
-                                                deptId ?? '-1');
+                                            await fetchAllUsers();
 
                                         setState(() {
                                           selectedDepartment = value;

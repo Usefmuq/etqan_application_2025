@@ -17,6 +17,11 @@ class UuidLookupConstants {
       'ar': 'قيد التنفيذ',
       'color': AppPallete.rejectColor,
     },
+    '682c5e5a-8280-4379-9bd5-3e35f18b4cf7': {
+      'en': 'Returned For Correction',
+      'ar': 'إرجاع الطلب للتصحيح',
+      'color': AppPallete.gradient1,
+    },
   };
   static const Map<String, Map<String, dynamic>> approvalStatusMap = {
     '1968dba5-db7a-4d7c-bc5a-956dd2ff9d20': {
@@ -38,6 +43,11 @@ class UuidLookupConstants {
       'en': 'Rejected',
       'ar': 'مرفوض',
       'color': AppPallete.rejectColor,
+    },
+    '96605a1f-f800-43d0-9519-7bfe2e1b8468': {
+      'en': 'Returned For Correction',
+      'ar': 'إرجاع الطلب للتصحيح',
+      'color': AppPallete.gradient1,
     },
   };
 

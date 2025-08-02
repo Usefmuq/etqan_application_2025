@@ -182,7 +182,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       return;
     }
     if (confirmed != true) return;
-
+    print(isApproved
+        ? LookupConstants.approvalStatusApprovalApproved
+        : (requestUnlockedFields.isNullOrEmpty
+            ? LookupConstants.approvalStatusApprovalRejected
+            : LookupConstants.approvalStatusApprovalReturnForCorrection));
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
     if (formKey.currentState!.validate()) {
@@ -350,6 +354,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                         icon: Icons.cancel_outlined,
                                         backgroundColor:
                                             AppPallete.textSecondary,
+                                        isDisabled: fieldControllers.isEmpty,
                                         onPressed: () {
                                           requestUnlockedFields =
                                               fieldControllers.entries
@@ -362,6 +367,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                                   .text, // 👈 assuming you have `value` field in model
                                             );
                                           }).toList();
+                                          _approveBlog(
+                                            isApproved: false,
+                                            requestUnlockedFields:
+                                                requestUnlockedFields,
+                                          );
                                         },
                                       ),
                                       const SizedBox(height: 12),
@@ -398,6 +408,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                           icon: Icons.cancel_outlined,
                                           backgroundColor:
                                               AppPallete.textSecondary,
+                                          isDisabled: fieldControllers.isEmpty,
                                           onPressed: () {
                                             requestUnlockedFields =
                                                 fieldControllers.entries
@@ -410,6 +421,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                                     .text, // 👈 assuming you have `value` field in model
                                               );
                                             }).toList();
+                                            _approveBlog(
+                                              isApproved: false,
+                                              requestUnlockedFields:
+                                                  requestUnlockedFields,
+                                            );
                                           },
                                         ),
                                       ),

@@ -44,7 +44,7 @@ Future<bool> updateApprovalSequenceDS({
       .eq('approval_id',
           approvalSequence.approvalId!) // Ensure you approve the correct row
       .select();
-
+  print(approvalSequence.approvalStatus);
 // ---------- #1 Approved Case ---------------
   if (approvalSequence.approvalStatus ==
       LookupConstants.approvalStatusApprovalApproved) {
