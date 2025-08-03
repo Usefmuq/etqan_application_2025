@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,13 @@ class BlogInputSection {
     required TextEditingController titleController,
     required TextEditingController contentController,
     required bool isWide,
+    required bool isUpdate,
+    List<RequestUnlockedFieldModel>? unlockedFields,
   }) {
+    bool containsKey(String key) {
+      return unlockedFields?.any((element) => element.fieldKey == key) ?? false;
+    }
+
     return [
       const SizedBox(height: 20),
       Wrap(
@@ -26,7 +33,12 @@ class BlogInputSection {
         ].map((topic) {
           final isSelected = selectedTopics.contains(topic);
           return GestureDetector(
-            onTap: () => onToggleTopic(topic),
+            onTap: () {
+              if (isUpdate && !containsKey('blog_topics')) {
+                return;
+              }
+              onToggleTopic(topic);
+            },
             child: Chip(
               label: Text(topic, style: const TextStyle(fontSize: 15)),
               color: isSelected
@@ -47,7 +59,7 @@ class BlogInputSection {
           responsiveField(
             CustomTextFormField(
               controller: titleController,
-              readOnly: false,
+              readOnly: isUpdate ? !containsKey('blog_title') : false,
               hintText: 'Blog title',
             ),
             isWide,
@@ -56,7 +68,7 @@ class BlogInputSection {
             CustomTextFormField(
               controller: contentController,
               hintText: 'Blog content',
-              readOnly: false,
+              readOnly: isUpdate ? !containsKey('blog_content') : false,
               maxLines: null,
             ),
             isWide,

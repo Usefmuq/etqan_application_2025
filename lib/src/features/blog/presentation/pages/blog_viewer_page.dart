@@ -182,11 +182,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       return;
     }
     if (confirmed != true) return;
-    print(isApproved
-        ? LookupConstants.approvalStatusApprovalApproved
-        : (requestUnlockedFields.isNullOrEmpty
-            ? LookupConstants.approvalStatusApprovalRejected
-            : LookupConstants.approvalStatusApprovalReturnForCorrection));
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
     if (formKey.currentState!.validate()) {
@@ -233,6 +228,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           listener: (context, state) {
             if (state is BlogFailure) {
               showSnackBar(context, state.error);
+            } else if (state is BlogApproveSuccess ||
+                state is BlogSubmitSuccess) {
+              showSnackBar(
+                context,
+                AppLocalizations.of(context)!.approvalSuccessful,
+              );
+
+              if (widget.requestId != null) {
+                _fetchBlogViewerData(widget.requestId!);
+              }
             }
           },
           builder: (context, state) {
@@ -244,7 +249,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 )) {
               return const Loader();
             }
+            if (state is BlogApproveSuccess || state is BlogSubmitSuccess) {
+              showSnackBar(
+                context,
+                AppLocalizations.of(context)!.approvalSuccessful,
+              );
 
+              if (widget.requestId != null) {
+                _fetchBlogViewerData(widget.requestId!);
+              }
+            }
             return Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

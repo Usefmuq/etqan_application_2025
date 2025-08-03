@@ -1,11 +1,11 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
@@ -28,6 +28,7 @@ class UpdateBlogPage extends StatefulWidget {
 
 class _UpdateBlogPageState extends State<UpdateBlogPage> {
   List<String>? permissions;
+  List<RequestUnlockedFieldModel>? unlockedFields;
   late Blog blog;
   final TextEditingController titleControler = TextEditingController();
   final TextEditingController contentControler = TextEditingController();
@@ -41,8 +42,15 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
     Future.microtask(() async {
+      final fetchedUnlockedFields =
+          await fetchUnlockedFields(widget.blog.requestId);
       final fetchedPermissions = await fetchUserPermissions(userId);
-      if (mounted) setState(() => permissions = fetchedPermissions);
+      if (mounted) {
+        setState(() {
+          permissions = fetchedPermissions;
+          unlockedFields = fetchedUnlockedFields;
+        });
+      }
     });
   }
 
@@ -72,14 +80,6 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     return CustomScaffold(
       title: 'Update Blog-${widget.blog.requestId}',
       showDrawer: false,
-      // tilteActions: [
-      //   if (isUserHasPermissionsView(
-      //       permissions ?? [], PermissionsConstants.updateBlog))
-      //     IconButton(
-      //       onPressed: _updateBlog,
-      //       icon: const Icon(Icons.done_rounded),
-      //     )
-      // ],
       body: [
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
@@ -107,10 +107,10 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
-                          setState: setState, // ✅ not state
+                          isUpdate: true,
+                          setState: setState,
                           selectedTopics: selectedTopics,
                           onToggleTopic: (topic) {
-                            // 👈 fix the name here
                             setState(() {
                               selectedTopics.contains(topic)
                                   ? selectedTopics.remove(topic)
@@ -119,66 +119,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                           },
                           titleController: titleControler,
                           contentController: contentControler,
-                          isWide: MediaQuery.of(context).size.width > 600,
-                        ),
-                        const SizedBox(height: 20),
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            'Option 1',
-                            'Option 2',
-                            'Option 3',
-                            'Option 4',
-                            'Option 5'
-                          ].map((topic) {
-                            final isSelected = selectedTopics.contains(topic);
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isSelected
-                                      ? selectedTopics.remove(topic)
-                                      : selectedTopics.add(topic);
-                                });
-                              },
-                              child: Chip(
-                                label: Text(topic,
-                                    style: const TextStyle(fontSize: 15)),
-                                color: isSelected
-                                    ? const WidgetStatePropertyAll(
-                                        AppPallete.gradient1)
-                                    : null,
-                                side: isSelected
-                                    ? null
-                                    : const BorderSide(
-                                        color: AppPallete.borderColor),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
-                          children: [
-                            responsiveField(
-                              CustomTextFormField(
-                                controller: titleControler,
-                                readOnly: false,
-                                hintText: 'Blog title',
-                              ),
-                              isWide,
-                            ),
-                            responsiveField(
-                              CustomTextFormField(
-                                controller: contentControler,
-                                hintText: 'Blog content',
-                                readOnly: false,
-                                maxLines: null,
-                              ),
-                              isWide,
-                            ),
-                          ],
+                          isWide: isWide,
                         ),
                         const SizedBox(height: 40),
                         Divider(thickness: 1.5, color: Colors.grey[300]),

@@ -35,6 +35,7 @@
   "approvalComment": "تعليق الموافقة",
   "approvalSequence": "تسلسل الموافقات",
   "approvalStatus": "حالة الموافقة",
+  "approvalSuccessful": "تم الإرسال",
   "approverName": "اسم المعتمد",
   "confirmApproval": "تأكيد الموافقة",
   "confirmRejection": "تأكيد الرفض",

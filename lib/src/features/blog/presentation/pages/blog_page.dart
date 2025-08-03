@@ -88,19 +88,27 @@ class _BlogPageState extends State<BlogPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ModalRoute? route = ModalRoute.of(context);
-      if (route?.isCurrent == true) {
-        context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
-              user: user,
-              departmentId: user.departmentId,
-              isManagerExpanded: isManagerExpanded,
-              isDepartmentManagerExpanded: isDepartmentManagerExpanded,
-              isViewAll: isViewAll,
-            ));
-      }
-    });
+    final state = context.read<AppUserCubit>().state;
+
+    if (state is AppUserSignedIn) {
+      final user = state.user;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final ModalRoute? route = ModalRoute.of(context);
+        if (route?.isCurrent == true) {
+          context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
+                user: user,
+                departmentId: user.departmentId,
+                isManagerExpanded: isManagerExpanded,
+                isDepartmentManagerExpanded: isDepartmentManagerExpanded,
+                isViewAll: isViewAll,
+              ));
+        }
+      });
+    } else {
+      // Optional: handle unauthenticated state (e.g., redirect to login)
+      debugPrint("User is not signed in yet.");
+    }
   }
 
   @override

@@ -106,10 +106,10 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
-                          setState: setState, // ✅ not state
+                          isUpdate: false,
+                          setState: setState,
                           selectedTopics: selectedTopics,
                           onToggleTopic: (topic) {
-                            // 👈 fix the name here
                             setState(() {
                               selectedTopics.contains(topic)
                                   ? selectedTopics.remove(topic)
@@ -118,7 +118,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                           },
                           titleController: titleControler,
                           contentController: contentControler,
-                          isWide: MediaQuery.of(context).size.width > 600,
+                          isWide: isWide,
                         ),
                         const SizedBox(height: 40),
                         Divider(thickness: 1.5, color: Colors.grey[300]),

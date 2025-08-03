@@ -28,6 +28,17 @@ List<ApprovalSequenceModel> mapServiceApproversToApprovalSequence({
   }).toList();
 }
 
+Future<List<RequestUnlockedFieldModel>?> fetchUnlockedFields(
+    int requestId) async {
+  final response = await Supabase.instance.client
+      .from('request_unlocked_fields')
+      .select()
+      .eq('request_id', requestId);
+
+  final data = response as List;
+  return data.map((json) => RequestUnlockedFieldModel.fromJson(json)).toList();
+}
+
 Future<bool> updateApprovalSequenceDS({
   required ApprovalSequenceViewModel approvalSequence,
   List<RequestUnlockedFieldModel>? requestUnlockedFields,
@@ -44,7 +55,6 @@ Future<bool> updateApprovalSequenceDS({
       .eq('approval_id',
           approvalSequence.approvalId!) // Ensure you approve the correct row
       .select();
-  print(approvalSequence.approvalStatus);
 // ---------- #1 Approved Case ---------------
   if (approvalSequence.approvalStatus ==
       LookupConstants.approvalStatusApprovalApproved) {
@@ -138,18 +148,5 @@ extension ApprovalSequenceRowFormatter on ApprovalSequence {
       'Order': approvalOrder,
       'Created At': createdAt,
     };
-  }
-
-  Future<List<RequestUnlockedFieldModel>> fetchUnlockedFields(
-      int requestId) async {
-    final response = await Supabase.instance.client
-        .from('request_unlocked_fields')
-        .select()
-        .eq('request_id', requestId);
-
-    final data = response as List;
-    return data
-        .map((json) => RequestUnlockedFieldModel.fromJson(json))
-        .toList();
   }
 }

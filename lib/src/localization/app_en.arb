@@ -34,6 +34,8 @@
   "approvalComment": "Approval comment",
   "approvalSequence": "Approval Sequence",
   "approvalStatus": "Approval Status",
+    "approvalSuccessful": "Approval sent successfully",
+
   "approverName": "Approver Name",
       "confirmApproval": "Confirm Approval",
     "confirmRejection": "Confirm Rejection",
