@@ -1,5 +1,5 @@
-import 'package:etqan_application_2025/src/core/common/entities/request_unlocked_field.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
@@ -14,6 +14,7 @@ class ApproveBlog implements Usecase<BlogViewerPageEntity, ApproveBlogParams> {
   Future<Either<Failure, BlogViewerPageEntity>> call(
       ApproveBlogParams params) async {
     return await blogRepostory.approveBlog(
+      requestUnlockedFields: params.requestUnlockedFields,
       approvalSequenceModel: params.approvalSequenceModel,
       blogModel: params.blogModel,
     );
@@ -22,7 +23,7 @@ class ApproveBlog implements Usecase<BlogViewerPageEntity, ApproveBlogParams> {
 
 class ApproveBlogParams {
   final ApprovalSequenceViewModel approvalSequenceModel;
-  final List<RequestUnlockedField>? requestUnlockedFields;
+  final List<RequestUnlockedFieldModel>? requestUnlockedFields;
 
   final BlogsPageViewModel blogModel;
 

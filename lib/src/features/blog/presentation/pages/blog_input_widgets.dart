@@ -8,7 +8,7 @@ class BlogInputSection {
   static List<Widget> build({
     required void Function(void Function()) setState,
     required List<String> selectedTopics,
-    required void Function(String topic) onToggleTopic, // ✅ Added callback
+    // required void Function(String topic) onToggleTopic, // ✅ Added callback
     required TextEditingController titleController,
     required TextEditingController contentController,
     required bool isWide,
@@ -16,7 +16,9 @@ class BlogInputSection {
     List<RequestUnlockedFieldModel>? unlockedFields,
   }) {
     bool containsKey(String key) {
-      return unlockedFields?.any((element) => element.fieldKey == key) ?? false;
+      final res =
+          unlockedFields?.any((element) => element.fieldKey == key) ?? false;
+      return res;
     }
 
     return [
@@ -37,7 +39,11 @@ class BlogInputSection {
               if (isUpdate && !containsKey('blog_topics')) {
                 return;
               }
-              onToggleTopic(topic);
+              setState(() {
+                isSelected
+                    ? selectedTopics.remove(topic)
+                    : selectedTopics.add(topic);
+              });
             },
             child: Chip(
               label: Text(topic, style: const TextStyle(fontSize: 15)),

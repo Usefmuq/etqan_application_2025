@@ -110,16 +110,17 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                           isUpdate: true,
                           setState: setState,
                           selectedTopics: selectedTopics,
-                          onToggleTopic: (topic) {
-                            setState(() {
-                              selectedTopics.contains(topic)
-                                  ? selectedTopics.remove(topic)
-                                  : selectedTopics.add(topic);
-                            });
-                          },
+                          // onToggleTopic: (topic) {
+                          //   setState(() {
+                          //     selectedTopics.contains(topic)
+                          //         ? selectedTopics.remove(topic)
+                          //         : selectedTopics.add(topic);
+                          //   });
+                          // },
                           titleController: titleControler,
                           contentController: contentControler,
                           isWide: isWide,
+                          unlockedFields: unlockedFields,
                         ),
                         const SizedBox(height: 40),
                         Divider(thickness: 1.5, color: Colors.grey[300]),

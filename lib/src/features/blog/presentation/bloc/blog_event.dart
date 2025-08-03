@@ -51,7 +51,7 @@ final class BlogApproveEvent extends BlogEvent {
   // final bool isActive;
   // final String approverComment;
   final ApprovalSequenceViewModel approvalSequence;
-  final List<RequestUnlockedField>? requestUnlockedFields;
+  final List<RequestUnlockedFieldModel>? requestUnlockedFields;
   final BlogsPageViewModel blogModel;
 
   BlogApproveEvent({

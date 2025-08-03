@@ -109,13 +109,13 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                           isUpdate: false,
                           setState: setState,
                           selectedTopics: selectedTopics,
-                          onToggleTopic: (topic) {
-                            setState(() {
-                              selectedTopics.contains(topic)
-                                  ? selectedTopics.remove(topic)
-                                  : selectedTopics.add(topic);
-                            });
-                          },
+                          // onToggleTopic: (topic) {
+                          //   setState(() {
+                          //     selectedTopics.contains(topic)
+                          //         ? selectedTopics.remove(topic)
+                          //         : selectedTopics.add(topic);
+                          //   });
+                          // },
                           titleController: titleControler,
                           contentController: contentControler,
                           isWide: isWide,

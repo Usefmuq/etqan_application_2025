@@ -126,10 +126,6 @@ Future<bool> updateApprovalSequenceDS({
       await supabaseClient
           .from('request_unlocked_fields')
           .insert(requestUnlockedFields.map((e) => e.toJson()).toList())
-          .eq(
-            'request_id',
-            approvalSequence.requestId!,
-          )
           .select();
     }
   }
