@@ -1,6 +1,7 @@
 import 'package:etqan_application_2025/src/core/common/entities/departments.dart';
 import 'package:etqan_application_2025/src/core/common/entities/positions.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,6 +13,20 @@ Future<List<Departments>> fetchDepartments() async {
 
   final data = response as List;
   return data.map((json) => Departments.fromJson(json)).toList();
+}
+
+Future<Departments?> fetchDepartmentById(String departmentId) async {
+  if (departmentId.isNullOrEmpty) {
+    return null;
+  }
+  final response = await Supabase.instance.client
+      .from('departments')
+      .select()
+      .eq('department_id', departmentId)
+      .order('department_name_en', ascending: true);
+
+  final data = response as List;
+  return data.map((json) => Departments.fromJson(json)).firstOrNull;
 }
 
 Future<List<Positions>> fetchPositions(String departmentId) async {
