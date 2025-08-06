@@ -78,7 +78,6 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
         setState(() {
           blogViewerPage = fetch;
           unlockedFields = fetchedUnlockedFields;
-          print(unlockedFields?.length);
           selectedTopics = blogViewerPage!.blogsView.topics!;
           titleControler.text = blogViewerPage!.blogsView.title!;
           contentControler.text = blogViewerPage!.blogsView.content!;

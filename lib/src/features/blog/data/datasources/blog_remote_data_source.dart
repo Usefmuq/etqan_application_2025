@@ -80,6 +80,14 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   @override
   Future<BlogViewerPageEntity> updateBlog(BlogModel blog) async {
     try {
+      final serviceAprovalUsersData = await supabaseClient
+          .from('service_approval_users')
+          .select('*')
+          .eq('service_id', ServicesConstants.blogServiceId)
+          .eq('is_active', true);
+      final serviceApprovalUsers = serviceAprovalUsersData
+          .map((item) => ServiceApprovalUsersModel.fromJson(item))
+          .toList();
       await supabaseClient
           .from('blogs')
           .update(
@@ -87,6 +95,32 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           )
           .eq('id', blog.id) // Ensure you update the correct row
           .select();
+      await supabaseClient
+          .from('requests_master')
+          .update({
+            'status': blog.status,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('request_id', blog.requestId) // Ensure you update the correct row
+          .select();
+      final approvalSequence = mapServiceApproversToApprovalSequence(
+        requestId: blog.requestId,
+        serviceApprovers: serviceApprovalUsers,
+      );
+      await supabaseClient
+          .from('approval_sequence')
+          .update({
+            'is_active': false,
+          })
+          .eq('request_id', blog.requestId) // Ensure you update the correct row
+          .select();
+      await supabaseClient
+          .from('approval_sequence')
+          .insert(
+            approvalSequence.map((e) => e.toJson()).toList(),
+          )
+          .select();
+
       final blogsView = await supabaseClient
           .from('blogs_page_view')
           .select('*')
@@ -218,6 +252,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .from('approval_sequence_view')
           .select('*')
           .eq('service_id', ServicesConstants.blogServiceId)
+          .eq('is_active', true)
           .select('*');
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
