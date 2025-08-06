@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
@@ -8,7 +9,8 @@ import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/usecases/fetch_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_input_widgets.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +18,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class UpdateBlogPage extends StatefulWidget {
-  final Blog blog;
-  const UpdateBlogPage({super.key, required this.blog});
-  static route(Blog blog) => MaterialPageRoute(
-        builder: (context) => UpdateBlogPage(blog: blog),
+  final BlogViewerPageEntity? initialBlogViewerPage;
+  final int? requestId;
+  const UpdateBlogPage({super.key, this.initialBlogViewerPage, this.requestId});
+  static route(BlogViewerPageEntity blogViewerPage) => MaterialPageRoute(
+        builder: (context) =>
+            UpdateBlogPage(initialBlogViewerPage: blogViewerPage),
       );
 
   @override
@@ -29,7 +33,7 @@ class UpdateBlogPage extends StatefulWidget {
 class _UpdateBlogPageState extends State<UpdateBlogPage> {
   List<String>? permissions;
   List<RequestUnlockedFieldModel>? unlockedFields;
-  late Blog blog;
+  BlogViewerPageEntity? blogViewerPage;
   final TextEditingController titleControler = TextEditingController();
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
@@ -38,17 +42,46 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   @override
   void initState() {
     super.initState();
-    blog = widget.blog;
+    if (widget.initialBlogViewerPage != null) {
+      blogViewerPage = widget.initialBlogViewerPage!;
+    } else if (widget.requestId != null) {
+      _fetchBlogViewerData(widget.requestId!);
+    }
+
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
     Future.microtask(() async {
-      final fetchedUnlockedFields =
-          await fetchUnlockedFields(widget.blog.requestId);
+      // final fetchedUnlockedFields =
+      //     await fetchUnlockedFields(blogViewerPage?.blogsView.requestId ?? -1);
       final fetchedPermissions = await fetchUserPermissions(userId);
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
+          // unlockedFields = fetchedUnlockedFields;
+        });
+      }
+    });
+  }
+
+  void _fetchBlogViewerData(int requestId) async {
+    final FetchBlogPage fetchBlogPage =
+        serviceLocator<FetchBlogPage>(); // ✅ Get use case from service locator
+
+    final fetched = await fetchBlogPage.call(
+        FetchBlogPageParams(requestId: requestId)); // Implement this fetch
+    final fetchedUnlockedFields = await fetchUnlockedFields(requestId);
+
+    fetched.fold((failure) {
+      return;
+    }, (fetch) {
+      if (mounted) {
+        setState(() {
+          blogViewerPage = fetch;
           unlockedFields = fetchedUnlockedFields;
+          print(unlockedFields?.length);
+          selectedTopics = blogViewerPage!.blogsView.topics!;
+          titleControler.text = blogViewerPage!.blogsView.title!;
+          contentControler.text = blogViewerPage!.blogsView.content!;
         });
       }
     });
@@ -58,11 +91,11 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
     if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
       context.read<BlogBloc>().add(
             BlogUpdateEvent(
-              id: blog.id,
-              createdById: blog.createdById,
-              status: blog.status,
-              requestId: blog.requestId,
-              isActive: blog.isActive,
+              id: blogViewerPage!.blogsView.blogId!,
+              createdById: blogViewerPage!.blogsView.createdById!,
+              status: blogViewerPage!.blogsView.status!,
+              requestId: blogViewerPage!.blogsView.requestId!,
+              isActive: blogViewerPage!.blogsView.isActive!,
               title: titleControler.text.trim(),
               content: contentControler.text.trim(),
               topics: selectedTopics,
@@ -73,12 +106,8 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
 
   @override
   Widget build(BuildContext context) {
-    selectedTopics = blog.topics;
-    titleControler.text = blog.title;
-    contentControler.text = blog.content;
-
     return CustomScaffold(
-      title: 'Update Blog-${widget.blog.requestId}',
+      title: 'Update Blog-${blogViewerPage?.blogsView.requestId}',
       showDrawer: false,
       body: [
         BlocConsumer<BlogBloc, BlogState>(
@@ -91,6 +120,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
           },
           builder: (context, state) {
             if (state is BlogLoading ||
+                blogViewerPage == null ||
                 !isUserHasPermissionsView(
                     permissions ?? [], PermissionsConstants.updateBlog)) {
               return const Loader();

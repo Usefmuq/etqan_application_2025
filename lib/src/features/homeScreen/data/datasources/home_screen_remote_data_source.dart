@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/service_master_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/domain/entities/home_screen_page_entity.dart';
@@ -27,14 +28,24 @@ class HomeScreenRemoteDataSourceImpl implements HomeScreenRemoteDataSource {
           .eq('approval_status', LookupConstants.approvalStatusApprovalPending)
           .eq('is_active', true)
           .or('approver_user_id.eq.${user.id},users_under_role_ids.ilike.%${user.id}%');
-
+      final returnedRequestsResult = await supabaseClient
+          .from('requests_master')
+          .select('*')
+          .eq('status', LookupConstants.requestStatusReturnForCorrection)
+          .eq('user_id', user.id)
+          .eq('is_active', true);
+      // print(returnedRequestsResult.first.length);
       return HomeScreenPageEntity(
-          services: servicesResult
-              .map((services) => ServiceMasterModel.fromJson(services))
-              .toList(),
-          approvals: approvalsView
-              .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
-              .toList());
+        services: servicesResult
+            .map((services) => ServiceMasterModel.fromJson(services))
+            .toList(),
+        approvals: approvalsView
+            .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
+            .toList(),
+        returnedRequests: returnedRequestsResult
+            .map((request) => RequestMasterModel.fromJson(request))
+            .toList(),
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

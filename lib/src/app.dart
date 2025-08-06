@@ -1,7 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/theme/theme.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_new_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_page.dart';
@@ -114,8 +113,12 @@ class MyAppState extends State<MyApp> {
         GoRoute(
           path: '/blog/update/:id',
           builder: (context, state) {
-            final entity = state.extra as Blog;
-            return UpdateBlogPage(blog: entity);
+            if (state.extra != null) {
+              final entity = state.extra as BlogViewerPageEntity;
+              return UpdateBlogPage(initialBlogViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateBlogPage(requestId: requestId!);
           },
         ),
         GoRoute(

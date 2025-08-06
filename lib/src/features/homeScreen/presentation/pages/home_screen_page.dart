@@ -28,6 +28,8 @@ class _HomeScreenPageState extends State<HomeScreenPage>
     with SingleTickerProviderStateMixin {
   List<String>? permissions;
   late TabController _tabController;
+  String? title;
+  String? subtitle;
 
   _HomeScreenPageState() : super();
   @override
@@ -35,11 +37,32 @@ class _HomeScreenPageState extends State<HomeScreenPage>
     super.initState();
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
+
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        setState(() {
+          switch (_tabController.index) {
+            case 0:
+              title = AppLocalizations.of(context)!.homeScreensService;
+              subtitle =
+                  AppLocalizations.of(context)!.homeScreensServiceSubtitle;
+              break;
+            case 1:
+              title = AppLocalizations.of(context)!.pendingApproval;
+              subtitle = 'xxxxx';
+              break;
+            case 2:
+              title = AppLocalizations.of(context)!.returnForCorrection;
+              subtitle = 'zzzz';
+              break;
+          }
+        });
+      }
+    });
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
-
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
@@ -54,6 +77,8 @@ class _HomeScreenPageState extends State<HomeScreenPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
+    title ??= AppLocalizations.of(context)!.homeScreensService;
+    subtitle ??= AppLocalizations.of(context)!.homeScreensServiceSubtitle;
 
     // Re-fetch homeScreens when this page becomes active again
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,16 +94,18 @@ class _HomeScreenPageState extends State<HomeScreenPage>
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: AppLocalizations.of(context)!.homeScreensService,
-      subtitle: AppLocalizations.of(context)!.homeScreensServiceSubtitle,
+      title: title ?? '',
+      subtitle: subtitle,
       tabController: _tabController,
       tabs: [
         Tab(text: AppLocalizations.of(context)!.homeScreensService),
         Tab(text: AppLocalizations.of(context)!.pendingApproval),
+        Tab(text: AppLocalizations.of(context)!.returnForCorrection),
       ],
       bodyPerTab: [
         [_servicesTab()],
         [_approvalsTab()],
+        [_returnedTab()],
       ],
     );
   }
@@ -175,6 +202,55 @@ class _HomeScreenPageState extends State<HomeScreenPage>
                     onTap: () {
                       context.push(
                         '/blog/${approval.requestId}',
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        }
+
+        return const SizedBox();
+      },
+    );
+  }
+
+  Widget _returnedTab() {
+    // final localeIsEn = Localizations.localeOf(context).languageCode == 'en';
+
+    return BlocConsumer<HomeScreenBloc, HomeScreenState>(
+      listener: (context, state) {
+        if (state is HomeScreenFailure) {
+          showSnackBar(context, state.error);
+        }
+      },
+      builder: (context, state) {
+        if (state is HomeScreenLoading) {
+          return const Loader();
+        }
+        if (state is HomeScreenShowAllSuccess) {
+          return ListView.builder(
+            shrinkWrap: true, // 👈 Important
+            physics:
+                const NeverScrollableScrollPhysics(), // 👈 Prevent inner scroll
+            itemCount: state.homeScreenPage.returnedRequests.length,
+            itemBuilder: (context, index) {
+              final req = state.homeScreenPage.returnedRequests[index];
+
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: AnimatedCardWrapper(
+                  index: index,
+                  child: CustomCardListRequests(
+                    title: '${req.requestId}',
+                    statusId: req.status,
+                    requestDate: req.createdAt,
+                    subtitle: req.requestDetails,
+                    onTap: () {
+                      context.push(
+                        '/blog/update/${req.requestId}',
                       );
                     },
                   ),
