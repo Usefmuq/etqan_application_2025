@@ -7,8 +7,8 @@ import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:flutter/material.dart';
@@ -170,7 +170,8 @@ class _BlogPageState extends State<BlogPage>
     return BlocConsumer<BlogBloc, BlogState>(
       listener: (context, state) {
         if (state is BlogFailure) {
-          showSnackBar(context, state.error);
+          SmartNotifier.error(context,
+              title: AppLocalizations.of(context)!.error, message: state.error);
         }
       },
       builder: (context, state) {

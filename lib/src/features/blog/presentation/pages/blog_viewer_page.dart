@@ -17,8 +17,8 @@ import 'package:etqan_application_2025/src/core/data/models/request_unlocked_fie
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/fetch_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
@@ -227,12 +227,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
             if (state is BlogFailure) {
-              showSnackBar(context, state.error);
+              SmartNotifier.error(context,
+                  title: AppLocalizations.of(context)!.error,
+                  message: state.error);
             } else if (state is BlogApproveSuccess ||
-                state is BlogSubmitSuccess) {
-              showSnackBar(
+                state is BlogSubmitSuccess ||
+                state is BlogUpdateSuccess) {
+              SmartNotifier.success(
                 context,
-                AppLocalizations.of(context)!.approvalSuccessful,
+                title: AppLocalizations.of(context)!.approvalSuccessful,
+                message: AppLocalizations.of(context)!.approvalSuccessful,
               );
               final reqId = widget.requestId ??
                   widget.initialBlogViewerPage?.blogsView.requestId;

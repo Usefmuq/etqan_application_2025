@@ -7,8 +7,8 @@ import 'package:etqan_application_2025/src/core/constants/permissions_constants.
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/fetch_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
@@ -16,6 +16,7 @@ import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class UpdateBlogPage extends StatefulWidget {
   final BlogViewerPageEntity? initialBlogViewerPage;
@@ -120,7 +121,9 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
             if (state is BlogFailure) {
-              showSnackBar(context, state.error);
+              SmartNotifier.error(context,
+                  title: AppLocalizations.of(context)!.error,
+                  message: state.error);
             } else if (state is BlogUpdateSuccess) {
               context.pop(state.blogViewerPageEntity);
             }

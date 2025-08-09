@@ -5,8 +5,8 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/presentation/bloc/home_screen_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,8 +35,10 @@ class _HomeScreenPageState extends State<HomeScreenPage>
   @override
   void initState() {
     super.initState();
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    final authState = context.read<AppUserCubit>().state;
+    if (authState is! AppUserSignedIn) return; // or early return
+
+    final userId = authState.user.id;
     _tabController = TabController(length: 3, vsync: this);
 
     _tabController.addListener(() {
@@ -76,7 +78,9 @@ class _HomeScreenPageState extends State<HomeScreenPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
+    final authState = context.read<AppUserCubit>().state;
+    if (authState is! AppUserSignedIn) return; // or early return
+    final user = authState.user;
     title ??= AppLocalizations.of(context)!.homeScreensService;
     subtitle ??= AppLocalizations.of(context)!.homeScreensServiceSubtitle;
 
@@ -116,7 +120,8 @@ class _HomeScreenPageState extends State<HomeScreenPage>
     return BlocConsumer<HomeScreenBloc, HomeScreenState>(
       listener: (context, state) {
         if (state is HomeScreenFailure) {
-          showSnackBar(context, state.error);
+          SmartNotifier.error(context,
+              title: AppLocalizations.of(context)!.error, message: state.error);
         }
       },
       builder: (context, state) {
@@ -170,7 +175,8 @@ class _HomeScreenPageState extends State<HomeScreenPage>
     return BlocConsumer<HomeScreenBloc, HomeScreenState>(
       listener: (context, state) {
         if (state is HomeScreenFailure) {
-          showSnackBar(context, state.error);
+          SmartNotifier.error(context,
+              title: AppLocalizations.of(context)!.error, message: state.error);
         }
       },
       builder: (context, state) {
@@ -222,7 +228,8 @@ class _HomeScreenPageState extends State<HomeScreenPage>
     return BlocConsumer<HomeScreenBloc, HomeScreenState>(
       listener: (context, state) {
         if (state is HomeScreenFailure) {
-          showSnackBar(context, state.error);
+          SmartNotifier.error(context,
+              title: AppLocalizations.of(context)!.error, message: state.error);
         }
       },
       builder: (context, state) {

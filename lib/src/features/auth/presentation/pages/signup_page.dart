@@ -1,5 +1,5 @@
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/widgets/auth_btn.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/widgets/auth_field.dart';
@@ -39,7 +39,9 @@ class _SignupPageState extends State<SignupPage> {
           child: BlocConsumer<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is AuthFailure) {
-                showSnackBar(context, state.message);
+                SmartNotifier.error(context,
+                    title: AppLocalizations.of(context)!.error,
+                    message: state.message);
               }
             },
             builder: (context, state) {

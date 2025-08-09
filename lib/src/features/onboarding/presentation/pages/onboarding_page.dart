@@ -4,8 +4,8 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/core/utils/show_snackbar.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/entities/onboarding_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +79,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
         BlocConsumer<OnboardingBloc, OnboardingState>(
           listener: (context, state) {
             if (state is OnboardingFailure) {
-              showSnackBar(context, state.error);
+              SmartNotifier.error(context,
+                  title: AppLocalizations.of(context)!.error,
+                  message: state.error);
             }
           },
           builder: (context, state) {
