@@ -120,7 +120,13 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
             approvalSequence.map((e) => e.toJson()).toList(),
           )
           .select();
-
+      await supabaseClient
+          .from('request_unlocked_fields')
+          .update({
+            'is_active': false,
+          })
+          .eq('request_id', blog.requestId) // Ensure you update the correct row
+          .select();
       final blogsView = await supabaseClient
           .from('blogs_page_view')
           .select('*')
@@ -270,6 +276,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .from('approval_sequence_view')
           .select('*')
           .eq('request_id', requestId)
+          .eq('is_active', true)
           .select('*');
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))

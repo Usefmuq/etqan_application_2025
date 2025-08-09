@@ -2,6 +2,7 @@ import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text
 import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 
 class BlogInputSection {
@@ -12,7 +13,7 @@ class BlogInputSection {
     required TextEditingController titleController,
     required TextEditingController contentController,
     required bool isWide,
-    required bool isUpdate,
+    required bool isLockFieldsWithoutComment,
     List<RequestUnlockedFieldModel>? unlockedFields,
   }) {
     bool containsKey(String key) {
@@ -36,7 +37,7 @@ class BlogInputSection {
           final isSelected = selectedTopics.contains(topic);
           return GestureDetector(
             onTap: () {
-              if (isUpdate && !containsKey('blog_topics')) {
+              if (isLockFieldsWithoutComment && !containsKey('blog_topics')) {
                 return;
               }
               setState(() {
@@ -65,8 +66,14 @@ class BlogInputSection {
           responsiveField(
             CustomTextFormField(
               controller: titleController,
-              readOnly: isUpdate ? !containsKey('blog_title') : false,
+              readOnly: isLockFieldsWithoutComment
+                  ? !containsKey('blog_title')
+                  : false,
               hintText: 'Blog title',
+              reviewerComment: unlockedFields
+                  ?.firstWhereOrNull(
+                      (element) => element.fieldKey == 'blog_title')
+                  ?.reason,
             ),
             isWide,
           ),
@@ -74,8 +81,14 @@ class BlogInputSection {
             CustomTextFormField(
               controller: contentController,
               hintText: 'Blog content',
-              readOnly: isUpdate ? !containsKey('blog_content') : false,
+              readOnly: isLockFieldsWithoutComment
+                  ? !containsKey('blog_content')
+                  : false,
               maxLines: null,
+              reviewerComment: unlockedFields
+                  ?.firstWhereOrNull(
+                      (element) => element.fieldKey == 'blog_content')
+                  ?.reason,
             ),
             isWide,
           ),

@@ -106,7 +106,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
-                          isUpdate: false,
+                          isLockFieldsWithoutComment: false,
                           setState: setState,
                           selectedTopics: selectedTopics,
                           // onToggleTopic: (topic) {

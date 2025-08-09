@@ -131,8 +131,8 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
 
   void _handleEdit() async {
     final updatedEntity = await context.push<BlogViewerPageEntity>(
-      '/blog/update/${blogViewerPage!.blogsView.blogId}',
-      extra: blogViewerPage!.blogsView.toBlog()!,
+      '/blog/update/${blogViewerPage!.blogsView.requestId}',
+      extra: blogViewerPage,
     );
 
     if (updatedEntity != null && mounted) {
@@ -234,9 +234,22 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 context,
                 AppLocalizations.of(context)!.approvalSuccessful,
               );
+              final reqId = widget.requestId ??
+                  widget.initialBlogViewerPage?.blogsView.requestId;
 
-              if (widget.requestId != null) {
-                _fetchBlogViewerData(widget.requestId!);
+              if (reqId != null) {
+                // Close any open dialog/sheet safely
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+
+                // Navigate AFTER the frame to avoid “during build” errors
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  // Option A: full reload via navigation
+                  context.pushReplacement('/blog/$reqId');
+                  // Option B: refresh in place instead of navigating:
+                  // _fetchBlogViewerData(reqId);
+                });
               }
             }
           },
@@ -249,16 +262,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 )) {
               return const Loader();
             }
-            if (state is BlogApproveSuccess || state is BlogSubmitSuccess) {
-              showSnackBar(
-                context,
-                AppLocalizations.of(context)!.approvalSuccessful,
-              );
 
-              if (widget.requestId != null) {
-                _fetchBlogViewerData(widget.requestId!);
-              }
-            }
             return Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

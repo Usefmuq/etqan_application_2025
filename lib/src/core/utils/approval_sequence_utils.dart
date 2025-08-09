@@ -33,7 +33,8 @@ Future<List<RequestUnlockedFieldModel>?> fetchUnlockedFields(
   final response = await Supabase.instance.client
       .from('request_unlocked_fields')
       .select()
-      .eq('request_id', requestId);
+      .eq('request_id', requestId)
+      .eq('is_active', true);
 
   final data = response as List;
   return data.map((json) => RequestUnlockedFieldModel.fromJson(json)).toList();

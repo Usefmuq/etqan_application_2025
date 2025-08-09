@@ -38,26 +38,34 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
+  String userId = '';
 
   @override
   void initState() {
     super.initState();
     if (widget.initialBlogViewerPage != null) {
       blogViewerPage = widget.initialBlogViewerPage!;
+      selectedTopics = blogViewerPage!.blogsView.topics!;
+      titleControler.text = blogViewerPage!.blogsView.title!;
+      contentControler.text = blogViewerPage!.blogsView.content!;
     } else if (widget.requestId != null) {
       _fetchBlogViewerData(widget.requestId!);
     }
 
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    userId = (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
     Future.microtask(() async {
       // final fetchedUnlockedFields =
       //     await fetchUnlockedFields(blogViewerPage?.blogsView.requestId ?? -1);
       final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetchedUnlockedFields = await fetchUnlockedFields(
+          widget.requestId ??
+              widget.initialBlogViewerPage?.blogsView.requestId! ??
+              -1);
+
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
-          // unlockedFields = fetchedUnlockedFields;
+          unlockedFields = fetchedUnlockedFields;
         });
       }
     });
@@ -136,7 +144,14 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
-                          isUpdate: true,
+                          isLockFieldsWithoutComment: isUserHasPermissionsView(
+                                      permissions ?? [],
+                                      PermissionsConstants.updateBlog) &&
+                                  widget.initialBlogViewerPage?.blogsView
+                                          .createdById !=
+                                      userId
+                              ? false
+                              : true,
                           setState: setState,
                           selectedTopics: selectedTopics,
                           // onToggleTopic: (topic) {
