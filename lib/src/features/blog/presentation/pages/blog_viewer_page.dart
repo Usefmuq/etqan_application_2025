@@ -1,4 +1,3 @@
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
@@ -49,10 +48,12 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   List<String>? permissions;
   ApprovalSequenceViewModel? pendingApproval;
   List<ServiceField> serviceFields = [];
+  List<bool> unlockedFieldsReadOnly = [];
   List<RequestUnlockedFieldModel> requestUnlockedFields = [];
-  Map<RequestUnlockedFieldModel, TextEditingController> fieldControllers = {};
+  List<TextEditingController> fieldControllers = [];
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  String userId = '';
 
   @override
   void initState() {
@@ -64,8 +65,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     } else if (widget.requestId != null) {
       _fetchBlogViewerData(widget.requestId!);
     }
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    userId = (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
@@ -84,6 +84,12 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
           permissions = fetchedPermissions;
           pendingApproval = fetchPendingApproval;
           serviceFields = fetcheServiceFields;
+          fieldControllers = List.generate(
+            serviceFields.length,
+            (_) => TextEditingController(),
+          );
+          unlockedFieldsReadOnly =
+              List.generate(serviceFields.length, (_) => true);
         });
       }
     });
@@ -333,23 +339,73 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                           permissions ?? [],
                           PermissionsConstants.approveBlog,
                         ) &&
-                        !pendingApproval.isNullOrEmpty)
+                        !pendingApproval.isNullOrEmpty &&
+                        blogViewerPage?.blogsView.createdById != userId)
                       Form(
                         key: formKey,
                         child: Column(
                           children: [
                             const SizedBox(height: 20),
                             const Divider(),
+                            const SizedBox(height: 20),
+
+                            Column(
+                              children:
+                                  serviceFields.asMap().entries.map((entry) {
+                                final index = entry.key;
+                                final field = entry.value;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      // Lock/Unlock Icon Button
+                                      IconButton(
+                                        icon: Icon(
+                                          unlockedFieldsReadOnly[index]
+                                              ? Icons.lock
+                                              : Icons.lock_open,
+                                          color: unlockedFieldsReadOnly[index]
+                                              ? AppPallete.greyColor
+                                              : AppPallete.rejectColor,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            unlockedFieldsReadOnly[index] =
+                                                !unlockedFieldsReadOnly[index];
+                                            fieldControllers[index].text = '';
+                                          });
+                                        },
+                                      ),
+                                      // Expanded Text Field
+                                      Expanded(
+                                        child: CustomTextFormField(
+                                          controller: fieldControllers[index],
+                                          hintText: field.fieldLabelAr ?? '',
+                                          readOnly:
+                                              unlockedFieldsReadOnly[index],
+                                          required:
+                                              !unlockedFieldsReadOnly[index],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ), // ..._returnBtbDialog(),
+                            const SizedBox(height: 20),
+
                             CustomTextFormField(
                               controller: commentController,
                               hintText:
                                   AppLocalizations.of(context)!.approvalComment,
                               maxLines: null,
                               readOnly: false,
+                              required: true,
                             ),
                             const SizedBox(height: 20),
-                            ..._returnBtbDialog(),
-                            const SizedBox(height: 20),
+
                             LayoutBuilder(
                               builder: (context, constraints) {
                                 final isSmallScreen = constraints.maxWidth <
@@ -379,15 +435,32 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                         isDisabled: fieldControllers.isEmpty,
                                         onPressed: () {
                                           requestUnlockedFields =
-                                              fieldControllers.entries
+                                              fieldControllers
+                                                  .asMap()
+                                                  .entries
+                                                  // Keep only unlocked fields
+                                                  .where((entry) =>
+                                                      !unlockedFieldsReadOnly[
+                                                          entry.key])
+                                                  // Map to model
                                                   .map((entry) {
-                                            final fieldModel = entry.key;
-                                            final controller = entry.value;
-
-                                            return fieldModel.copyWith(
-                                              reason: controller
-                                                  .text, // 👈 assuming you have `value` field in model
+                                            final model =
+                                                RequestUnlockedFieldModel(
+                                              id: Uuid().v1(),
+                                              fieldKey: serviceFields[entry.key]
+                                                  .fieldKey,
+                                              requestId: blogViewerPage!
+                                                  .blogsView.requestId!,
+                                              unlockedBy: (context
+                                                      .read<AppUserCubit>()
+                                                      .state as AppUserSignedIn)
+                                                  .user
+                                                  .id,
+                                              unlockedAt: DateTime.now(),
+                                              reason: entry.value.text,
+                                              isActive: true,
                                             );
+                                            return model;
                                           }).toList();
                                           _approveBlog(
                                             isApproved: false,
@@ -433,15 +506,34 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                           isDisabled: fieldControllers.isEmpty,
                                           onPressed: () {
                                             requestUnlockedFields =
-                                                fieldControllers.entries
+                                                fieldControllers
+                                                    .asMap()
+                                                    .entries
+                                                    // Keep only unlocked fields
+                                                    .where((entry) =>
+                                                        !unlockedFieldsReadOnly[
+                                                            entry.key])
+                                                    // Map to model
                                                     .map((entry) {
-                                              final fieldModel = entry.key;
-                                              final controller = entry.value;
-
-                                              return fieldModel.copyWith(
-                                                reason: controller
-                                                    .text, // 👈 assuming you have `value` field in model
+                                              final model =
+                                                  RequestUnlockedFieldModel(
+                                                id: Uuid().v1(),
+                                                fieldKey:
+                                                    serviceFields[entry.key]
+                                                        .fieldKey,
+                                                requestId: blogViewerPage!
+                                                    .blogsView.requestId!,
+                                                unlockedBy: (context
+                                                            .read<AppUserCubit>()
+                                                            .state
+                                                        as AppUserSignedIn)
+                                                    .user
+                                                    .id,
+                                                unlockedAt: DateTime.now(),
+                                                reason: entry.value.text,
+                                                isActive: true,
                                               );
+                                              return model;
                                             }).toList();
                                             _approveBlog(
                                               isApproved: false,
@@ -480,85 +572,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         ),
       ],
     );
-  }
-
-  List<Widget> _returnBtbDialog() {
-    List<String?> list = serviceFields
-        .map(
-          (e) => e.fieldKey,
-        )
-        .toList();
-
-    return [
-      StatefulBuilder(
-        builder: (context, setStateSB) {
-          // <- use setStateSB for dialog rebuild
-          return SizedBox(
-            width: double.maxFinite,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CustomDropdown<String>.multiSelect(
-                    hintText: 'Choose one or more…',
-                    items: (list).map((e) => e ?? '').toList(),
-                    decoration: CustomDropdownDecoration(
-                      closedFillColor: Colors.white,
-                      closedBorderRadius: BorderRadius.circular(6),
-                      closedBorder: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 1,
-                      ),
-                      listItemDecoration: ListItemDecoration(
-                        selectedColor: Colors.blue.shade50,
-                      ),
-                    ),
-                    onListChanged: (List<String> keys) {
-                      setState(() {
-                        fieldControllers.clear();
-                        for (final key in keys) {
-                          // Convert string key to a model
-                          final model = RequestUnlockedFieldModel(
-                            id: Uuid().v1(), // or look up the ID if you have it
-                            fieldKey: key,
-                            requestId: blogViewerPage!.blogsView.requestId!,
-                            unlockedBy: (context.read<AppUserCubit>().state
-                                    as AppUserSignedIn)
-                                .user
-                                .id,
-                            unlockedAt: DateTime.now(),
-                            isActive: true,
-                          );
-                          fieldControllers[model] = TextEditingController();
-                        }
-                      });
-                    },
-                  ),
-                  if (fieldControllers.isNotEmpty)
-                    Column(
-                      children: fieldControllers.entries.map((entry) {
-                        final fieldModel = entry.key;
-                        final controller = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: TextFormField(
-                            controller: controller,
-                            decoration: InputDecoration(
-                              labelText:
-                                  fieldModel.fieldKey, // or fieldModel.label
-                              border: const OutlineInputBorder(),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                ],
-              ),
-            ),
-          );
-        },
-      )
-    ];
   }
 
   @override
