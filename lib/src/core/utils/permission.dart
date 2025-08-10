@@ -13,7 +13,9 @@ bool isUserHasPermissionsView(
 Future<List<String>?> fetchUserPermissions(String userId) async {
   final GetUserPermissions getUserPermissions = serviceLocator<
       GetUserPermissions>(); // ✅ Get use case from service locator
-
+  if (userId.isNullOrEmpty) {
+    return [];
+  }
   final response =
       await getUserPermissions.call(GetUserPermissionsParams(userId: userId));
   return response.fold((failure) {

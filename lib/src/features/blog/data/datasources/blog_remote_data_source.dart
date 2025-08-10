@@ -5,6 +5,7 @@ import 'package:etqan_application_2025/src/core/data/models/request_unlocked_fie
 import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -210,13 +211,21 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
 
       if (!isViewAll) {
         if (isDepartmentManagerExpanded) {
-          if (departmentId == null) {
+          if (departmentId.isNullOrEmpty) {
             return [];
           }
-          filters['department_id'] = departmentId;
+          filters['department_id'] = departmentId!;
         } else if (isManagerExpanded) {
+          if (userId.isNullOrEmpty) {
+            return [];
+          }
+
           filters['report_to'] = userId;
         } else {
+          if (userId.isNullOrEmpty) {
+            return [];
+          }
+
           filters['created_by_id'] = userId;
         }
       }

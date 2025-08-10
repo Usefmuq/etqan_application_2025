@@ -41,6 +41,10 @@ Future<List<Positions>> fetchPositions(String departmentId) async {
 }
 
 Future<List<UserModel>> fetchUsersByDepartment(String departmentId) async {
+  if (departmentId.isNullOrEmpty) {
+    return [];
+  }
+
   final response = await Supabase.instance.client
       .from('users')
       .select()
