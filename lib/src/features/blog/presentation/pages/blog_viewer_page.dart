@@ -1,11 +1,6 @@
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_key_value_grid.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
-import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
@@ -13,7 +8,7 @@ import 'package:etqan_application_2025/src/core/constants/permissions_constants.
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
-import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
@@ -21,12 +16,11 @@ import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/usecases/fetch_blog_page.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
+import 'package:etqan_application_2025/src/features/blog/presentation/pages/blog_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:uuid/uuid.dart';
 
 class BlogViewerPage extends StatefulWidget {
   final BlogViewerPageEntity? initialBlogViewerPage;
@@ -44,16 +38,19 @@ class BlogViewerPage extends StatefulWidget {
 }
 
 class _BlogViewerPageState extends State<BlogViewerPage> {
+  // >>> keep your variables as-is
   BlogViewerPageEntity? blogViewerPage;
   List<String>? permissions;
   ApprovalSequenceViewModel? pendingApproval;
   List<ServiceField> serviceFields = [];
-  List<bool> unlockedFieldsReadOnly = [];
   List<RequestUnlockedFieldModel> requestUnlockedFields = [];
   List<TextEditingController> fieldControllers = [];
+  final Map<int, bool> unlockedFieldsReadOnly =
+      {}; // index -> true (locked/readOnly), false (unlocked/editable)
+
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  String userId = '';
+  // <<< keep your variables as-is
 
   @override
   void initState() {
@@ -65,13 +62,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     } else if (widget.requestId != null) {
       _fetchBlogViewerData(widget.requestId!);
     }
-    userId = (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+
+    final userId =
+        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
-      final fetcheServiceFields =
+      final fetchedServiceFields =
           await fetchFieldsByServiceId(ServicesConstants.blogServiceId);
 
+      // Optionally compute pendingApproval if we already have blogViewerPage
       final fetchPendingApproval =
           await blogViewerPage?.approval!.firstWhereOrNullAsync((a) async {
         return a.approvalStatus?.toLowerCase() ==
@@ -79,41 +79,56 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
             (a.approverUserId == userId ||
                 await isUserHasRole(userId, a.roleId ?? ''));
       });
-      if (mounted) {
-        setState(() {
-          permissions = fetchedPermissions;
-          pendingApproval = fetchPendingApproval;
-          serviceFields = fetcheServiceFields;
-          fieldControllers = List.generate(
-            serviceFields.length,
-            (_) => TextEditingController(),
-          );
-          unlockedFieldsReadOnly =
-              List.generate(serviceFields.length, (_) => true);
-        });
-      }
+
+      if (!mounted) return;
+      setState(() {
+        permissions = fetchedPermissions;
+        pendingApproval = fetchPendingApproval;
+        serviceFields = fetchedServiceFields;
+      });
+
+      _ensureControllersAndLocksInitialized();
     });
+  }
+
+  void _ensureControllersAndLocksInitialized() {
+    // make fieldControllers match serviceFields length
+    if (fieldControllers.length != serviceFields.length) {
+      fieldControllers = List.generate(
+        serviceFields.length,
+        (_) => TextEditingController(),
+      );
+    }
+    // default all to locked (readOnly == true) unless already set
+    if (unlockedFieldsReadOnly.length != serviceFields.length) {
+      for (var i = 0; i < serviceFields.length; i++) {
+        unlockedFieldsReadOnly[i] = unlockedFieldsReadOnly[i] ?? true;
+      }
+    }
   }
 
   void _fetchBlogViewerData(int requestId) async {
-    final FetchBlogPage fetchBlogPage =
-        serviceLocator<FetchBlogPage>(); // ✅ Get use case from service locator
+    final FetchBlogPage fetchBlogPage = serviceLocator<FetchBlogPage>();
+    final fetched =
+        await fetchBlogPage.call(FetchBlogPageParams(requestId: requestId));
 
-    final fetched = await fetchBlogPage.call(
-        FetchBlogPageParams(requestId: requestId)); // Implement this fetch
     fetched.fold((failure) {
-      return;
-    }, (fetch) {
-      if (mounted) {
-        setState(() {
-          blogViewerPage = fetch;
-        });
-        _initializeApprovals();
-      }
+      SmartNotifier.error(
+        context,
+        title: AppLocalizations.of(context)!.error,
+        message: failure.message,
+      );
+    }, (fetch) async {
+      if (!mounted) return;
+      setState(() {
+        blogViewerPage = fetch;
+      });
+      await _initializeApprovals();
+      _ensureControllersAndLocksInitialized();
     });
   }
 
-  void _initializeApprovals() async {
+  Future<void> _initializeApprovals() async {
     final userId =
         (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
 
@@ -127,88 +142,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
               await isUserHasRole(userId, a.roleId ?? ''));
     });
 
-    if (mounted) {
-      setState(() {
-        permissions = fetchedPermissions;
-        pendingApproval = fetchPendingApproval;
-      });
-    }
-  }
-
-  void _handleEdit() async {
-    final updatedEntity = await context.push<BlogViewerPageEntity>(
-      '/blog/update/${blogViewerPage!.blogsView.requestId}',
-      extra: blogViewerPage,
-    );
-
-    if (updatedEntity != null && mounted) {
-      setState(() {
-        blogViewerPage = updatedEntity;
-      });
-    }
-  }
-
-  void _approveBlog({
-    required bool isApproved,
-    List<RequestUnlockedFieldModel>? requestUnlockedFields,
-  }) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(
-          isApproved
-              ? AppLocalizations.of(context)!.confirmApproval
-              : (requestUnlockedFields.isNullOrEmpty
-                  ? AppLocalizations.of(context)!.confirmRejection
-                  : AppLocalizations.of(context)!.confirmReturnForCorrection),
-        ),
-        content: Text(isApproved
-            ? AppLocalizations.of(context)!.confirmApprovalDesc
-            : (requestUnlockedFields.isNullOrEmpty
-                ? AppLocalizations.of(context)!.confirmRejectionDesc
-                : AppLocalizations.of(context)!
-                    .confirmReturnForCorrectionDesc)),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(AppLocalizations.of(context)!.cancel)),
-          TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(AppLocalizations.of(context)!.yes)),
-        ],
-      ),
-    );
     if (!mounted) return;
-
-    if (!isUserHasPermissionsView(
-          permissions ?? [],
-          PermissionsConstants.approveBlog,
-        ) &&
-        pendingApproval.isNullOrEmpty) {
-      return;
-    }
-    if (confirmed != true) return;
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
-    if (formKey.currentState!.validate()) {
-      final updatedApproval = pendingApproval!.copyWith(
-        approvalStatus: isApproved
-            ? LookupConstants.approvalStatusApprovalApproved
-            : (requestUnlockedFields.isNullOrEmpty
-                ? LookupConstants.approvalStatusApprovalRejected
-                : LookupConstants.approvalStatusApprovalReturnForCorrection),
-        approverComment: commentController.text,
-        approvedBy: userId,
-      );
-
-      context.read<BlogBloc>().add(
-            BlogApproveEvent(
-              approvalSequence: updatedApproval,
-              requestUnlockedFields: requestUnlockedFields,
-              blogModel: blogViewerPage!.blogsView,
-            ),
-          );
-    }
+    setState(() {
+      permissions = fetchedPermissions;
+      pendingApproval = fetchPendingApproval;
+    });
   }
 
   @override
@@ -226,41 +164,28 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
             blogViewerPage!.blogsView.toBlog() != null)
           IconButton(
             onPressed: _handleEdit,
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
           ),
       ],
       body: [
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
             if (state is BlogFailure) {
-              SmartNotifier.error(context,
-                  title: AppLocalizations.of(context)!.error,
-                  message: state.error);
+              SmartNotifier.error(
+                context,
+                title: AppLocalizations.of(context)!.unexpectedError,
+                message: state.error,
+              );
             } else if (state is BlogApproveSuccess ||
-                state is BlogSubmitSuccess ||
-                state is BlogUpdateSuccess) {
+                state is BlogSubmitSuccess) {
               SmartNotifier.success(
                 context,
                 title: AppLocalizations.of(context)!.approvalSuccessful,
-                message: AppLocalizations.of(context)!.approvalSuccessful,
               );
               final reqId = widget.requestId ??
-                  widget.initialBlogViewerPage?.blogsView.requestId;
-
-              if (reqId != null) {
-                // Close any open dialog/sheet safely
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
-
-                // Navigate AFTER the frame to avoid “during build” errors
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // Option A: full reload via navigation
-                  context.pushReplacement('/blog/$reqId');
-                  // Option B: refresh in place instead of navigating:
-                  // _fetchBlogViewerData(reqId);
-                });
-              }
+                  widget.initialBlogViewerPage!.blogsView.requestId!;
+              // Refresh data after success
+              _fetchBlogViewerData(reqId);
             }
           },
           builder: (context, state) {
@@ -279,292 +204,131 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                   borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CustomSectionTitle(
-                      title: AppLocalizations.of(context)!.blogDetails,
-                    ),
-                    CustomKeyValueGrid(
-                      data: {
-                        AppLocalizations.of(context)!.title:
-                            blogViewerPage!.blogsView.title,
-                        AppLocalizations.of(context)!.requestId:
-                            "${AppLocalizations.of(context)!.blog}-${blogViewerPage!.blogsView.requestId}",
-                        AppLocalizations.of(context)!.status:
-                            blogViewerPage!.blogsView.requestStatusId,
-                        AppLocalizations.of(context)!.topics:
-                            blogViewerPage!.blogsView.topics!.join(', '),
-                        AppLocalizations.of(context)!.createdBy:
-                            blogViewerPage!.blogsView.fullNameAr,
-                        AppLocalizations.of(context)!.priority:
-                            blogViewerPage!.blogsView.priorityId,
-                        AppLocalizations.of(context)!.requestDetails:
-                            blogViewerPage!.blogsView.requestDetails,
-                        AppLocalizations.of(context)!.createdAt:
-                            DateFormat.yMMMd().add_jm().format(
-                                blogViewerPage!.blogsView.requestCreatedAt!),
-                        AppLocalizations.of(context)!.updatedAt:
-                            blogViewerPage!.blogsView.blogUpdatedAt,
-                        AppLocalizations.of(context)!.approvedAt:
-                            blogViewerPage!.blogsView.requestApprovedAt != null
-                                ? DateFormat.yMMMd().add_jm().format(
-                                    blogViewerPage!
-                                        .blogsView.requestApprovedAt!)
-                                : AppLocalizations.of(context)!.notYet,
-                      },
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 12),
-                    CustomSectionTitle(
-                      title: AppLocalizations.of(context)!.approvalSequence,
-                    ),
-                    CustomTableGrid(
-                      headers: [
-                        AppLocalizations.of(context)!.approvalId,
-                        AppLocalizations.of(context)!.requestId,
-                        AppLocalizations.of(context)!.approvalStatus,
-                        AppLocalizations.of(context)!.approverName,
-                        AppLocalizations.of(context)!.roleName,
-                        AppLocalizations.of(context)!.approvedAt,
-                        AppLocalizations.of(context)!.createdAt,
-                      ],
-                      rows: blogViewerPage!.approval!
-                          .map((e) => e.toTableRow())
-                          .toList(),
-                      useChipsForStatus: true,
-                    ),
-                    const SizedBox(height: 30),
-                    if (isUserHasPermissionsView(
-                          permissions ?? [],
-                          PermissionsConstants.approveBlog,
-                        ) &&
-                        !pendingApproval.isNullOrEmpty &&
-                        blogViewerPage?.blogsView.createdById != userId)
-                      Form(
-                        key: formKey,
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 20),
-                            const Divider(),
-                            const SizedBox(height: 20),
-
-                            Column(
-                              children:
-                                  serviceFields.asMap().entries.map((entry) {
-                                final index = entry.key;
-                                final field = entry.value;
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      // Lock/Unlock Icon Button
-                                      IconButton(
-                                        icon: Icon(
-                                          unlockedFieldsReadOnly[index]
-                                              ? Icons.lock
-                                              : Icons.lock_open,
-                                          color: unlockedFieldsReadOnly[index]
-                                              ? AppPallete.greyColor
-                                              : AppPallete.rejectColor,
-                                        ),
-                                        onPressed: () {
-                                          setState(() {
-                                            unlockedFieldsReadOnly[index] =
-                                                !unlockedFieldsReadOnly[index];
-                                            fieldControllers[index].text = '';
-                                          });
-                                        },
-                                      ),
-                                      // Expanded Text Field
-                                      Expanded(
-                                        child: CustomTextFormField(
-                                          controller: fieldControllers[index],
-                                          hintText: field.fieldLabelAr ?? '',
-                                          readOnly:
-                                              unlockedFieldsReadOnly[index],
-                                          required:
-                                              !unlockedFieldsReadOnly[index],
-                                        ),
-                                      ),
-                                    ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      buildDetailsSection(context, blogViewerPage),
+                      const Divider(),
+                      const SizedBox(height: 12),
+                      buildApprovalTableSection(context, blogViewerPage),
+                      const SizedBox(height: 24),
+                      if (isUserHasPermissionsView(
+                            permissions ?? [],
+                            PermissionsConstants.approveBlog,
+                          ) &&
+                          !pendingApproval.isNullOrEmpty)
+                        Form(
+                          key: formKey,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12),
+                              buildCommentField(
+                                context,
+                                commentController,
+                              ),
+                              const SizedBox(height: 20),
+                              buildReturnForCorrectionUI(
+                                context,
+                                serviceFields,
+                                unlockedFieldsReadOnly,
+                                fieldControllers,
+                                (idx, wasReadOnly) {
+                                  // <-- you get index and current state
+                                  setState(() {
+                                    unlockedFieldsReadOnly[idx] = !wasReadOnly;
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              // _buildActionButtons(),
+                              buildActionButtons(
+                                context: context,
+                                onApprove: () => approveRequest(
+                                  context: context,
+                                  formKey: formKey,
+                                  commentController: commentController,
+                                  isApproved: true,
+                                  pendingApproval: pendingApproval!,
+                                  model: blogViewerPage!.blogsView,
+                                  dispatchEvent: (event) =>
+                                      context.read<BlogBloc>().add(event),
+                                  buildEvent: ({
+                                    required approvalSequence,
+                                    required model,
+                                    requestUnlockedFields,
+                                  }) =>
+                                      BlogApproveEvent(
+                                    approvalSequence: approvalSequence,
+                                    blogModel: blogViewerPage!.blogsView,
+                                    requestUnlockedFields:
+                                        requestUnlockedFields,
                                   ),
-                                );
-                              }).toList(),
-                            ), // ..._returnBtbDialog(),
-                            const SizedBox(height: 20),
-
-                            CustomTextFormField(
-                              controller: commentController,
-                              hintText:
-                                  AppLocalizations.of(context)!.approvalComment,
-                              maxLines: null,
-                              readOnly: false,
-                              required: true,
-                            ),
-                            const SizedBox(height: 20),
-
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                final isSmallScreen = constraints.maxWidth <
-                                    800; // adjust breakpoint as needed
-
-                                if (isSmallScreen) {
-                                  // 📱 Small screen: stack vertically
-                                  return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      CustomButton(
-                                        text: AppLocalizations.of(context)!
-                                            .approve,
-                                        icon: Icons.check_circle_outline,
-                                        onPressed: () {
-                                          _approveBlog(isApproved: true);
-                                        },
+                                ),
+                                onReturnForCorrection: () =>
+                                    handleReturnForCorrectionPressed(
+                                  fieldControllers: fieldControllers,
+                                  serviceFields: serviceFields,
+                                  unlockedFieldsReadOnly:
+                                      unlockedFieldsReadOnly,
+                                  formKey: formKey,
+                                  requestUnlockedFields: requestUnlockedFields,
+                                  context: context,
+                                  requestId:
+                                      blogViewerPage!.blogsView.requestId!,
+                                  onReturnForCorrection: (unlockedFields) {
+                                    approveRequest(
+                                      commentController: commentController,
+                                      formKey: formKey,
+                                      context: context,
+                                      isApproved: false,
+                                      pendingApproval: pendingApproval!,
+                                      model: blogViewerPage!.blogsView,
+                                      requestUnlockedFields: unlockedFields,
+                                      dispatchEvent: (event) =>
+                                          context.read<BlogBloc>().add(event),
+                                      buildEvent: ({
+                                        required approvalSequence,
+                                        requestUnlockedFields,
+                                        required model,
+                                      }) =>
+                                          BlogApproveEvent(
+                                        approvalSequence: approvalSequence,
+                                        requestUnlockedFields:
+                                            requestUnlockedFields,
+                                        blogModel: model,
                                       ),
-                                      const SizedBox(height: 12),
-                                      CustomButton(
-                                        text: AppLocalizations.of(context)!
-                                            .returnForCorrection,
-                                        icon: Icons.cancel_outlined,
-                                        backgroundColor:
-                                            AppPallete.textSecondary,
-                                        isDisabled: fieldControllers.isEmpty,
-                                        onPressed: () {
-                                          requestUnlockedFields =
-                                              fieldControllers
-                                                  .asMap()
-                                                  .entries
-                                                  // Keep only unlocked fields
-                                                  .where((entry) =>
-                                                      !unlockedFieldsReadOnly[
-                                                          entry.key])
-                                                  // Map to model
-                                                  .map((entry) {
-                                            final model =
-                                                RequestUnlockedFieldModel(
-                                              id: Uuid().v1(),
-                                              fieldKey: serviceFields[entry.key]
-                                                  .fieldKey,
-                                              requestId: blogViewerPage!
-                                                  .blogsView.requestId!,
-                                              unlockedBy: (context
-                                                      .read<AppUserCubit>()
-                                                      .state as AppUserSignedIn)
-                                                  .user
-                                                  .id,
-                                              unlockedAt: DateTime.now(),
-                                              reason: entry.value.text,
-                                              isActive: true,
-                                            );
-                                            return model;
-                                          }).toList();
-                                          _approveBlog(
-                                            isApproved: false,
-                                            requestUnlockedFields:
-                                                requestUnlockedFields,
-                                          );
-                                        },
-                                      ),
-                                      const SizedBox(height: 12),
-                                      CustomButton(
-                                        text: AppLocalizations.of(context)!
-                                            .reject,
-                                        icon: Icons.cancel_outlined,
-                                        backgroundColor: AppPallete.errorColor,
-                                        onPressed: () {
-                                          _approveBlog(isApproved: false);
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                } else {
-                                  // 💻 Large screen: keep them in a row
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                        child: CustomButton(
-                                          text: AppLocalizations.of(context)!
-                                              .approve,
-                                          icon: Icons.check_circle_outline,
-                                          onPressed: () {
-                                            _approveBlog(isApproved: true);
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: CustomButton(
-                                          text: AppLocalizations.of(context)!
-                                              .returnForCorrection,
-                                          icon: Icons.cancel_outlined,
-                                          backgroundColor:
-                                              AppPallete.textSecondary,
-                                          isDisabled: fieldControllers.isEmpty,
-                                          onPressed: () {
-                                            requestUnlockedFields =
-                                                fieldControllers
-                                                    .asMap()
-                                                    .entries
-                                                    // Keep only unlocked fields
-                                                    .where((entry) =>
-                                                        !unlockedFieldsReadOnly[
-                                                            entry.key])
-                                                    // Map to model
-                                                    .map((entry) {
-                                              final model =
-                                                  RequestUnlockedFieldModel(
-                                                id: Uuid().v1(),
-                                                fieldKey:
-                                                    serviceFields[entry.key]
-                                                        .fieldKey,
-                                                requestId: blogViewerPage!
-                                                    .blogsView.requestId!,
-                                                unlockedBy: (context
-                                                            .read<AppUserCubit>()
-                                                            .state
-                                                        as AppUserSignedIn)
-                                                    .user
-                                                    .id,
-                                                unlockedAt: DateTime.now(),
-                                                reason: entry.value.text,
-                                                isActive: true,
-                                              );
-                                              return model;
-                                            }).toList();
-                                            _approveBlog(
-                                              isApproved: false,
-                                              requestUnlockedFields:
-                                                  requestUnlockedFields,
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: CustomButton(
-                                          text: AppLocalizations.of(context)!
-                                              .reject,
-                                          icon: Icons.cancel_outlined,
-                                          backgroundColor:
-                                              AppPallete.errorColor,
-                                          onPressed: () {
-                                            _approveBlog(isApproved: false);
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }
-                              },
-                            ),
-                          ],
+                                    );
+                                  },
+                                ),
+                                onReject: () => approveRequest(
+                                  commentController: commentController,
+                                  formKey: formKey,
+                                  context: context,
+                                  isApproved: false,
+                                  pendingApproval: pendingApproval!,
+                                  model: blogViewerPage!.blogsView,
+                                  dispatchEvent: (event) =>
+                                      context.read<BlogBloc>().add(event),
+                                  buildEvent: ({
+                                    required approvalSequence,
+                                    requestUnlockedFields,
+                                    required model,
+                                  }) =>
+                                      BlogApproveEvent(
+                                    approvalSequence: approvalSequence,
+                                    requestUnlockedFields:
+                                        requestUnlockedFields,
+                                    blogModel: model,
+                                  ),
+                                ),
+                                unlockedFieldsReadOnly: unlockedFieldsReadOnly,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
@@ -574,9 +338,25 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
     );
   }
 
+  void _handleEdit() async {
+    final updatedEntity = await context.push<BlogViewerPageEntity>(
+      '/blog/update/${blogViewerPage!.blogsView.requestId}',
+      extra: blogViewerPage!.blogsView.toBlog()!,
+    );
+
+    if (updatedEntity != null && mounted) {
+      setState(() {
+        blogViewerPage = updatedEntity;
+      });
+    }
+  }
+
   @override
   void dispose() {
-    super.dispose();
+    for (final c in fieldControllers) {
+      c.dispose();
+    }
     commentController.dispose();
+    super.dispose();
   }
 }

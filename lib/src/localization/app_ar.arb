@@ -20,6 +20,8 @@
   "no": "لا",
   "confirm": "تأكيد",
   "approve": "موافقة",
+  "fieldIsRequired": "الحقل مطلوب",
+  "reason": "السبب",
   "pendingApproval": "الموافقات المعلقة",
     "approveRequestFor": "الموافقة على طلب",
 
