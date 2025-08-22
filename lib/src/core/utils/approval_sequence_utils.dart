@@ -257,6 +257,19 @@ bool hasAnyUnlockedField(
   return unlockedFieldsReadOnly.values.any((v) => v == false);
 }
 
+bool containsKey(
+  String key,
+  List<RequestUnlockedFieldModel>? unlockedFields,
+) =>
+    unlockedFields?.any((e) => e.fieldKey == key) ?? false;
+
+bool canEdit(
+  String key,
+  bool isLockFieldsWithoutComment,
+  List<RequestUnlockedFieldModel>? unlockedFields,
+) =>
+    isLockFieldsWithoutComment ? containsKey(key, unlockedFields) : true;
+
 // ---------------------------
 // UI: Action Buttons
 // ---------------------------

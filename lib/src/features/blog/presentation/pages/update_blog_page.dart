@@ -3,6 +3,7 @@ import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
+import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
@@ -58,17 +59,17 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
       // final fetchedUnlockedFields =
       //     await fetchUnlockedFields(blogViewerPage?.blogsView.requestId ?? -1);
       final fetchedPermissions = await fetchUserPermissions(userId);
-      final fetchedUnlockedFields = await fetchUnlockedFields(
-          widget.requestId ??
-              widget.initialBlogViewerPage?.blogsView.requestId! ??
-              -1);
-
-      if (mounted) {
-        setState(() {
-          permissions = fetchedPermissions;
-          unlockedFields = fetchedUnlockedFields;
-        });
+      final reqId =
+          widget.requestId ?? widget.initialBlogViewerPage?.blogsView.requestId;
+      List<RequestUnlockedFieldModel>? fetchedUnlockedFields;
+      if (reqId != null) {
+        fetchedUnlockedFields = await fetchUnlockedFields(reqId);
       }
+      if (!mounted) return;
+      setState(() {
+        permissions = fetchedPermissions;
+        unlockedFields = fetchedUnlockedFields; // may be null initially
+      });
     });
   }
 
@@ -96,26 +97,37 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   }
 
   void _updateBlog() {
-    if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
-      context.read<BlogBloc>().add(
-            BlogUpdateEvent(
-              id: blogViewerPage!.blogsView.blogId!,
-              createdById: blogViewerPage!.blogsView.createdById!,
-              status: blogViewerPage!.blogsView.status!,
-              requestId: blogViewerPage!.blogsView.requestId!,
-              isActive: blogViewerPage!.blogsView.isActive!,
-              title: titleControler.text.trim(),
-              content: contentControler.text.trim(),
-              topics: selectedTopics,
-            ),
-          );
+    if (!(formKey.currentState?.validate() ?? false)) return;
+
+    if (selectedTopics.isEmpty) {
+      SmartNotifier.warning(
+        context,
+        title: AppLocalizations.of(context)!.error,
+        message: AppLocalizations.of(context)!.fieldIsRequired,
+      );
+      return;
     }
+
+    context.read<BlogBloc>().add(
+          BlogUpdateEvent(
+            id: blogViewerPage!.blogsView.blogId!,
+            createdById: blogViewerPage!.blogsView.createdById!,
+            status: blogViewerPage!.blogsView.status!,
+            requestId: blogViewerPage!.blogsView.requestId!,
+            isActive: blogViewerPage!.blogsView.isActive!,
+            title: titleControler.text.trim(),
+            content: contentControler.text.trim(),
+            topics: selectedTopics,
+          ),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Update Blog-${blogViewerPage?.blogsView.requestId}',
+      title: blogViewerPage?.blogsView.requestId != null
+          ? '${AppLocalizations.of(context)!.blogUpdate} #${blogViewerPage!.blogsView.requestId}'
+          : AppLocalizations.of(context)!.blog,
       showDrawer: false,
       body: [
         BlocConsumer<BlogBloc, BlogState>(
@@ -135,6 +147,20 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                     permissions ?? [], PermissionsConstants.updateBlog)) {
               return const Loader();
             }
+// compute using the data you actually have at build time
+            final currentCreatedById = blogViewerPage?.blogsView.createdById ??
+                widget.initialBlogViewerPage?.blogsView.createdById;
+
+// approver = has update permission (your existing flag)
+            final isApprover = isUserHasPermissionsView(
+                permissions ?? [], PermissionsConstants.updateBlog);
+
+// creator?
+            final isCreator = currentCreatedById == userId;
+
+// lock mode: submitter should be locked (except returned fields).
+// approver (not creator) can edit regardless; otherwise locked.
+            final isLockFieldsWithoutComment = !(isApprover && !isCreator);
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -147,14 +173,8 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
-                          isLockFieldsWithoutComment: isUserHasPermissionsView(
-                                      permissions ?? [],
-                                      PermissionsConstants.updateBlog) &&
-                                  widget.initialBlogViewerPage?.blogsView
-                                          .createdById !=
-                                      userId
-                              ? false
-                              : true,
+                          isLockFieldsWithoutComment:
+                              isLockFieldsWithoutComment,
                           setState: setState,
                           selectedTopics: selectedTopics,
                           // onToggleTopic: (topic) {
@@ -180,13 +200,17 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                             CustomButton(
                               width: 180,
                               icon: Icons.check_circle,
-                              text: 'Update',
+                              text: AppLocalizations.of(context)!.update,
+                              isDisabled: isCreator &&
+                                  blogViewerPage?.blogsView.requestStatusId !=
+                                      LookupConstants
+                                          .requestStatusReturnForCorrection,
                               onPressed: _updateBlog,
                             ),
                             CustomButton(
                               width: 180,
                               icon: Icons.cancel,
-                              text: 'Cancel',
+                              text: AppLocalizations.of(context)!.cancel,
                               backgroundColor: AppPallete.errorColor,
                               onPressed: context.pop,
                             ),

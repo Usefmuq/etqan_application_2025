@@ -4,6 +4,7 @@
     "signIn": "تسجيل الدخول",
   "cancel": "إلغاء",
   "submit": "إرسال",
+  "update": "تحديث",
   "homePage": "الصفحة الرئيسية",
   "changeLang": "English",
         "myRequests": "طلباتي",
@@ -15,6 +16,7 @@
     "logout": "تسجيل خروج",
 
   "edit": "تعديل",
+  "noPermission": "لا تملك الصلاحيات",
   "delete": "حذف",
   "yes": "نعم",
   "no": "لا",
@@ -65,6 +67,9 @@
   "blogDetails": "تفاصيل المدونة",
   "blogsService": "خدمة المدونات",
   "blogsServiceSubtitle": "هذه خدمة المدونات",
+  "blogSubmitNew": "تقديم طلب جديد لخدمة المدونة",
+  "blogUpdate": "تحديث مدونة",
+
   "submitOnboarding": "إرسال بيانات التوظيف",
   "updateOnboarding": "تحديث بيانات التوظيف",
   "firstNameEN": "الاسم الأول (إنجليزي)",

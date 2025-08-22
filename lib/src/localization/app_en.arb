@@ -4,6 +4,8 @@
   "signIn": "Sign In",
   "cancel": "Cancel",
   "submit": "Submit",
+    "update": "تحديث",
+
     "homePage": "Home Page",
       "changeLang": "العربية",
       "myRequests": "My Requests",
@@ -15,6 +17,8 @@
       "logout": "Logout",
 
   "edit": "Edit",
+    "noPermission": "You don't have permission",
+
   "delete": "Delete",
   "yes": "Yes",
   "no": "No",
@@ -68,7 +72,9 @@
     "blogDetails": "Blog Details",
     "blogsService": "Blogs Service",
     "blogsServiceSubtitle": "here is blog service",
+  "blogSubmitNew": "Submit new request for blog service",
 
+  "blogUpdate": "Update blog",
 
   "submitOnboarding": "Submit New Onboarding",
   "updateOnboarding": "Update Onboarding",

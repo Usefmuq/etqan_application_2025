@@ -24,8 +24,8 @@ class RequestUnlockedFieldModel extends RequestUnlockedField {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final map = <String, dynamic>{
+      // 'id': id,
       'request_id': requestId,
       'field_key': fieldKey,
       'unlocked_by': unlockedBy,
@@ -33,6 +33,10 @@ class RequestUnlockedFieldModel extends RequestUnlockedField {
       'reason': reason,
       'is_active': isActive,
     };
+    if (id.isNotEmpty) {
+      map['id'] = id;
+    }
+    return map;
   }
 
   RequestUnlockedFieldModel copyWith({

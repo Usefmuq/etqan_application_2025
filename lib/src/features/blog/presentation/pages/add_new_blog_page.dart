@@ -24,16 +24,22 @@ class AddNewBlogPage extends StatefulWidget {
 
 class _AddNewBlogPageState extends State<AddNewBlogPage> {
   List<String>? permissions;
-  final TextEditingController titleControler = TextEditingController();
-  final TextEditingController contentControler = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
 
   @override
   void initState() {
     super.initState();
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    final userState = context.read<AppUserCubit>().state;
+    if (userState is! AppUserSignedIn) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {}); // let build run after auth state becomes ready
+      });
+      return;
+    }
+    final userId = userState.user.id;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
@@ -47,14 +53,37 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
   }
 
   void _submitBlog() {
-    if (formKey.currentState!.validate() && selectedTopics.isNotEmpty) {
-      final createdById =
-          (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    final isValid = formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    if (selectedTopics.isEmpty) {
+      SmartNotifier.warning(
+        context,
+        title: AppLocalizations.of(context)!.error,
+        message: AppLocalizations.of(context)!
+            .fieldIsRequired, // or a “select topics” string
+      );
+      return;
+    }
+
+    {
+      final userState = context.read<AppUserCubit>().state;
+      if (userState is! AppUserSignedIn) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          SmartNotifier.warning(
+            context,
+            title: AppLocalizations.of(context)!.error,
+            message: AppLocalizations.of(context)!.unexpectedError,
+          );
+        });
+        return;
+      }
+      final createdById = userState.user.id;
       context.read<BlogBloc>().add(
             BlogSubmitEvent(
               createdById: createdById,
-              title: titleControler.text.trim(),
-              content: contentControler.text.trim(),
+              title: titleController.text.trim(),
+              content: contentController.text.trim(),
               topics: selectedTopics,
             ),
           );
@@ -63,15 +92,16 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
 
   @override
   void dispose() {
+    titleController.dispose();
+    contentController.dispose();
     super.dispose();
-    titleControler.dispose();
-    contentControler.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: 'Submit New Blog',
+      title: AppLocalizations.of(context)!.blogSubmitNew,
+
       showDrawer: false,
       // tilteActions: [
       //   IconButton(
@@ -83,20 +113,34 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
         BlocConsumer<BlogBloc, BlogState>(
           listener: (context, state) {
             if (state is BlogFailure) {
-              SmartNotifier.error(context,
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                SmartNotifier.error(
+                  context,
                   title: AppLocalizations.of(context)!.error,
-                  message: state.error);
+                  message: state.error,
+                );
+              });
             } else if (state is BlogSubmitSuccess) {
-              context.pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) context.pop();
+              });
             }
           },
           builder: (context, state) {
-            if (state is BlogLoading ||
-                !isUserHasPermissionsView(
-                  permissions ?? [],
-                  PermissionsConstants.addBlog,
-                )) {
+            final permsReady = permissions != null;
+            final canAdd = isUserHasPermissionsView(
+              permissions ?? const [],
+              PermissionsConstants.addBlog,
+            );
+
+            if (state is BlogLoading || !permsReady) {
               return const Loader();
+            }
+            if (!canAdd) {
+              return Center(
+                child: Text(AppLocalizations.of(context)!.noPermission),
+              );
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -119,8 +163,8 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                           //         : selectedTopics.add(topic);
                           //   });
                           // },
-                          titleController: titleControler,
-                          contentController: contentControler,
+                          titleController: titleController,
+                          contentController: contentController,
                           isWide: isWide,
                         ),
                         const SizedBox(height: 40),
@@ -134,13 +178,13 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                             CustomButton(
                               width: 180,
                               icon: Icons.check_circle,
-                              text: 'Submit',
+                              text: AppLocalizations.of(context)!.submit,
                               onPressed: _submitBlog,
                             ),
                             CustomButton(
                               width: 180,
                               icon: Icons.cancel,
-                              text: 'Cancel',
+                              text: AppLocalizations.of(context)!.cancel,
                               // type: ButtonType.outlined,
                               backgroundColor: AppPallete.errorColor,
                               onPressed: context.pop,

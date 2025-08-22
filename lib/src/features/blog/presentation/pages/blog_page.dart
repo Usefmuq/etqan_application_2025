@@ -16,6 +16,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+enum _TabKind { my, employees, department, all }
+
 class BlogPage extends StatefulWidget {
   static route() => MaterialPageRoute(
         builder: (context) => const BlogPage(),
@@ -31,58 +33,39 @@ class _BlogPageState extends State<BlogPage>
     with SingleTickerProviderStateMixin {
   List<String>? permissions;
   TabController? _tabController;
+
   bool isManagerExpanded = false;
   bool isDepartmentManagerExpanded = false;
   bool isViewAll = false;
+
   Departments? userDepartment;
   User? userDetails;
-  List<Tab> tabs = [];
+
+  // Build tabs from kinds (no l10n usage before build)
+  List<_TabKind> _tabKinds = [];
+
+  // optional: if you still use this elsewhere
   List<List<Widget>> bodyPerTab = [[]];
 
   @override
   void initState() {
     super.initState();
 
-    final user = (context.read<AppUserCubit>().state as AppUserSignedIn).user;
+    final appUserState = context.read<AppUserCubit>().state;
+    if (appUserState is! AppUserSignedIn) return;
+    final user = appUserState.user;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(user.id);
       final fetchedDepartment = await fetchDepartmentById(user.departmentId);
-      if (mounted) {
-        setState(() {
-          permissions = fetchedPermissions;
-          userDepartment = fetchedDepartment;
-          userDetails = user;
-          _setupTabsAndController();
-          _tabController?.addListener(() {
-            if (_tabController!.indexIsChanging) return;
 
-            setState(() {
-              isManagerExpanded = false;
-              isDepartmentManagerExpanded = false;
-              isViewAll = false;
-
-              if (_tabController?.index == 1) {
-                isManagerExpanded = true;
-              } else if (_tabController?.index == 2) {
-                isDepartmentManagerExpanded = true;
-              } else if (_tabController?.index == 3) {
-                isViewAll = true;
-              }
-            });
-
-            final user =
-                (context.read<AppUserCubit>().state as AppUserSignedIn).user;
-            context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
-                  user: user,
-                  departmentId: user.departmentId,
-                  isManagerExpanded: isManagerExpanded,
-                  isDepartmentManagerExpanded: isDepartmentManagerExpanded,
-                  isViewAll: isViewAll,
-                ));
-          });
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        permissions = fetchedPermissions;
+        userDepartment = fetchedDepartment;
+        userDetails = user;
+        _setupTabsAndController();
+      });
     });
   }
 
@@ -94,24 +77,66 @@ class _BlogPageState extends State<BlogPage>
 
   void _setupTabsAndController() {
     final isDepManager = userDepartment?.managerId == userDetails?.id;
-    final updatedTabs = [
-      Tab(text: AppLocalizations.of(context)!.myRequests),
-      Tab(text: AppLocalizations.of(context)!.employees),
-      if (isDepManager) Tab(text: AppLocalizations.of(context)!.department),
+
+    final kinds = <_TabKind>[
+      _TabKind.my,
+      _TabKind.employees,
+      if (isDepManager) _TabKind.department,
       if (isUserHasPermissionsView(
           permissions ?? [], PermissionsConstants.updateBlog))
-        Tab(text: AppLocalizations.of(context)!.all),
+        _TabKind.all,
     ];
 
-    _tabController?.dispose(); // dispose old controller
+    _tabController?.dispose();
 
     setState(() {
-      tabs = updatedTabs;
-      bodyPerTab = List.generate(tabs.length, (_) => [_blogTab()]);
-      _tabController = TabController(length: tabs.length, vsync: this);
+      _tabKinds = kinds;
+      bodyPerTab = List.generate(_tabKinds.length, (_) => [_blogTab()]);
+      _tabController = TabController(length: _tabKinds.length, vsync: this);
+
       isManagerExpanded = false;
       isDepartmentManagerExpanded = false;
       isViewAll = false;
+
+      _tabController!.addListener(() {
+        if (_tabController!.indexIsChanging) return;
+
+        final selectedKind = _tabKinds[_tabController!.index];
+        setState(() {
+          isManagerExpanded = (selectedKind == _TabKind.employees);
+          isDepartmentManagerExpanded = (selectedKind == _TabKind.department);
+          isViewAll = (selectedKind == _TabKind.all);
+        });
+
+        final appUserState = context.read<AppUserCubit>().state;
+        if (appUserState is! AppUserSignedIn) return;
+        final user = appUserState.user;
+
+        context.read<BlogBloc>().add(
+              BlogGetAllBlogsEvent(
+                user: user,
+                departmentId: user.departmentId,
+                isManagerExpanded: isManagerExpanded,
+                isDepartmentManagerExpanded: isDepartmentManagerExpanded,
+                isViewAll: isViewAll,
+              ),
+            );
+      });
+
+      // initial fetch right after controller creation
+      final appUserState = context.read<AppUserCubit>().state;
+      if (appUserState is AppUserSignedIn) {
+        final user = appUserState.user;
+        context.read<BlogBloc>().add(
+              BlogGetAllBlogsEvent(
+                user: user,
+                departmentId: user.departmentId,
+                isManagerExpanded: false,
+                isDepartmentManagerExpanded: false,
+                isViewAll: false,
+              ),
+            );
+      }
     });
   }
 
@@ -120,24 +145,24 @@ class _BlogPageState extends State<BlogPage>
     super.didChangeDependencies();
 
     final state = context.read<AppUserCubit>().state;
-
     if (state is AppUserSignedIn) {
       final user = state.user;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final ModalRoute? route = ModalRoute.of(context);
         if (route?.isCurrent == true) {
-          context.read<BlogBloc>().add(BlogGetAllBlogsEvent(
-                user: user,
-                departmentId: user.departmentId,
-                isManagerExpanded: isManagerExpanded,
-                isDepartmentManagerExpanded: isDepartmentManagerExpanded,
-                isViewAll: isViewAll,
-              ));
+          context.read<BlogBloc>().add(
+                BlogGetAllBlogsEvent(
+                  user: user,
+                  departmentId: user.departmentId,
+                  isManagerExpanded: isManagerExpanded,
+                  isDepartmentManagerExpanded: isDepartmentManagerExpanded,
+                  isViewAll: isViewAll,
+                ),
+              );
         }
       });
     } else {
-      // Optional: handle unauthenticated state (e.g., redirect to login)
       debugPrint("User is not signed in yet.");
     }
   }
@@ -148,7 +173,7 @@ class _BlogPageState extends State<BlogPage>
       title: AppLocalizations.of(context)!.blogsService,
       subtitle: AppLocalizations.of(context)!.blogsServiceSubtitle,
       tabController: _tabController,
-      tabs: tabs,
+      tabs: _tabsFromKinds(context, _tabKinds),
       bodyPerTab: bodyPerTab,
       tilteActions: [
         if (isUserHasPermissionsView(
@@ -166,12 +191,31 @@ class _BlogPageState extends State<BlogPage>
     );
   }
 
+  List<Tab> _tabsFromKinds(BuildContext context, List<_TabKind> kinds) {
+    final l10n = AppLocalizations.of(context)!;
+    return kinds.map((k) {
+      switch (k) {
+        case _TabKind.my:
+          return Tab(text: l10n.myRequests);
+        case _TabKind.employees:
+          return Tab(text: l10n.employees);
+        case _TabKind.department:
+          return Tab(text: l10n.department);
+        case _TabKind.all:
+          return Tab(text: l10n.all);
+      }
+    }).toList();
+  }
+
   Widget _blogTab() {
     return BlocConsumer<BlogBloc, BlogState>(
       listener: (context, state) {
         if (state is BlogFailure) {
-          SmartNotifier.error(context,
-              title: AppLocalizations.of(context)!.error, message: state.error);
+          SmartNotifier.error(
+            context,
+            title: AppLocalizations.of(context)!.error,
+            message: state.error,
+          );
         }
       },
       builder: (context, state) {
@@ -182,15 +226,15 @@ class _BlogPageState extends State<BlogPage>
             )) {
           return const Loader();
         }
+
         if (state is BlogShowAllSuccess) {
           if (state.blogPage.blogsView.isEmpty) {
-            return const Center(child: Text("No Blogs Found"));
+            return Center(child: Text(AppLocalizations.of(context)!.noResults));
           }
 
           return ListView.builder(
-            shrinkWrap: true, // 👈 Important
-            physics:
-                const NeverScrollableScrollPhysics(), // 👈 Prevent inner scroll
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: state.blogPage.blogsView.length,
             itemBuilder: (context, index) {
               final blog = state.blogPage.blogsView[index];

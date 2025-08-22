@@ -63,8 +63,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
       _fetchBlogViewerData(widget.requestId!);
     }
 
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    final userState = context.read<AppUserCubit>().state;
+    if (userState is! AppUserSignedIn) {
+      // Defer until dependencies are ready
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(
+            () {}); // trigger rebuild; didChangeDependencies can pick it up
+      });
+      return;
+    }
+    final userId = userState.user.id;
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
@@ -113,11 +121,13 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
         await fetchBlogPage.call(FetchBlogPageParams(requestId: requestId));
 
     fetched.fold((failure) {
-      SmartNotifier.error(
-        context,
-        title: AppLocalizations.of(context)!.error,
-        message: failure.message,
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        SmartNotifier.error(
+          context,
+          title: AppLocalizations.of(context)!.error,
+          message: failure.message,
+        );
+      });
     }, (fetch) async {
       if (!mounted) return;
       setState(() {
@@ -129,8 +139,16 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   }
 
   Future<void> _initializeApprovals() async {
-    final userId =
-        (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+    final userState = context.read<AppUserCubit>().state;
+    if (userState is! AppUserSignedIn) {
+      // Defer until dependencies are ready
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(
+            () {}); // trigger rebuild; didChangeDependencies can pick it up
+      });
+      return;
+    }
+    final userId = userState.user.id;
 
     final fetchedPermissions = await fetchUserPermissions(userId);
 
@@ -178,14 +196,15 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
               );
             } else if (state is BlogApproveSuccess ||
                 state is BlogSubmitSuccess) {
-              SmartNotifier.success(
-                context,
-                title: AppLocalizations.of(context)!.approvalSuccessful,
-              );
-              final reqId = widget.requestId ??
-                  widget.initialBlogViewerPage!.blogsView.requestId!;
-              // Refresh data after success
-              _fetchBlogViewerData(reqId);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                SmartNotifier.success(
+                  context,
+                  title: AppLocalizations.of(context)!.approvalSuccessful,
+                );
+                final reqId = widget.requestId ??
+                    widget.initialBlogViewerPage!.blogsView.requestId!;
+                _fetchBlogViewerData(reqId);
+              });
             }
           },
           builder: (context, state) {
@@ -341,7 +360,7 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   void _handleEdit() async {
     final updatedEntity = await context.push<BlogViewerPageEntity>(
       '/blog/update/${blogViewerPage!.blogsView.requestId}',
-      extra: blogViewerPage!.blogsView.toBlog()!,
+      // extra: blogViewerPage!.blogsView.toBlog()!,
     );
 
     if (updatedEntity != null && mounted) {
