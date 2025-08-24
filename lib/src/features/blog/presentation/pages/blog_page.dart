@@ -219,12 +219,19 @@ class _BlogPageState extends State<BlogPage>
         }
       },
       builder: (context, state) {
-        if (state is BlogLoading ||
-            !isUserHasPermissionsView(
-              permissions ?? [],
-              PermissionsConstants.viewBlog,
-            )) {
+        final permsReady = permissions != null;
+        final canAdd = isUserHasPermissionsView(
+          permissions ?? const [],
+          PermissionsConstants.viewBlog,
+        );
+
+        if (state is BlogLoading || !permsReady) {
           return const Loader();
+        }
+        if (!canAdd) {
+          return Center(
+            child: Text(AppLocalizations.of(context)!.noPermission),
+          );
         }
 
         if (state is BlogShowAllSuccess) {

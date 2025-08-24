@@ -1,9 +1,12 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
@@ -28,6 +31,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
   final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
+  List<ServiceField> serviceFields = [];
 
   @override
   void initState() {
@@ -43,10 +47,13 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
 
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetchedServiceFields =
+          await fetchFieldsByServiceId(ServicesConstants.blogServiceId);
 
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
+          serviceFields = fetchedServiceFields;
         });
       }
     });
@@ -153,6 +160,7 @@ class _AddNewBlogPageState extends State<AddNewBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
+                          serviceFields: serviceFields,
                           isLockFieldsWithoutComment: false,
                           setState: setState,
                           selectedTopics: selectedTopics,

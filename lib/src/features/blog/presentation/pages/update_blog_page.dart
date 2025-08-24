@@ -1,13 +1,16 @@
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
+import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
@@ -41,6 +44,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
   final formKey = GlobalKey<FormState>();
   List<String> selectedTopics = [];
   String userId = '';
+  List<ServiceField> serviceFields = [];
 
   @override
   void initState() {
@@ -59,6 +63,9 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
       // final fetchedUnlockedFields =
       //     await fetchUnlockedFields(blogViewerPage?.blogsView.requestId ?? -1);
       final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetchedServiceFields =
+          await fetchFieldsByServiceId(ServicesConstants.blogServiceId);
+
       final reqId =
           widget.requestId ?? widget.initialBlogViewerPage?.blogsView.requestId;
       List<RequestUnlockedFieldModel>? fetchedUnlockedFields;
@@ -69,6 +76,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
       setState(() {
         permissions = fetchedPermissions;
         unlockedFields = fetchedUnlockedFields; // may be null initially
+        serviceFields = fetchedServiceFields;
       });
     });
   }
@@ -173,6 +181,7 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ...BlogInputSection.build(
+                          serviceFields: serviceFields,
                           isLockFieldsWithoutComment:
                               isLockFieldsWithoutComment,
                           setState: setState,

@@ -70,6 +70,7 @@ Future<List<ServiceField>> fetchFieldsByServiceId(int serviceId) async {
       .from('service_fields')
       .select()
       .eq('service_id', serviceId)
+      .eq('is_active', true)
       .order('order_index', ascending: true);
 
   final data = response as List;

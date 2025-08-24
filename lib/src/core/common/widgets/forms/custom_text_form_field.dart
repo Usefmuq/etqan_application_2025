@@ -15,6 +15,7 @@ class CustomTextFormField extends StatelessWidget {
 
   /// Make the field required (affects validator).
   final bool required;
+  final bool isActive;
 
   const CustomTextFormField({
     super.key,
@@ -25,13 +26,14 @@ class CustomTextFormField extends StatelessWidget {
     this.reviewerComment,
     this.showCommentAbove = false,
     this.required = false,
+    this.isActive = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final hasComment =
         reviewerComment != null && reviewerComment!.trim().isNotEmpty;
-
+    if (!isActive) return Card();
     Widget commentChip() {
       return Container(
         width: double.infinity,

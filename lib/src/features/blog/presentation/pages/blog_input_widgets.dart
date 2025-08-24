@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
@@ -5,6 +6,7 @@ import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class BlogInputSection {
   static List<Widget> build({
@@ -15,6 +17,8 @@ class BlogInputSection {
     required bool isWide,
     required bool isLockFieldsWithoutComment,
     List<RequestUnlockedFieldModel>? unlockedFields,
+    List<ServiceField>? serviceFields,
+
     // NEW: pass available topics from caller instead of hard-coding
     List<String> topics = const [
       'Option 1',
@@ -24,6 +28,14 @@ class BlogInputSection {
       'Option 5'
     ],
   }) {
+    final locale = Intl.getCurrentLocale();
+
+    final blogTitleField = serviceFields?.firstWhereOrNull(
+      (field) => field.fieldKey == 'blog_title',
+    );
+    final blogContentField = serviceFields?.firstWhereOrNull(
+      (field) => field.fieldKey == 'blog_content',
+    );
     return [
       const SizedBox(height: 20),
       Wrap(
@@ -68,13 +80,18 @@ class BlogInputSection {
             CustomTextFormField(
               controller: titleController,
               readOnly: !canEdit(
-                'blog_title',
+                blogTitleField?.fieldKey ?? '',
                 isLockFieldsWithoutComment,
                 unlockedFields,
               ),
-              hintText: 'Blog title',
+              isActive: blogTitleField?.isActive ?? false,
+              hintText: locale == 'ar'
+                  ? (blogTitleField?.fieldLabelAr ?? '')
+                  : (blogTitleField?.fieldLabelEn ?? ''),
               reviewerComment: unlockedFields
-                  ?.firstWhereOrNull((e) => e.fieldKey == 'blog_title')
+                  ?.firstWhereOrNull(
+                    (e) => e.fieldKey == blogTitleField?.fieldKey,
+                  )
                   ?.reason,
             ),
             isWide,
@@ -82,15 +99,20 @@ class BlogInputSection {
           responsiveField(
             CustomTextFormField(
               controller: contentController,
-              hintText: 'Blog content',
+              isActive: blogContentField?.isActive ?? false,
+              hintText: locale == 'ar'
+                  ? (blogContentField?.fieldLabelAr ?? '')
+                  : (blogContentField?.fieldLabelEn ?? ''),
               readOnly: !canEdit(
-                'blog_content',
+                blogContentField?.fieldKey ?? '',
                 isLockFieldsWithoutComment,
                 unlockedFields,
               ),
               maxLines: null,
               reviewerComment: unlockedFields
-                  ?.firstWhereOrNull((e) => e.fieldKey == 'blog_content')
+                  ?.firstWhereOrNull(
+                    (e) => e.fieldKey == blogContentField?.fieldKey,
+                  )
                   ?.reason,
             ),
             isWide,
