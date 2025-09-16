@@ -51,7 +51,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
   final TextEditingController commentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   // <<< keep your variables as-is
-
   @override
   void initState() {
     super.initState();
@@ -216,7 +215,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                 )) {
               return const Loader();
             }
-
             return Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -230,7 +228,10 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                       buildDetailsSection(context, blogViewerPage),
                       const Divider(),
                       const SizedBox(height: 12),
-                      buildApprovalTableSection(context, blogViewerPage),
+                      buildApprovalTableSection(
+                        context,
+                        blogViewerPage?.approval,
+                      ),
                       const SizedBox(height: 24),
                       if (isUserHasPermissionsView(
                             permissions ?? [],
@@ -241,11 +242,6 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                           key: formKey,
                           child: Column(
                             children: [
-                              const SizedBox(height: 12),
-                              buildCommentField(
-                                context,
-                                commentController,
-                              ),
                               const SizedBox(height: 20),
                               buildReturnForCorrectionUI(
                                 context,
@@ -258,6 +254,11 @@ class _BlogViewerPageState extends State<BlogViewerPage> {
                                     unlockedFieldsReadOnly[idx] = !wasReadOnly;
                                   });
                                 },
+                              ),
+                              const SizedBox(height: 20),
+                              buildCommentField(
+                                context,
+                                commentController,
                               ),
                               const SizedBox(height: 20),
                               // _buildActionButtons(),

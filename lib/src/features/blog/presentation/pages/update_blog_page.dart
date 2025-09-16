@@ -115,17 +115,14 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
       );
       return;
     }
-
     context.read<BlogBloc>().add(
           BlogUpdateEvent(
-            id: blogViewerPage!.blogsView.blogId!,
-            createdById: blogViewerPage!.blogsView.createdById!,
-            status: blogViewerPage!.blogsView.status!,
-            requestId: blogViewerPage!.blogsView.requestId!,
-            isActive: blogViewerPage!.blogsView.isActive!,
-            title: titleControler.text.trim(),
-            content: contentControler.text.trim(),
-            topics: selectedTopics,
+            blogViewerPage: blogViewerPage!.blogsView.copyWith(
+              title: titleControler.text,
+              content: contentControler.text,
+              topics: selectedTopics,
+            ),
+            updatedBy: userId,
           ),
         );
   }
@@ -146,6 +143,10 @@ class _UpdateBlogPageState extends State<UpdateBlogPage> {
                   message: state.error);
             } else if (state is BlogUpdateSuccess) {
               context.pop(state.blogViewerPageEntity);
+              SmartNotifier.success(
+                context,
+                title: AppLocalizations.of(context)!.approvalSuccessful,
+              );
             }
           },
           builder: (context, state) {

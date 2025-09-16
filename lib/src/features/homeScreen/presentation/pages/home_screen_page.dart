@@ -52,11 +52,13 @@ class _HomeScreenPageState extends State<HomeScreenPage>
               break;
             case 1:
               title = AppLocalizations.of(context)!.pendingApproval;
-              subtitle = 'xxxxx';
+              subtitle = AppLocalizations.of(context)!
+                  .homeScreensPendingApprovalsSubtitle;
               break;
             case 2:
               title = AppLocalizations.of(context)!.returnForCorrection;
-              subtitle = 'zzzz';
+              subtitle =
+                  AppLocalizations.of(context)!.homeScreensReturnedSubtitle;
               break;
           }
         });

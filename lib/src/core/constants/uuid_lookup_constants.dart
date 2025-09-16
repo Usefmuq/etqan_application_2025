@@ -15,12 +15,17 @@ class UuidLookupConstants {
     '1593bad1-d843-4323-a673-36cc01df315a': {
       'en': 'In Progress',
       'ar': 'قيد التنفيذ',
-      'color': AppPallete.rejectColor,
+      'color': AppPallete.inProgressColor,
     },
     '682c5e5a-8280-4379-9bd5-3e35f18b4cf7': {
       'en': 'Returned For Correction',
       'ar': 'إرجاع الطلب للتصحيح',
       'color': AppPallete.gradient1,
+    },
+    'd887c1c9-2f59-478c-90f7-f8921d57d032': {
+      'en': 'Rejected',
+      'ar': 'مرفوض',
+      'color': AppPallete.rejectColor,
     },
   };
   static const Map<String, Map<String, dynamic>> approvalStatusMap = {

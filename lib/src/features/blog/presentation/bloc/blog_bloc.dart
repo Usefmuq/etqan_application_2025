@@ -61,14 +61,8 @@ class BlogBloc extends Bloc<BlogEvent, BlogState> {
     Emitter<BlogState> emit,
   ) async {
     final response = await _updateBlog(UpdateBlogParams(
-      id: event.id,
-      createdById: event.createdById,
-      status: event.status,
-      requestId: event.requestId,
-      isActive: event.isActive,
-      title: event.title,
-      content: event.content,
-      topics: event.topics,
+      blogViewerPage: event.blogViewerPage,
+      updatedBy: event.updatedBy,
     ));
     response.fold(
       (failure) => emit(BlogFailure(failure.message)),

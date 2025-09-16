@@ -47,7 +47,8 @@
   "confirmApprovalDesc": "هل أنت متأكد من الموافقة على هذا الطلب؟",
   "confirmRejectionDesc": "هل أنت متأكد من رفض هذا الطلب؟",
   "confirmReturnForCorrectionDesc": "هل أنت متأكد من إرجاع الطلب للتصحيح؟",
-  "roleName": "المسمى الوظيفي",
+  "cantApproveByCreator": "لا يمكنك الموافقة على طلب قمت بإنشائه",
+  "roleName": "صفة المعتمد",
   "notYet": "ليس بعد",
   "topics": "المواضيع",
   "priority": "الأولوية",
@@ -99,6 +100,8 @@
   "onboarding": "التوظيف",
   "homeScreensService": "قائمة الخدمات",
   "homeScreensServiceSubtitle": "أدناه تستطيع البدء بالتقديم على خدمة",
+  "homeScreensPendingApprovalsSubtitle": "هذه الطلبات بانتظار مراجعتك والموافقة عليها",
+  "homeScreensReturnedSubtitle": "تمت إعادة هذه الطلبات إليك لتصحيحها قبل إعادة تقديمها",
   "noResults": "لا توجد نتائج",
   "unexpectedError": "حدث خطأ غير متوقع، يرجى التواصل مع إدارة إتقان",
   "email": "البريد الإلكتروني"

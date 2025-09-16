@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
@@ -13,7 +14,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
   Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
-  Future<BlogViewerPageEntity> updateBlog(BlogModel blog);
+  Future<BlogViewerPageEntity> updateBlog(
+    BlogsPageViewModel blog,
+    String updatedBy,
+  );
   Future<BlogViewerPageEntity> approveBlog(
     ApprovalSequenceViewModel approvalSequence,
     List<RequestUnlockedFieldModel>? requestUnlockedFields,
@@ -79,7 +83,10 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   }
 
   @override
-  Future<BlogViewerPageEntity> updateBlog(BlogModel blog) async {
+  Future<BlogViewerPageEntity> updateBlog(
+    BlogsPageViewModel blogViewerPage,
+    String updatedBy,
+  ) async {
     try {
       final serviceAprovalUsersData = await supabaseClient
           .from('service_approval_users')
@@ -91,57 +98,74 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .toList();
       await supabaseClient
           .from('blogs')
-          .update(
-            blog.toJson(),
-          )
-          .eq('id', blog.id) // Ensure you update the correct row
+          .update({
+            'updated_at': DateTime.now().toIso8601String(),
+            'title': blogViewerPage.title,
+            'content': blogViewerPage.content,
+            'topics': blogViewerPage.topics,
+          })
+          .eq(
+            'id',
+            blogViewerPage.blogId!,
+          ) // Ensure you update the correct row
           .select();
       await supabaseClient
           .from('requests_master')
           .update({
-            'status': blog.status,
+            'status': blogViewerPage.createdById == updatedBy
+                ? LookupConstants.requestStatusPending
+                : blogViewerPage.requestStatusId,
             'updated_at': DateTime.now().toIso8601String(),
           })
-          .eq('request_id', blog.requestId) // Ensure you update the correct row
+          .eq(
+            'request_id',
+            blogViewerPage.requestId!,
+          ) // Ensure you update the correct row
           .select();
-      final approvalSequence = mapServiceApproversToApprovalSequence(
-        requestId: blog.requestId,
-        serviceApprovers: serviceApprovalUsers,
-      );
-      await supabaseClient
-          .from('approval_sequence')
-          .update({
-            'is_active': false,
-          })
-          .eq('request_id', blog.requestId) // Ensure you update the correct row
-          .select();
-      await supabaseClient
-          .from('approval_sequence')
-          .insert(
-            approvalSequence.map((e) => e.toJson()).toList(),
-          )
-          .select();
-      await supabaseClient
-          .from('request_unlocked_fields')
-          .update({
-            'is_active': false,
-          })
-          .eq('request_id', blog.requestId) // Ensure you update the correct row
-          .select();
+      if (blogViewerPage.createdById == updatedBy) {
+        final approvalSequence = mapServiceApproversToApprovalSequence(
+          requestId: blogViewerPage.requestId!,
+          serviceApprovers: serviceApprovalUsers,
+        );
+        await supabaseClient
+            .from('approval_sequence')
+            .update({
+              'is_active': false,
+            })
+            .eq(
+              'request_id',
+              blogViewerPage.requestId!,
+            ) // Ensure you update the correct row
+            .select();
+        await supabaseClient
+            .from('approval_sequence')
+            .insert(
+              approvalSequence.map((e) => e.toJson()).toList(),
+            )
+            .select();
+        await supabaseClient
+            .from('request_unlocked_fields')
+            .update({
+              'is_active': false,
+            })
+            .eq('request_id',
+                blogViewerPage.requestId!) // Ensure you update the correct row
+            .select();
+      }
       final blogsView = await supabaseClient
           .from('blogs_page_view')
           .select('*')
           .eq('request_is_active', true)
           .eq(
             'request_id',
-            blog.requestId,
+            blogViewerPage.requestId!,
           );
       final approvalsView = await supabaseClient
           .from('approval_sequence_view')
           .select('*')
           .eq(
             'request_id',
-            blog.requestId,
+            blogViewerPage.requestId!,
           )
           .eq('is_active', true);
       return BlogViewerPageEntity(

@@ -18,14 +18,8 @@ abstract interface class BlogRepository {
     required List<String> topics,
   });
   Future<Either<Failure, BlogViewerPageEntity>> updateBlog({
-    required String id,
-    required String createdById,
-    required String status,
-    required int requestId,
-    required bool isActive,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required BlogsPageViewModel blogViewerPage,
+    required String updatedBy,
   });
   Future<Either<Failure, BlogViewerPageEntity>> approveBlog({
     required ApprovalSequenceViewModel approvalSequenceModel,

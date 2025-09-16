@@ -13,7 +13,6 @@ import 'package:etqan_application_2025/src/core/data/models/service_approval_use
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -164,7 +163,7 @@ extension ApprovalSequenceRowFormatter on ApprovalSequence {
 
 Widget buildApprovalTableSection(
   BuildContext context,
-  BlogViewerPageEntity? blogViewerPage,
+  List<ApprovalSequenceViewModel>? approval,
 ) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -180,7 +179,7 @@ Widget buildApprovalTableSection(
           AppLocalizations.of(context)!.approvedAt,
           AppLocalizations.of(context)!.createdAt,
         ],
-        rows: blogViewerPage!.approval!.map((e) => e.toTableRow()).toList(),
+        rows: approval!.map((e) => e.toTableRow()).toList(),
         useChipsForStatus: true,
       ),
     ],
@@ -228,7 +227,10 @@ Widget buildReturnForCorrectionUI(
                 SizedBox(
                   width: 40,
                   child: IconButton(
-                    onPressed: () => onToggle(index, isReadOnly), // <-- per row
+                    onPressed: () {
+                      fieldControllers[index].text = '';
+                      onToggle(index, isReadOnly);
+                    },
                     icon: Icon(isReadOnly ? Icons.lock : Icons.lock_open),
                     color: isReadOnly ? Colors.grey : Colors.red,
                   ),
@@ -431,11 +433,15 @@ Future<void> approveRequest({
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, false),
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
           child: Text(AppLocalizations.of(context)!.cancel),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, true),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
           child: Text(AppLocalizations.of(context)!.yes),
         ),
       ],
@@ -445,6 +451,17 @@ Future<void> approveRequest({
 
   final userId =
       (context.read<AppUserCubit>().state as AppUserSignedIn).user.id;
+
+  if ((pendingApproval.requestUserId == userId
+      ? pendingApproval.usersUnderRoleIds?.split(', ').length != 1
+      : false)) {
+    SmartNotifier.warning(
+      context,
+      title: AppLocalizations.of(context)!.error,
+      message: AppLocalizations.of(context)!.cantApproveByCreator,
+    );
+    return;
+  }
 
   if (!(formKey.currentState?.validate() ?? false)) {
     SmartNotifier.warning(
@@ -464,7 +481,6 @@ Future<void> approveRequest({
     approverComment: commentController.text,
     approvedBy: userId,
   );
-
   dispatchEvent(
     buildEvent(
       approvalSequence: updatedApproval,

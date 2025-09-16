@@ -107,7 +107,7 @@ class _CustomTableGridState extends State<CustomTableGrid> {
             ),
             child: IntrinsicHeight(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Flexible(
                     child: SingleChildScrollView(

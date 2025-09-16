@@ -22,24 +22,12 @@ final class BlogSubmitEvent extends BlogEvent {
 }
 
 final class BlogUpdateEvent extends BlogEvent {
-  final String id;
-  final String createdById;
-  final String status;
-  final int requestId;
-  final bool isActive;
-  final String title;
-  final String content;
-  final List<String> topics;
+  final BlogsPageViewModel blogViewerPage;
+  final String updatedBy;
 
   BlogUpdateEvent({
-    required this.id,
-    required this.createdById,
-    required this.status,
-    required this.requestId,
-    required this.isActive,
-    required this.title,
-    required this.content,
-    required this.topics,
+    required this.blogViewerPage,
+    required this.updatedBy,
   });
 }
 
