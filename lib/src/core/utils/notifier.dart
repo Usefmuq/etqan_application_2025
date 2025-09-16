@@ -83,6 +83,7 @@ class _ToastOverlayHost {
   _ToastOverlayHost._(this._controller, this._entry);
 
   final _ToastController _controller;
+  // ignore: unused_field
   final OverlayEntry _entry;
 
   static final Map<OverlayState, _ToastOverlayHost> _hosts = {};
@@ -244,16 +245,15 @@ class _ToastOverlayWidgetState extends State<_ToastOverlayWidget> {
                     ? CrossAxisAlignment.end
                     : CrossAxisAlignment.center,
                 children: [
-                  for (final t in list)
+                  for (var i = 0; i < list.length; i++) ...[
                     _ToastCard(
-                      key: t.id,
-                      data: t,
-                      onClose: () => widget.controller.dismiss(t.id),
+                      key: list[i].id,
+                      data: list[i],
+                      onClose: () => widget.controller.dismiss(list[i].id),
                     ),
-                ].expand((w) sync* {
-                  yield w;
-                  if (w != list.last) yield const SizedBox(height: 8);
-                }).toList(),
+                    if (i < list.length - 1) const SizedBox(height: 8),
+                  ],
+                ],
               ),
             ),
           );

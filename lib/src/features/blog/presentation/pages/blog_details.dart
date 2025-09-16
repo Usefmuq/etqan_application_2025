@@ -15,7 +15,7 @@ Widget buildDetailsSection(
   final l10n = AppLocalizations.of(context)!;
   final view = blogViewerPage.blogsView;
 
-  String _fmt(DateTime? dt) =>
+  String fmt(DateTime? dt) =>
       dt == null ? l10n.notYet : DateFormat.yMMMd().add_jm().format(dt);
 
   // topics may be null/empty
@@ -36,12 +36,12 @@ Widget buildDetailsSection(
           l10n.createdBy: view.fullNameAr ?? '—',
           l10n.priority: view.priorityId, // assuming grid handles lookup
           l10n.requestDetails: view.requestDetails ?? '—',
-          l10n.createdAt: _fmt(view.requestCreatedAt),
+          l10n.createdAt: fmt(view.requestCreatedAt),
           // If blogUpdatedAt is a DateTime, format it; if it's already a string, show it.
           l10n.updatedAt: view.blogUpdatedAt is DateTime
-              ? _fmt(view.blogUpdatedAt as DateTime)
+              ? fmt(view.blogUpdatedAt as DateTime)
               : (view.blogUpdatedAt?.toString() ?? '—'),
-          l10n.approvedAt: _fmt(view.requestApprovedAt),
+          l10n.approvedAt: fmt(view.requestApprovedAt),
         },
       ),
     ],

@@ -75,9 +75,7 @@ class NoticeCard extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (title != null ||
-                        message != null ||
-                        palette.icon != null)
+                    if (title != null || message != null)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
