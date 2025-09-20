@@ -48,7 +48,7 @@ class _AddNewOnboardingPageState extends State<AddNewOnboardingPage> {
   String? departmentId = '';
   String? positionId = '';
   String? reportTo = '';
-  DateTime? startDate = DateTime.now();
+  DateTime? startDate = DateTime.now().toUtc().add(Duration(hours: 3));
 
   final formKey = GlobalKey<FormState>();
 

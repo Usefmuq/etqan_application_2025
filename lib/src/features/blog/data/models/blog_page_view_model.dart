@@ -201,7 +201,8 @@ class BlogsPageViewModel extends BlogsPageView {
     return Blog(
       id: blogId ?? "",
       createdById: createdById ?? "",
-      updatedAt: blogUpdatedAt ?? DateTime.now(),
+      updatedAt:
+          blogUpdatedAt ?? DateTime.now().toUtc().add(Duration(hours: 3)),
       status: status ?? "",
       requestId: requestId ?? 0,
       isActive: isActive ?? true,

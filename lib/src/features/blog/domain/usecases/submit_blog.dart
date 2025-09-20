@@ -1,14 +1,15 @@
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
+import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
-class SubmitBlog implements Usecase<Blog, SubmitBlogParams> {
+class SubmitBlog implements Usecase<BlogViewerPageEntity, SubmitBlogParams> {
   final BlogRepository blogRepostory;
   SubmitBlog(this.blogRepostory);
   @override
-  Future<Either<Failure, Blog>> call(SubmitBlogParams params) async {
+  Future<Either<Failure, BlogViewerPageEntity>> call(
+      SubmitBlogParams params) async {
     return await blogRepostory.submitBlog(
       createdById: params.createdById,
       // status: params.status,

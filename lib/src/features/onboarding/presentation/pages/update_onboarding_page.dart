@@ -74,7 +74,7 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
               positionId: selectedPosition?.id,
               reportTo: selectedManager?.id,
               startDate: startDate,
-              updatedAt: DateTime.now(),
+              updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
             )),
           );
     }

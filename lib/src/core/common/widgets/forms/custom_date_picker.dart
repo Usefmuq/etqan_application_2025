@@ -40,7 +40,7 @@ class CustomDatePicker extends StatelessWidget {
           ),
           child: InkWell(
             onTap: () async {
-              final now = DateTime.now();
+              final now = DateTime.now().toUtc().add(Duration(hours: 3));
               final initialDate = selectedDate ?? now;
               final picked = await showDatePicker(
                 context: context,

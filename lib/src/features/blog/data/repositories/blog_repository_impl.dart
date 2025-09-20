@@ -10,7 +10,6 @@ import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/blog/data/datasources/blog_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
-import 'package:etqan_application_2025/src/features/blog/domain/entities/blog.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/repositories/blog_repository.dart';
@@ -25,7 +24,7 @@ class BlogRepositoryImpl implements BlogRepository {
     this.permissionRemoteDataSource,
   );
   @override
-  Future<Either<Failure, Blog>> submitBlog({
+  Future<Either<Failure, BlogViewerPageEntity>> submitBlog({
     required String createdById,
     // required String status,
     // required String requestId,
@@ -39,13 +38,13 @@ class BlogRepositoryImpl implements BlogRepository {
         userId: createdById,
         serviceId: ServicesConstants.blogServiceId,
         status: LookupConstants.requestStatusPending,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
       );
       BlogModel blogModel = BlogModel(
         id: Uuid().v1(),
         createdById: createdById,
-        updatedAt: DateTime.now(),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
         status: LookupConstants.requestStatusPending,
         requestId: -1,
         isActive: true,

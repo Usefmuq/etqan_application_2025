@@ -36,9 +36,21 @@ List<ApprovalSequenceModel> mapServiceApproversToApprovalSequence({
       approvalOrder: approver.approvalOrder,
       approvedAt: null,
       isActive: approver.isActive,
-      createdAt: DateTime.now(),
+      createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
     );
   }).toList();
+}
+
+Future<List<ServiceApprovalUsersModel>> loadServiceApprovers({
+  required int serviceId,
+  required SupabaseClient supabaseClient,
+}) async {
+  final data = await supabaseClient
+      .from('service_approval_users')
+      .select('*')
+      .eq('service_id', serviceId)
+      .eq('is_active', true);
+  return data.map(ServiceApprovalUsersModel.fromJson).toList();
 }
 
 Future<List<RequestUnlockedFieldModel>?> fetchUnlockedFields(
@@ -64,7 +76,8 @@ Future<bool> updateApprovalSequenceDS({
         'approver_comment': approvalSequence.approverComment,
         'approval_status': approvalSequence.approvalStatus,
         'approved_by': approvalSequence.approvedBy,
-        'approved_at': DateTime.now().toIso8601String(),
+        'approved_at':
+            DateTime.now().toUtc().add(Duration(hours: 3)).toIso8601String(),
       })
       .eq('approval_id',
           approvalSequence.approvalId!) // Ensure you approve the correct row
@@ -376,7 +389,7 @@ Future<void> handleReturnForCorrectionPressed({
           requestId: requestId,
           unlockedBy:
               (context.read<AppUserCubit>().state as AppUserSignedIn).user.id,
-          unlockedAt: DateTime.now(),
+          unlockedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
           reason: reason,
           isActive: true,
         ),

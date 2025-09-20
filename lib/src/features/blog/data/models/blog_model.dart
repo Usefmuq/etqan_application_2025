@@ -33,7 +33,7 @@ class BlogModel extends Blog {
       id: map['id'] as String,
       createdById: map['created_by_id'] as String,
       updatedAt: map['updated_at'] == null
-          ? DateTime.now()
+          ? DateTime.now().toUtc().add(Duration(hours: 3))
           : DateTime.parse(map['updated_at']),
       status: map['status'] as String,
       requestId: map['request_id'] as int,

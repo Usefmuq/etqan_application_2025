@@ -1,11 +1,8 @@
-import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
-import 'package:etqan_application_2025/src/core/data/models/service_approval_users_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
-import 'package:etqan_application_2025/src/core/utils/approval_sequence_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_model.dart';
 import 'package:etqan_application_2025/src/features/blog/data/models/blog_page_view_model.dart';
@@ -13,7 +10,8 @@ import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_vi
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class BlogRemoteDataSource {
-  Future<BlogModel> submitBlog(BlogModel blog, RequestMasterModel request);
+  Future<BlogViewerPageEntity> submitBlog(
+      BlogModel blog, RequestMasterModel request);
   Future<BlogViewerPageEntity> updateBlog(
     BlogsPageViewModel blog,
     String updatedBy,
@@ -40,43 +38,31 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
   final SupabaseClient supabaseClient;
   BlogRemoteDataSourceImpl(this.supabaseClient);
   @override
-  Future<BlogModel> submitBlog(
+  Future<BlogViewerPageEntity> submitBlog(
     BlogModel blog,
     RequestMasterModel request,
   ) async {
     try {
-      final serviceAprovalUsersData = await supabaseClient
-          .from('service_approval_users')
-          .select('*')
-          .eq('service_id', ServicesConstants.blogServiceId)
-          .eq('is_active', true);
-      final serviceApprovalUsers = serviceAprovalUsersData
-          .map((item) => ServiceApprovalUsersModel.fromJson(item))
+      // SUBMIT
+      final submitRes =
+          await supabaseClient.rpc('rpc_service_submit_generic', params: {
+        'p_service_id': ServicesConstants.blogServiceId, // int
+        'p_entity_table': 'blogs',
+        'p_view_name': 'blogs_page_view',
+        'p_approvals_view': 'approval_sequence_view',
+        'p_request': request.toJson(),
+        'p_entity':
+            blog.toJson(), // no need to include request_id; RPC injects it
+      });
+      final blogsView = BlogsPageViewModel.fromJson(submitRes['view']);
+      final approvals = (submitRes['approval'] as List)
+          .map((j) => ApprovalSequenceViewModel.fromJson(j))
           .toList();
-      final requestData = await supabaseClient
-          .from('requests_master')
-          .insert(
-            request.toJson(),
-          )
-          .select();
-      final req = RequestMasterModel.fromJson(requestData.first);
-      final approvalSequence = mapServiceApproversToApprovalSequence(
-        requestId: req.requestId ?? -1,
-        serviceApprovers: serviceApprovalUsers,
+
+      return BlogViewerPageEntity(
+        blogsView: blogsView,
+        approval: approvals,
       );
-      await supabaseClient
-          .from('approval_sequence')
-          .insert(
-            approvalSequence.map((e) => e.toJson()).toList(),
-          )
-          .select();
-      final blogData = await supabaseClient
-          .from('blogs')
-          .insert(
-            blog.copyWith(requestId: req.requestId).toJson(),
-          )
-          .select();
-      return BlogModel.fromJson(blogData.first);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -88,92 +74,28 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     String updatedBy,
   ) async {
     try {
-      final serviceAprovalUsersData = await supabaseClient
-          .from('service_approval_users')
-          .select('*')
-          .eq('service_id', ServicesConstants.blogServiceId)
-          .eq('is_active', true);
-      final serviceApprovalUsers = serviceAprovalUsersData
-          .map((item) => ServiceApprovalUsersModel.fromJson(item))
+      final res =
+          await supabaseClient.rpc('rpc_service_update_generic', params: {
+        'p_service_id': ServicesConstants.blogServiceId,
+        'p_entity_table': 'blogs',
+        'p_view_name': 'blogs_page_view',
+        'p_approvals_view': 'approval_sequence_view',
+        'p_request_id': blogViewerPage.requestId,
+        'p_updated_by': updatedBy,
+        'p_entity': {
+          'title': blogViewerPage.title,
+          'content': blogViewerPage.content,
+          'topics': blogViewerPage.topics ?? <String>[], // if present in table
+        },
+      });
+      final blogsView = BlogsPageViewModel.fromJson(res['view']);
+      final approvals = (res['approval'] as List)
+          .map((j) => ApprovalSequenceViewModel.fromJson(j))
           .toList();
-      await supabaseClient
-          .from('blogs')
-          .update({
-            'updated_at': DateTime.now().toIso8601String(),
-            'title': blogViewerPage.title,
-            'content': blogViewerPage.content,
-            'topics': blogViewerPage.topics,
-          })
-          .eq(
-            'id',
-            blogViewerPage.blogId!,
-          ) // Ensure you update the correct row
-          .select();
-      await supabaseClient
-          .from('requests_master')
-          .update({
-            'status': blogViewerPage.createdById == updatedBy
-                ? LookupConstants.requestStatusPending
-                : blogViewerPage.requestStatusId,
-            'updated_at': DateTime.now().toIso8601String(),
-          })
-          .eq(
-            'request_id',
-            blogViewerPage.requestId!,
-          ) // Ensure you update the correct row
-          .select();
-      if (blogViewerPage.createdById == updatedBy) {
-        final approvalSequence = mapServiceApproversToApprovalSequence(
-          requestId: blogViewerPage.requestId!,
-          serviceApprovers: serviceApprovalUsers,
-        );
-        await supabaseClient
-            .from('approval_sequence')
-            .update({
-              'is_active': false,
-            })
-            .eq(
-              'request_id',
-              blogViewerPage.requestId!,
-            ) // Ensure you update the correct row
-            .select();
-        await supabaseClient
-            .from('approval_sequence')
-            .insert(
-              approvalSequence.map((e) => e.toJson()).toList(),
-            )
-            .select();
-        await supabaseClient
-            .from('request_unlocked_fields')
-            .update({
-              'is_active': false,
-            })
-            .eq('request_id',
-                blogViewerPage.requestId!) // Ensure you update the correct row
-            .select();
-      }
-      final blogsView = await supabaseClient
-          .from('blogs_page_view')
-          .select('*')
-          .eq('request_is_active', true)
-          .eq(
-            'request_id',
-            blogViewerPage.requestId!,
-          );
-      final approvalsView = await supabaseClient
-          .from('approval_sequence_view')
-          .select('*')
-          .eq(
-            'request_id',
-            blogViewerPage.requestId!,
-          )
-          .eq('is_active', true);
+
       return BlogViewerPageEntity(
-        blogsView:
-            blogsView.map((blog) => BlogsPageViewModel.fromJson(blog)).first,
-        approval: approvalsView
-            .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
-            .toList(),
+        blogsView: blogsView,
+        approval: approvals,
       );
     } catch (e) {
       throw ServerException(e.toString());
@@ -187,33 +109,27 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
     BlogsPageViewModel blog,
   ) async {
     try {
-      updateApprovalSequenceDS(
-        approvalSequence: approvalSequence,
-        requestUnlockedFields: requestUnlockedFields,
-        supabaseClient: supabaseClient,
-      );
-      final blogsView = await supabaseClient
-          .from('blogs_page_view')
-          .select('*')
-          .eq('request_is_active', true)
-          .eq(
-            'request_id',
-            approvalSequence.requestId!,
-          );
-      final approvalsView = await supabaseClient
-          .from('approval_sequence_view')
-          .select('*')
-          .eq(
-            'request_id',
-            blog.requestId!,
-          )
-          .eq('is_active', true);
+      final res =
+          await supabaseClient.rpc('rpc_service_approve_generic', params: {
+        'p_entity_table': 'blogs',
+        'p_view_name': 'blogs_page_view',
+        'p_approvals_view': 'approval_sequence_view',
+        'p_request_id': approvalSequence.requestId,
+        'p_approval_id': approvalSequence.approvalId,
+        'p_status_id': approvalSequence.approvalStatus,
+        'p_comment': approvalSequence.approverComment ?? '',
+        'p_approved_by': approvalSequence.approvedBy,
+        'p_unlocked_fields':
+            (requestUnlockedFields ?? []).map((e) => e.toJson()).toList(),
+      });
+      final blogsView = BlogsPageViewModel.fromJson(res['view']);
+      final approvals = (res['approval'] as List)
+          .map((j) => ApprovalSequenceViewModel.fromJson(j))
+          .toList();
+
       return BlogViewerPageEntity(
-        blogsView:
-            blogsView.map((blog) => BlogsPageViewModel.fromJson(blog)).first,
-        approval: approvalsView
-            .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
-            .toList(),
+        blogsView: blogsView,
+        approval: approvals,
       );
     } catch (e) {
       throw ServerException(e.toString());
@@ -257,7 +173,8 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
       final result = await supabaseClient
           .from('blogs_page_view')
           .select('*')
-          .match(filters);
+          .match(filters)
+          .order('updated_at', ascending: false);
 
       return result.map((blog) => BlogsPageViewModel.fromJson(blog)).toList();
     } catch (e) {
@@ -273,12 +190,18 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
         'request_id': requestId,
       };
 
-      final result = await supabaseClient
+      final Map<String, dynamic>? row = await supabaseClient
           .from('blogs_page_view')
           .select('*')
-          .match(filters);
+          .match(filters)
+          .order('updated_at', ascending: false)
+          .maybeSingle();
 
-      return result.map((blog) => BlogsPageViewModel.fromJson(blog)).first;
+      if (row == null) {
+        throw ServerException('Result view not found');
+      }
+
+      return BlogsPageViewModel.fromJson(row);
     } catch (e) {
       throw ServerException(e.toString());
     }
@@ -291,8 +214,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .from('approval_sequence_view')
           .select('*')
           .eq('service_id', ServicesConstants.blogServiceId)
-          .eq('is_active', true)
-          .select('*');
+          .eq('is_active', true);
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
           .toList();
@@ -309,8 +231,7 @@ class BlogRemoteDataSourceImpl implements BlogRemoteDataSource {
           .from('approval_sequence_view')
           .select('*')
           .eq('request_id', requestId)
-          .eq('is_active', true)
-          .select('*');
+          .eq('is_active', true);
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
           .toList();

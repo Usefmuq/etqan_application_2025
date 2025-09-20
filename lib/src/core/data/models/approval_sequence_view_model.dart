@@ -221,7 +221,7 @@ class ApprovalSequenceViewModel {
       approvalOrder: approvalOrder ?? 0,
       approvedAt: approvedAt,
       isActive: isActive ?? true,
-      createdAt: createdAt ?? DateTime.now(),
+      createdAt: createdAt ?? DateTime.now().toUtc().add(Duration(hours: 3)),
     );
   }
 

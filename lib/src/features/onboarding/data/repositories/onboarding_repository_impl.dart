@@ -42,8 +42,8 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         userId: createdBy,
         serviceId: ServicesConstants.onboardingServiceId,
         status: LookupConstants.requestStatusPending,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
       );
       OnboardingModel onboardingModel = OnboardingModel(
         // onboardingId: onboardingId,
@@ -57,11 +57,11 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         positionId: positionId,
         reportTo: reportTo,
         startDate: startDate,
-        updatedAt: DateTime.now(),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
         status: LookupConstants.requestStatusPending,
         isActive: true,
         createdBy: createdBy,
-        createdAt: DateTime.now(),
+        createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
         notes: notes,
       );
       final insertedOnboarding = await onboardingRemoteDataSource
@@ -91,7 +91,7 @@ class OnboardingRepositoryImpl implements OnboardingRepository {
         positionId: onboardingsPageViewModel.positionId,
         reportTo: onboardingsPageViewModel.reportTo,
         startDate: onboardingsPageViewModel.startDate,
-        updatedAt: DateTime.now(),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
         status: onboardingsPageViewModel.statusId,
         isActive: onboardingsPageViewModel.isActive,
         createdBy: onboardingsPageViewModel.createdBy,

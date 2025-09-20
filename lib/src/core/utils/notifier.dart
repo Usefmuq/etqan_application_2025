@@ -32,15 +32,17 @@ class SmartNotifier {
     Duration duration = const Duration(seconds: 4),
     bool dismissible = true,
     ToastPlacement placement = ToastPlacement.topRight,
-  }) =>
-      _ToastOverlayHost.of(context).show(
-        title: title,
-        message: message,
-        variant: ToastVariant.error,
-        duration: duration,
-        dismissible: dismissible,
-        placement: placement,
-      );
+  }) {
+    debugPrint("$title $message");
+    _ToastOverlayHost.of(context).show(
+      title: title,
+      message: message,
+      variant: ToastVariant.error,
+      duration: duration,
+      dismissible: dismissible,
+      placement: placement,
+    );
+  }
 
   static void warning(
     BuildContext context, {

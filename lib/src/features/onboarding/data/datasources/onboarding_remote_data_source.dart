@@ -159,7 +159,10 @@ class OnboardingRemoteDataSourceImpl implements OnboardingRemoteDataSource {
             'approver_comment': approvalSequence.approverComment,
             'approval_status': approvalSequence.approvalStatus,
             'approved_by': approvalSequence.approvedBy,
-            'approved_at': DateTime.now().toIso8601String(),
+            'approved_at': DateTime.now()
+                .toUtc()
+                .add(Duration(hours: 3))
+                .toIso8601String(),
           })
           .eq(
               'approval_id',
