@@ -77,6 +77,18 @@
 
   "blogUpdate": "Update blog",
 
+
+  "usersManager": "Users Manager",
+  "usersManagerTitle": "Users Managers Title",
+  "usersManagerContent": "محتوى إدارة المستخدمين",
+  "usersManagerDetails": "تفاصيل إدارة المستخدمين",
+  "usersManagersService": "Users Manager Service",
+  "usersManagersServiceSubtitle": "Service to manage users",
+  "usersManagerSubmitNew": "تقديم طلب جديد لخدمة إدارة المستخدمين",
+  "usersManagerUpdate": "تحديث إدارة المستخدمين",
+
+
+
   "submitOnboarding": "Submit New Onboarding",
   "updateOnboarding": "Update Onboarding",
   "firstNameEN": "First name (EN)",

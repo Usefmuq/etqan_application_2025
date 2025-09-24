@@ -1,0 +1,342 @@
+import 'package:etqan_application_2025/src/features/usersManager/domain/entities/users_manager.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/entities/users_manager_page_view.dart';
+
+class UsersManagerPageViewModel extends UsersManagerPageView {
+  UsersManagerPageViewModel({
+    // entity
+    required super.requestId,
+    required super.userId,
+    required super.roleId,
+    super.roleNameEn,
+    super.roleNameAr,
+    required super.appliesToAllDepartments,
+    super.departmentId,
+    super.departmentNameEn,
+    super.departmentNameAr,
+    required super.startAt,
+    super.endAt,
+    required super.action,
+    super.terminatedBy,
+    super.terminatedAt,
+    super.terminationReason,
+    super.notes,
+    required super.createdById,
+    required super.createdAt,
+    required super.updatedAt,
+    // creator
+    super.fullNameEn,
+    super.fullNameAr,
+    super.email,
+    super.phone,
+    super.creatorDepartmentId,
+    super.creatorDepartmentNameEn,
+    super.creatorDepartmentNameAr,
+    super.creatorPositionId,
+    super.creatorPositionNameEn,
+    super.creatorPositionNameAr,
+    super.reportTo,
+    super.reportToNameEn,
+    super.reportToNameAr,
+    // request
+    required super.serviceId,
+    super.serviceNameEn,
+    super.serviceNameAr,
+    required super.requestStatusId,
+    super.requestStatusKey,
+    super.requestStatusEn,
+    super.requestStatusAr,
+    super.priorityId,
+    super.priorityKey,
+    super.priorityEn,
+    super.priorityAr,
+    super.requestDetails,
+    required super.requestCreatedAt,
+    required super.requestUpdatedAt,
+    super.requestApprovedAt,
+    required super.requestIsActive,
+    super.numberOfManagerApprovalsNeeded,
+    super.numberOfApprovalsNeeded,
+    required super.numberOfApprovalsDone,
+    required super.numberOfApprovalsPending,
+  });
+
+  factory UsersManagerPageViewModel.fromJson(Map<String, dynamic> json) {
+    return UsersManagerPageViewModel(
+      // entity
+      requestId: json['request_id'] as int,
+      userId: json['user_id'] as String,
+      roleId: json['role_id'] as String,
+      roleNameEn: json['role_name_en'] as String?,
+      roleNameAr: json['role_name_ar'] as String?,
+      appliesToAllDepartments: json['applies_to_all_departments'] as bool,
+      departmentId: json['department_id'] as String?,
+      departmentNameEn: json['department_name_en'] as String?,
+      departmentNameAr: json['department_name_ar'] as String?,
+      startAt: DateTime.parse(json['start_at'] as String),
+      endAt: json['end_at'] != null
+          ? DateTime.tryParse(json['end_at'] as String)
+          : null,
+      action: json['action'] as String,
+      terminatedBy: json['terminated_by'] as String?,
+      terminatedAt: json['terminated_at'] != null
+          ? DateTime.tryParse(json['terminated_at'] as String)
+          : null,
+      terminationReason: json['termination_reason'] as String?,
+      notes: json['notes'] as String?,
+      createdById: json['created_by_id'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+
+      // creator
+      fullNameEn: json['full_name_en'] as String?,
+      fullNameAr: json['full_name_ar'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
+      creatorDepartmentId: json['creator_department_id'] as String?,
+      creatorDepartmentNameEn: json['creator_department_name_en'] as String?,
+      creatorDepartmentNameAr: json['creator_department_name_ar'] as String?,
+      creatorPositionId: json['creator_position_id'] as String?,
+      creatorPositionNameEn: json['creator_position_name_en'] as String?,
+      creatorPositionNameAr: json['creator_position_name_ar'] as String?,
+      reportTo: json['report_to'] as String?,
+      reportToNameEn: json['report_to_name_en'] as String?,
+      reportToNameAr: json['report_to_name_ar'] as String?,
+
+      // request + service
+      serviceId: json['service_id'] as int,
+      serviceNameEn: json['service_name_en'] as String?,
+      serviceNameAr: json['service_name_ar'] as String?,
+      requestStatusId: json['request_status_id'] as String,
+      requestStatusKey: json['request_status_key'] as String?,
+      requestStatusEn: json['request_status_en'] as String?,
+      requestStatusAr: json['request_status_ar'] as String?,
+      priorityId: json['priority_id'] as String?,
+      priorityKey: json['priority_key'] as String?,
+      priorityEn: json['priority_en'] as String?,
+      priorityAr: json['priority_ar'] as String?,
+      requestDetails: json['request_details'] as Map<String, dynamic>?,
+      requestCreatedAt: DateTime.parse(json['request_created_at'] as String),
+      requestUpdatedAt: DateTime.parse(json['request_updated_at'] as String),
+      requestApprovedAt: json['request_approved_at'] != null
+          ? DateTime.tryParse(json['request_approved_at'] as String)
+          : null,
+      requestIsActive: json['request_is_active'] as bool,
+      numberOfManagerApprovalsNeeded:
+          (json['number_of_manager_approvals_needed'] as int?),
+      numberOfApprovalsNeeded: (json['number_of_approvals_needed'] as int?),
+      numberOfApprovalsDone:
+          (json['number_of_approvals_done'] as num?)?.toInt() ?? 0,
+      numberOfApprovalsPending:
+          (json['number_of_approvals_pending'] as num?)?.toInt() ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      // entity
+      'request_id': requestId,
+      'user_id': userId,
+      'role_id': roleId,
+      'role_name_en': roleNameEn,
+      'role_name_ar': roleNameAr,
+      'applies_to_all_departments': appliesToAllDepartments,
+      'department_id': departmentId,
+      'department_name_en': departmentNameEn,
+      'department_name_ar': departmentNameAr,
+      'start_at': startAt.toIso8601String(),
+      'end_at': endAt?.toIso8601String(),
+      'action': action,
+      'terminated_by': terminatedBy,
+      'terminated_at': terminatedAt?.toIso8601String(),
+      'termination_reason': terminationReason,
+      'notes': notes,
+      'created_by_id': createdById,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+
+      // creator
+      'full_name_en': fullNameEn,
+      'full_name_ar': fullNameAr,
+      'email': email,
+      'phone': phone,
+      'creator_department_id': creatorDepartmentId,
+      'creator_department_name_en': creatorDepartmentNameEn,
+      'creator_department_name_ar': creatorDepartmentNameAr,
+      'creator_position_id': creatorPositionId,
+      'creator_position_name_en': creatorPositionNameEn,
+      'creator_position_name_ar': creatorPositionNameAr,
+      'report_to': reportTo,
+      'report_to_name_en': reportToNameEn,
+      'report_to_name_ar': reportToNameAr,
+
+      // request + service
+      'service_id': serviceId,
+      'service_name_en': serviceNameEn,
+      'service_name_ar': serviceNameAr,
+      'request_status_id': requestStatusId,
+      'request_status_key': requestStatusKey,
+      'request_status_en': requestStatusEn,
+      'request_status_ar': requestStatusAr,
+      'priority_id': priorityId,
+      'priority_key': priorityKey,
+      'priority_en': priorityEn,
+      'priority_ar': priorityAr,
+      'request_details': requestDetails,
+      'request_created_at': requestCreatedAt.toIso8601String(),
+      'request_updated_at': requestUpdatedAt.toIso8601String(),
+      'request_approved_at': requestApprovedAt?.toIso8601String(),
+      'request_is_active': requestIsActive,
+      'number_of_manager_approvals_needed': numberOfManagerApprovalsNeeded,
+      'number_of_approvals_needed': numberOfApprovalsNeeded,
+      'number_of_approvals_done': numberOfApprovalsDone,
+      'number_of_approvals_pending': numberOfApprovalsPending,
+    };
+  }
+
+  UsersManagerPageViewModel copyWith({
+    // entity
+    int? requestId,
+    String? userId,
+    String? roleId,
+    String? roleNameEn,
+    String? roleNameAr,
+    bool? appliesToAllDepartments,
+    String? departmentId,
+    String? departmentNameEn,
+    String? departmentNameAr,
+    DateTime? startAt,
+    DateTime? endAt,
+    String? action,
+    String? terminatedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? notes,
+    String? createdById,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    // creator
+    String? fullNameEn,
+    String? fullNameAr,
+    String? email,
+    String? phone,
+    String? creatorDepartmentId,
+    String? creatorDepartmentNameEn,
+    String? creatorDepartmentNameAr,
+    String? creatorPositionId,
+    String? creatorPositionNameEn,
+    String? creatorPositionNameAr,
+    String? reportTo,
+    String? reportToNameEn,
+    String? reportToNameAr,
+    // request
+    int? serviceId,
+    String? serviceNameEn,
+    String? serviceNameAr,
+    String? requestStatusId,
+    String? requestStatusKey,
+    String? requestStatusEn,
+    String? requestStatusAr,
+    String? priorityId,
+    String? priorityKey,
+    String? priorityEn,
+    String? priorityAr,
+    Map<String, dynamic>? requestDetails,
+    DateTime? requestCreatedAt,
+    DateTime? requestUpdatedAt,
+    DateTime? requestApprovedAt,
+    bool? requestIsActive,
+    int? numberOfManagerApprovalsNeeded,
+    int? numberOfApprovalsNeeded,
+    int? numberOfApprovalsDone,
+    int? numberOfApprovalsPending,
+  }) {
+    return UsersManagerPageViewModel(
+      // entity
+      requestId: requestId ?? this.requestId,
+      userId: userId ?? this.userId,
+      roleId: roleId ?? this.roleId,
+      roleNameEn: roleNameEn ?? this.roleNameEn,
+      roleNameAr: roleNameAr ?? this.roleNameAr,
+      appliesToAllDepartments:
+          appliesToAllDepartments ?? this.appliesToAllDepartments,
+      departmentId: departmentId ?? this.departmentId,
+      departmentNameEn: departmentNameEn ?? this.departmentNameEn,
+      departmentNameAr: departmentNameAr ?? this.departmentNameAr,
+      startAt: startAt ?? this.startAt,
+      endAt: endAt ?? this.endAt,
+      action: action ?? this.action,
+      terminatedBy: terminatedBy ?? this.terminatedBy,
+      terminatedAt: terminatedAt ?? this.terminatedAt,
+      terminationReason: terminationReason ?? this.terminationReason,
+      notes: notes ?? this.notes,
+      createdById: createdById ?? this.createdById,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+
+      // creator
+      fullNameEn: fullNameEn ?? this.fullNameEn,
+      fullNameAr: fullNameAr ?? this.fullNameAr,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      creatorDepartmentId: creatorDepartmentId ?? this.creatorDepartmentId,
+      creatorDepartmentNameEn:
+          creatorDepartmentNameEn ?? this.creatorDepartmentNameEn,
+      creatorDepartmentNameAr:
+          creatorDepartmentNameAr ?? this.creatorDepartmentNameAr,
+      creatorPositionId: creatorPositionId ?? this.creatorPositionId,
+      creatorPositionNameEn:
+          creatorPositionNameEn ?? this.creatorPositionNameEn,
+      creatorPositionNameAr:
+          creatorPositionNameAr ?? this.creatorPositionNameAr,
+      reportTo: reportTo ?? this.reportTo,
+      reportToNameEn: reportToNameEn ?? this.reportToNameEn,
+      reportToNameAr: reportToNameAr ?? this.reportToNameAr,
+
+      // request
+      serviceId: serviceId ?? this.serviceId,
+      serviceNameEn: serviceNameEn ?? this.serviceNameEn,
+      serviceNameAr: serviceNameAr ?? this.serviceNameAr,
+      requestStatusId: requestStatusId ?? this.requestStatusId,
+      requestStatusKey: requestStatusKey ?? this.requestStatusKey,
+      requestStatusEn: requestStatusEn ?? this.requestStatusEn,
+      requestStatusAr: requestStatusAr ?? this.requestStatusAr,
+      priorityId: priorityId ?? this.priorityId,
+      priorityKey: priorityKey ?? this.priorityKey,
+      priorityEn: priorityEn ?? this.priorityEn,
+      priorityAr: priorityAr ?? this.priorityAr,
+      requestDetails: requestDetails ?? this.requestDetails,
+      requestCreatedAt: requestCreatedAt ?? this.requestCreatedAt,
+      requestUpdatedAt: requestUpdatedAt ?? this.requestUpdatedAt,
+      requestApprovedAt: requestApprovedAt ?? this.requestApprovedAt,
+      requestIsActive: requestIsActive ?? this.requestIsActive,
+      numberOfManagerApprovalsNeeded:
+          numberOfManagerApprovalsNeeded ?? this.numberOfManagerApprovalsNeeded,
+      numberOfApprovalsNeeded:
+          numberOfApprovalsNeeded ?? this.numberOfApprovalsNeeded,
+      numberOfApprovalsDone:
+          numberOfApprovalsDone ?? this.numberOfApprovalsDone,
+      numberOfApprovalsPending:
+          numberOfApprovalsPending ?? this.numberOfApprovalsPending,
+    );
+  }
+
+  UsersManager toUsersManager() {
+    return UsersManager(
+      requestId: requestId,
+      userId: userId,
+      roleId: roleId,
+      appliesToAllDepartments: appliesToAllDepartments,
+      departmentId: departmentId,
+      startAt: startAt,
+      endAt: endAt,
+      action: action,
+      terminatedBy: terminatedBy,
+      terminatedAt: terminatedAt,
+      terminationReason: terminationReason,
+      notes: notes,
+      createdById: createdById,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+}

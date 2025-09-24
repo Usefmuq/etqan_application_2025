@@ -38,6 +38,15 @@ import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/g
 import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/submit_onboarding.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/update_onboarding.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:etqan_application_2025/src/features/usersManager/data/datasources/users_manager_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/usersManager/data/repositories/users_manager_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/repositories/users_manager_repository.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/approve_users_manager.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/fetch_users_manager_page.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/get_all_users_manager.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/submit_users_manager.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/update_users_manager.dart';
+import 'package:etqan_application_2025/src/features/usersManager/presentation/bloc/users_manager_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -47,6 +56,7 @@ Future<void> initdependencies() async {
   _intitAuth();
   _intitHomeScreen();
   _intitBlog();
+  _intitUsersManager();
   _intitOnboarding();
   final supabase = await Supabase.initialize(
     url: SupabaseConf.supabaseUrl,
@@ -185,6 +195,58 @@ void _intitBlog() {
         updateBlog: serviceLocator(),
         approveBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
+      ),
+    );
+}
+
+void _intitUsersManager() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<UsersManagerRemoteDataSource>(
+      () => UsersManagerRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<UsersManagerRepository>(
+      () => UsersManagerRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitUsersManager(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateUsersManager(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllUsersManagers(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchUsersManagerPage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveUsersManager(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => UsersManagerBloc(
+        submitUsersManager: serviceLocator(),
+        updateUsersManager: serviceLocator(),
+        approveUsersManager: serviceLocator(),
+        getAllUsersManagers: serviceLocator(),
       ),
     );
 }

@@ -13,6 +13,11 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/page
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/onboarding_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/update_onboarding_page.dart';
+import 'package:etqan_application_2025/src/features/usersManager/domain/entities/users_manager_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/add_new_users_manager_page.dart';
+import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/update_users_manager_page.dart';
+import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/users_manager_page.dart';
+import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/users_manager_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -130,6 +135,42 @@ class MyAppState extends State<MyApp> {
             }
             final requestId = int.tryParse(state.pathParameters['id'] ?? '');
             return BlogViewerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/usersManager',
+          builder: (context, state) {
+            return UsersManagerPage();
+          },
+        ),
+        GoRoute(
+          path: '/usersManager/submit',
+          builder: (context, state) {
+            return AddNewUsersManagerPage();
+          },
+        ),
+        GoRoute(
+          path: '/usersManager/update/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as UsersManagerViewerPageEntity;
+              return UpdateUsersManagerPage(
+                  initialUsersManagerViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateUsersManagerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/usersManager/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as UsersManagerViewerPageEntity;
+              return UsersManagerViewerPage(
+                  initialUsersManagerViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UsersManagerViewerPage(requestId: requestId!);
           },
         ),
         GoRoute(

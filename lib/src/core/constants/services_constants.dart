@@ -6,7 +6,9 @@ class ServicesConstants {
   static List<String> servicesRoutes = [
     '/blogs',
     '/onboardings',
+    '/usersManager',
   ];
   static int blogServiceId = 1;
   static int onboardingServiceId = 2;
+  static int usersManagerServiceId = 3;
 }

@@ -71,6 +71,17 @@
   "blogSubmitNew": "تقديم طلب جديد لخدمة المدونة",
   "blogUpdate": "تحديث مدونة",
 
+
+  "usersManager": "إدارة المستخدمين",
+  "usersManagerTitle": "عنوان إدارة المستخدمين",
+  "usersManagerContent": "محتوى إدارة المستخدمين",
+  "usersManagerDetails": "تفاصيل إدارة المستخدمين",
+  "usersManagersService": "خدمة إدارة المستخدمين",
+  "usersManagersServiceSubtitle": "هذه خدمة إدارة المستخدمين",
+  "usersManagerSubmitNew": "تقديم طلب جديد لخدمة إدارة المستخدمين",
+  "usersManagerUpdate": "تحديث إدارة المستخدمين",
+
+
   "submitOnboarding": "إرسال بيانات التوظيف",
   "updateOnboarding": "تحديث بيانات التوظيف",
   "firstNameEN": "الاسم الأول (إنجليزي)",
