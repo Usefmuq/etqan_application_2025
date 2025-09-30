@@ -144,9 +144,13 @@ class MyAppState extends State<MyApp> {
           },
         ),
         GoRoute(
-          path: '/usersManager/submit',
+          path: '/usersManager/submit/:id',
           builder: (context, state) {
-            return AddNewUsersManagerPage();
+            final userId = state.pathParameters['id'];
+
+            return AddNewUsersManagerPage(
+              userId: userId,
+            );
           },
         ),
         GoRoute(

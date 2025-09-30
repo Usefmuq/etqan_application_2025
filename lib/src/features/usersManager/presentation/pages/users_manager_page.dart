@@ -1,12 +1,16 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/entities/departments.dart';
+import 'package:etqan_application_2025/src/core/common/entities/positions.dart';
 import 'package:etqan_application_2025/src/core/common/entities/user.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_section_title.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
+import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/bloc/users_manager_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,12 +34,14 @@ class _UsersManagerPageState extends State<UsersManagerPage>
     with SingleTickerProviderStateMixin {
   List<String>? permissions;
   TabController? _tabController;
-
+  List<UserModel>? allUsers;
   bool isManagerExpanded = false;
   bool isDepartmentManagerExpanded = false;
   bool isViewAll = false;
 
   Departments? userDepartment;
+  List<Departments>? allDepartments;
+  List<Positions>? allPositions;
   User? userDetails;
 
   // Build tabs from kinds (no l10n usage before build)
@@ -55,11 +61,16 @@ class _UsersManagerPageState extends State<UsersManagerPage>
     Future.microtask(() async {
       final fetchedPermissions = await fetchUserPermissions(user.id);
       final fetchedDepartment = await fetchDepartmentById(user.departmentId);
-
+      final fetchedAllDepartments = await fetchDepartments();
+      final fetchedAllPositions = await fetchAllPositions();
+      final fetchedUsers = await fetchAllUsers();
       if (!mounted) return;
       setState(() {
+        allUsers = fetchedUsers;
         permissions = fetchedPermissions;
         userDepartment = fetchedDepartment;
+        allDepartments = fetchedAllDepartments;
+        allPositions = fetchedAllPositions;
         userDetails = user;
         _setupTabsAndController();
       });
@@ -232,23 +243,38 @@ class _UsersManagerPageState extends State<UsersManagerPage>
         }
 
         if (state is UsersManagerShowAllSuccess) {
-          if (state.usersManagerPage.usersManagersView.isEmpty) {
+          if (allUsers == null) {
             return Center(child: Text(AppLocalizations.of(context)!.noResults));
           }
-
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.usersManagerPage.usersManagersView.length,
-            itemBuilder: (context, index) {
-              final usersManager =
-                  state.usersManagerPage.usersManagersView[index];
-
-              return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Scaffold());
-            },
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomSectionTitle(
+                title:
+                    'AppLocalizations.of(context)!.approvalSequence) list of all users',
+              ),
+              CustomTableGrid(
+                headers: [
+                  AppLocalizations.of(context)!.email,
+                  AppLocalizations.of(context)!.fullNameAR,
+                  AppLocalizations.of(context)!.fullNameEN,
+                  AppLocalizations.of(context)!.phone,
+                  AppLocalizations.of(context)!.department,
+                  AppLocalizations.of(context)!.position,
+                  AppLocalizations.of(context)!.status,
+                  AppLocalizations.of(context)!.manager,
+                ],
+                rows: allUsers!.map((u) => u.toTableRow()).toList(),
+                useChipsForStatus: true,
+                departments: allDepartments ?? [],
+                positions: allPositions ?? [],
+                users: allUsers ?? [],
+                onEdit: (row) {
+                  print(row['ID']);
+                  context.push('/usersManager/submit/${row['ID']}');
+                },
+              ),
+            ],
           );
         }
 

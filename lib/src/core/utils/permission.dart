@@ -1,4 +1,5 @@
 import 'package:etqan_application_2025/init_dependencies.dart';
+import 'package:etqan_application_2025/src/core/common/entities/permissions_view.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_roles.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
@@ -23,6 +24,21 @@ Future<List<String>?> fetchUserPermissions(String userId) async {
   }, (permissionsList) {
     final perms = permissionsList.map((p) => p.permissionKey).toList();
     return perms;
+  });
+}
+
+Future<List<PermissionsView>?> fetchUserPermissionsView(String userId) async {
+  final GetUserPermissions getUserPermissions = serviceLocator<
+      GetUserPermissions>(); // ✅ Get use case from service locator
+  if (userId.isNullOrEmpty) {
+    return [];
+  }
+  final response =
+      await getUserPermissions.call(GetUserPermissionsParams(userId: userId));
+  return response.fold((failure) {
+    return [];
+  }, (permissionsList) {
+    return permissionsList;
   });
 }
 

@@ -1,10 +1,13 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
+import 'package:etqan_application_2025/src/core/common/entities/permissions_view.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
+import 'package:etqan_application_2025/src/core/data/models/role_permission_view_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/roles_model.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
@@ -17,7 +20,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddNewUsersManagerPage extends StatefulWidget {
-  const AddNewUsersManagerPage({super.key});
+  final String? userId;
+  const AddNewUsersManagerPage({super.key, this.userId});
   static route() => MaterialPageRoute(
         builder: (context) => const AddNewUsersManagerPage(),
       );
@@ -27,12 +31,14 @@ class AddNewUsersManagerPage extends StatefulWidget {
 
 class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
   List<String>? permissions;
+  List<PermissionsView>? permissionsView;
+  List<RolesModel>? allRoles;
+  List<RolesModel> selectedRoles = [];
+  List<RolePermissionViewModel> rolePermissionView = [];
   final TextEditingController notesController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  List<String> selectedTopics = [];
   List<ServiceField> serviceFields = [];
-
   @override
   void initState() {
     super.initState();
@@ -43,17 +49,22 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
       });
       return;
     }
-    final userId = userState.user.id;
+    final loggedInUserId = userState.user.id;
 
     Future.microtask(() async {
-      final fetchedPermissions = await fetchUserPermissions(userId);
+      final fetchedPermissions = await fetchUserPermissions(loggedInUserId);
+      final fetchedPermissionsView =
+          await fetchUserPermissionsView(widget.userId ?? '');
+      final fetchedAllRoles = await fetchAllRoles();
       final fetchedServiceFields =
           await fetchFieldsByServiceId(ServicesConstants.usersManagerServiceId);
 
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
+          permissionsView = fetchedPermissionsView;
           serviceFields = fetchedServiceFields;
+          allRoles = fetchedAllRoles;
         });
       }
     });
@@ -62,16 +73,6 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
   void _submitUsersManager() {
     final isValid = formKey.currentState?.validate() ?? false;
     if (!isValid) return;
-
-    if (selectedTopics.isEmpty) {
-      SmartNotifier.warning(
-        context,
-        title: AppLocalizations.of(context)!.error,
-        message: AppLocalizations.of(context)!
-            .fieldIsRequired, // or a “select topics” string
-      );
-      return;
-    }
 
     {
       final userState = context.read<AppUserCubit>().state;
@@ -113,14 +114,7 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
   Widget build(BuildContext context) {
     return CustomScaffold(
       title: AppLocalizations.of(context)!.usersManagerSubmitNew,
-
       showDrawer: false,
-      // tilteActions: [
-      //   IconButton(
-      //     onPressed: _submitUsersManager,
-      //     icon: Icon(Icons.done_rounded),
-      //   )
-      // ],
       body: [
         BlocConsumer<UsersManagerBloc, UsersManagerState>(
           listener: (context, state) {
@@ -168,11 +162,15 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
                           serviceFields: serviceFields,
                           isLockFieldsWithoutComment: false,
                           setState: setState,
-                          selectedTopics: selectedTopics,
                           titleController: notesController,
                           contentController: contentController,
                           isWide: isWide,
+                          permissionsView: permissionsView ?? [],
+                          allRoles: allRoles ?? [],
+                          selectedRoles: selectedRoles,
+                          rolePermissionView: rolePermissionView,
                         ),
+                        const SizedBox(height: 40),
                         const SizedBox(height: 40),
                         Divider(thickness: 1.5, color: Colors.grey[300]),
                         const SizedBox(height: 24),

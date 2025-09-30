@@ -71,9 +71,7 @@ class _UpdateUsersManagerPageState extends State<UpdateUsersManagerPage> {
           // widget.initialUsersManagerViewerPage?.usersManagersView.requestId;
           -1;
       List<RequestUnlockedFieldModel>? fetchedUnlockedFields;
-      if (reqId != null) {
-        fetchedUnlockedFields = await fetchUnlockedFields(reqId);
-      }
+      fetchedUnlockedFields = await fetchUnlockedFields(reqId);
       if (!mounted) return;
       setState(() {
         permissions = fetchedPermissions;

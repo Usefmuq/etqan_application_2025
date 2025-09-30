@@ -1,16 +1,28 @@
+import 'package:etqan_application_2025/src/core/common/entities/departments.dart';
+import 'package:etqan_application_2025/src/core/common/entities/positions.dart';
+import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import 'package:etqan_application_2025/src/core/constants/uuid_lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 
 class CustomTableGrid extends StatefulWidget {
   final List<String> headers;
   final List<Map<String, dynamic>> rows;
+
   final bool useChipsForStatus;
+
   final Function(Map<String, dynamic> row)? onEdit;
   final Function(Map<String, dynamic> row)? onDelete;
   final Function(Map<String, dynamic> row)? onApprove;
+
   final int rowsPerPage;
+
+  /// NEW: pre-fetched lookup lists
+  final List<Departments> departments;
+  final List<UserModel> users;
+  final List<Positions> positions;
 
   const CustomTableGrid({
     super.key,
@@ -21,6 +33,11 @@ class CustomTableGrid extends StatefulWidget {
     this.onDelete,
     this.onApprove,
     this.rowsPerPage = 10,
+
+    // lookups injected (can be empty lists)
+    this.departments = const [],
+    this.users = const [],
+    this.positions = const [],
   });
 
   @override
@@ -31,6 +48,28 @@ class _CustomTableGridState extends State<CustomTableGrid> {
   int _sortColumnIndex = 0;
   bool _sortAscending = true;
   int _currentPage = 0;
+
+  late final Map<String, Map<String, String>> _deptMap; // id -> {en, ar}
+  late final Map<String, Map<String, String>> _posMap; // id -> {en, ar}
+  late final Map<String, Map<String, String>> _userMap; // id -> {en, ar}
+
+  @override
+  void initState() {
+    super.initState();
+    _deptMap = {
+      for (final d in widget.departments) d.id: {'en': d.nameEn, 'ar': d.nameAr}
+    };
+    _posMap = {
+      for (final p in widget.positions) p.id: {'en': p.nameEn, 'ar': p.nameAr}
+    };
+    _userMap = {
+      for (final u in widget.users)
+        u.id: {
+          'en': '${u.firstNameEn} ${u.lastNameEn}'.trim(),
+          'ar': '${u.firstNameAr} ${u.lastNameAr}'.trim(),
+        }
+    };
+  }
 
   List<Map<String, dynamic>> get _pagedRows {
     final start = _currentPage * widget.rowsPerPage;
@@ -54,16 +93,44 @@ class _CustomTableGridState extends State<CustomTableGrid> {
     });
   }
 
-  Widget formatValue(BuildContext context, dynamic value) {
+  bool _isUuid(dynamic v) =>
+      v is String && RegExp(r'^[0-9a-fA-F\-]{36}$').hasMatch(v);
+
+  /// Very simple header-based routing. Tweak to your headers.
+  String? _kindForKey(String columnKey) {
+    final k = columnKey.toLowerCase();
+    if (k.contains('department') || k.contains('القسم')) return 'dept';
+    if (k.contains('position') || k.contains('الوظيفة')) return 'pos';
+    if (k.contains('user') ||
+        k.contains('created by') ||
+        k.contains('المدير') ||
+        k.contains('created_by') ||
+        k.contains('report to') ||
+        k.contains('report_to')) {
+      return 'user';
+    }
+    return null;
+  }
+
+  String? _localized(
+      Map<String, Map<String, String>> map, String id, String locale) {
+    final o = map[id];
+    if (o == null) return null;
+    return (locale == 'ar' ? o['ar'] : o['en']) ?? o['en'];
+  }
+
+  Widget _formatValue(BuildContext context, String columnKey, dynamic value) {
     final locale = Localizations.localeOf(context).languageCode;
 
     if (value == null) return const Text('—');
 
-    // UUID -> Lookup label + color (status, user, role)
+    // 1) Known constants (statuses/priorities/etc.) → chip or text
     if (value is String &&
-        RegExp(r'^[0-9a-fA-F\-]{36}$').hasMatch(value) &&
+        _isUuid(value) &&
         UuidLookupConstants.combinedLookup.containsKey(value)) {
-      final label = UuidLookupConstants.combinedLookup[value]?[locale] ?? '—';
+      final label = UuidLookupConstants.combinedLookup[value]?[locale] ??
+          UuidLookupConstants.combinedLookup[value]?['en'] ??
+          '—';
       final color = UuidLookupConstants.combinedLookup[value]?['color'] ??
           AppPallete.greyColor;
 
@@ -71,22 +138,45 @@ class _CustomTableGridState extends State<CustomTableGrid> {
           ? Chip(
               label: Text(label),
               backgroundColor: color.withOpacity(0.12),
-              labelStyle: TextStyle(
-                // color: color,
-                fontWeight: FontWeight.w500,
-              ),
+              labelStyle: const TextStyle(fontWeight: FontWeight.w500),
             )
           : Text(label);
     }
 
-    // Booleans
+    // 2) UUIDs → try departments / positions / users maps depending on column header
+    if (_isUuid(value)) {
+      final kind = _kindForKey(columnKey);
+      if (kind == 'dept') {
+        return Text(
+          _localized(_deptMap, value, locale) ?? value,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
+      if (kind == 'pos') {
+        return Text(
+          _localized(_posMap, value, locale) ?? value,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
+      if (kind == 'user') {
+        return Text(
+          _localized(_userMap, value, locale) ?? value,
+          overflow: TextOverflow.ellipsis,
+        );
+      }
+      // unknown UUID kind → just print raw
+      return Text(value);
+    }
+
+    // 3) Booleans
     if (value is bool) return Text(value ? '✓' : '✗');
 
-    // DateTime
+    // 4) DateTime
     if (value is DateTime) {
       return Text(DateFormat.yMMMd(locale).add_jm().format(value));
     }
 
+    // 5) Numbers/Strings fallback
     return Text(value.toString());
   }
 
@@ -102,7 +192,7 @@ class _CustomTableGridState extends State<CustomTableGrid> {
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: 500, // ✅ Give a max height to avoid infinite size
+              maxHeight: 500,
               minWidth: constraints.maxWidth,
             ),
             child: IntrinsicHeight(
@@ -144,16 +234,20 @@ class _CustomTableGridState extends State<CustomTableGrid> {
                           }),
                           if (hasActions)
                             const DataColumn(
-                              label: Text('Actions',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                              label: Text(
+                                'Actions',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             ),
                         ],
                         rows: _pagedRows.map((row) {
                           return DataRow(
                             cells: [
-                              ...widget.headers.map((key) =>
-                                  DataCell(formatValue(context, row[key]))),
+                              ...widget.headers.map(
+                                (key) => DataCell(
+                                  _formatValue(context, key, row[key]),
+                                ),
+                              ),
                               if (hasActions)
                                 DataCell(
                                   Row(

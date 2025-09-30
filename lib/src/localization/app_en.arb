@@ -95,6 +95,8 @@
   "lastNameEN": "Last name (EN)",
   "firstNameAR": "First name (AR)",
   "lastNameAR": "Last name (AR)",
+      "fullNameAR": "Name (EN)",
+    "fullNameEN": "Name (EN)",
   "phone": "Phone",
   "startDate": "Start Date",
   "selectDate": "Select Date",

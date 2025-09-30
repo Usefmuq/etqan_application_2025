@@ -88,6 +88,9 @@
   "lastNameEN": "اسم العائلة (إنجليزي)",
   "firstNameAR": "الاسم الأول (عربي)",
   "lastNameAR": "اسم العائلة (عربي)",
+    "fullNameAR": "الإسم (عربي)",
+    "fullNameEN": "الإسم (إنجليزي)",
+
   "phone": "رقم الهاتف",
   "startDate": "تاريخ البدء",
   "selectDate": "اختر التاريخ",

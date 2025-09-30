@@ -74,4 +74,43 @@ class UserModel extends User {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  Map<String, dynamic> toTableRow() {
+    return {
+      'ID': id,
+      'المعرّف': id,
+      'Email': email,
+      'البريد الإلكتروني': email,
+      'First Name (EN)': firstNameEn,
+      'الاسم الأول (إنجليزي)': firstNameEn,
+      'Last Name (EN)': lastNameEn,
+      'اسم العائلة (إنجليزي)': lastNameEn,
+      'First Name (AR)': firstNameAr,
+      'الاسم الأول (عربي)': firstNameAr,
+      'Last Name (AR)': lastNameAr,
+      'اسم العائلة (عربي)': lastNameAr,
+      'Name (EN)': '$firstNameEn $lastNameEn',
+      'الإسم (إنجليزي)': '$firstNameEn $lastNameEn',
+      'Name (AR)': '$firstNameAr $lastNameAr',
+      'الإسم (عربي)': '$firstNameAr $lastNameAr',
+      'Phone': phone,
+      'رقم الهاتف': phone,
+      'Department': departmentId,
+      'القسم': departmentId,
+      'Position': positionId,
+      'الوظيفة': positionId,
+      'Status ID': statusId,
+      'الحالة': statusId,
+      'Report To': reportTo,
+      'المدير': reportTo,
+      'Language': languagePreference,
+      'اللغة': languagePreference,
+      'Timezone': timezone,
+      'المنطقة الزمنية': timezone,
+      'Created At': createdAt,
+      'تاريخ الإنشاء': createdAt,
+      'Updated At': updatedAt,
+      'تاريخ التحديث': updatedAt,
+    };
+  }
 }

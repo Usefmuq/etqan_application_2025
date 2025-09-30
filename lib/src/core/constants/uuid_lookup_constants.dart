@@ -28,6 +28,23 @@ class UuidLookupConstants {
       'color': AppPallete.rejectColor,
     },
   };
+  static const Map<String, Map<String, dynamic>> userStatusMap = {
+    '388e4fe0-1b39-4e9b-b6d0-c58d5f317b33': {
+      'en': 'Inactive',
+      'ar': 'غير نشط',
+      'color': AppPallete.inProgressColor,
+    },
+    '3beb63e3-42f2-4b85-aed9-64ca95a1426f': {
+      'en': 'Active',
+      'ar': 'نشط',
+      'color': AppPallete.completedColor,
+    },
+    '5705a545-7542-494f-afac-714c7ad858ef': {
+      'en': 'Suspended',
+      'ar': 'معلق',
+      'color': AppPallete.errorColor,
+    },
+  };
   static const Map<String, Map<String, dynamic>> approvalStatusMap = {
     '1968dba5-db7a-4d7c-bc5a-956dd2ff9d20': {
       'en': 'Pending',
@@ -59,5 +76,6 @@ class UuidLookupConstants {
   static final Map<String, Map<String, dynamic>> combinedLookup = {
     ...requestStatusMap,
     ...approvalStatusMap,
+    ...userStatusMap,
   };
 }
