@@ -19,8 +19,7 @@ class UsersManagerInputSection {
     required List<PermissionsView> permissionsView,
     required List<RolesModel> allRoles,
     required List<RolesModel> selectedRoles,
-    required TextEditingController titleController,
-    required TextEditingController contentController,
+    required TextEditingController notesController,
     required bool isWide,
     required bool isLockFieldsWithoutComment,
     List<RequestUnlockedFieldModel>? unlockedFields,
@@ -30,121 +29,111 @@ class UsersManagerInputSection {
     final locale = Intl.getCurrentLocale();
     final byRole = _groupByRole(permissionsView);
 
-    final usersManagerTitleField = serviceFields?.firstWhereOrNull(
-      (field) => field.fieldKey == 'usersManager_title',
-    );
-    final usersManagerContentField = serviceFields?.firstWhereOrNull(
-      (field) => field.fieldKey == 'usersManager_content',
+    final usersManagerNotesField = serviceFields?.firstWhereOrNull(
+      (field) => field.fieldKey == 'usersManager_notes',
     );
     return [
-      ...byRole.entries.map(
-        (e) => RoleCard(
-          roleId: e.key,
-          roleName: locale == 'ar' ? e.value.roleNameAr : e.value.roleNameEn,
-          permissions: e.value.permissions,
-          useAr: locale == 'ar',
-          departmentNames: null,
-        ),
+      Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        children: byRole.entries.map((e) {
+          return SizedBox(
+            width: isWide ? 300 : double.infinity,
+            height: 300, // 👈 force all cards same height
+            child: RoleCard(
+              roleId: e.key,
+              roleName:
+                  locale == 'ar' ? e.value.roleNameAr : e.value.roleNameEn,
+              permissions: e.value.permissions,
+              useAr: locale == 'ar',
+              departmentNames: null,
+            ),
+          );
+        }).toList(),
       ),
       const SizedBox(height: 20),
       Wrap(
         spacing: 16,
         runSpacing: 16,
         children: [
-          responsiveField(
-            CustomTextFormField(
-              controller: titleController,
-              readOnly: !canEdit(
-                usersManagerTitleField?.fieldKey ?? '',
-                isLockFieldsWithoutComment,
-                unlockedFields,
-              ),
-              isActive: usersManagerTitleField?.isActive ?? false,
-              hintText: locale == 'ar'
-                  ? (usersManagerTitleField?.fieldLabelAr ?? '')
-                  : (usersManagerTitleField?.fieldLabelEn ?? ''),
-              reviewerComment: unlockedFields
-                  ?.firstWhereOrNull(
-                    (e) => e.fieldKey == usersManagerTitleField?.fieldKey,
-                  )
-                  ?.reason,
-            ),
-            isWide,
+          CustomMultiCheckbox<RolesModel>(
+            title: 'الأدوار',
+            items: allRoles,
+            selectedItems: selectedRoles,
+            itemLabel: (r) => locale == 'ar' ? r.roleNameAr : r.roleNameEn,
+            itemId: (r) => r.roleId,
+            pageSize: 8,
+            searchHint: locale == 'ar' ? 'ابحث…' : 'Search…',
+            onChanged: (list) async {
+              final newSelected = List<RolesModel>.from(list);
+              final roleIds = newSelected.map((r) => r.roleId).toList();
+              final fetched = await fetchRolePermissionView(roleIds);
+
+              setState(() {
+                selectedRoles
+                  ..clear()
+                  ..addAll(newSelected);
+
+                // ✅ mutate the same object instead of reassigning the parameter
+                rolePermissionView
+                  ..clear()
+                  ..addAll(fetched);
+              });
+            },
+            // Optional trailing
+            trailingBuilder: (r) => const Icon(Icons.verified_user, size: 16),
           ),
-          responsiveField(
-            CustomMultiCheckbox<RolesModel>(
-              title: 'الأدوار',
-              items: allRoles,
-              selectedItems: selectedRoles,
-              itemLabel: (r) => locale == 'ar' ? r.roleNameAr : r.roleNameEn,
-              itemId: (r) => r.roleId,
-              pageSize: 8,
-              searchHint: locale == 'ar' ? 'ابحث…' : 'Search…',
-              onChanged: (list) async {
-                final newSelected = List<RolesModel>.from(list);
-                final roleIds = newSelected.map((r) => r.roleId).toList();
-                final fetched = await fetchRolePermissionView(roleIds);
+          if (rolePermissionView.isNotEmpty) ...[
+            Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: rolePermissionView
+                  .map((e) => e.roleId)
+                  .toSet() // distinct roleIds
+                  .map((rid) {
+                final perRole =
+                    rolePermissionView.where((r) => r.roleId == rid).toList();
+                final roleName = locale == 'ar'
+                    ? perRole.first.roleNameAr
+                    : perRole.first.roleNameEn;
 
-                setState(() {
-                  selectedRoles
-                    ..clear()
-                    ..addAll(newSelected);
-
-                  // ✅ mutate the same object instead of reassigning the parameter
-                  rolePermissionView
-                    ..clear()
-                    ..addAll(fetched);
-                });
-              },
-              // Optional trailing
-              trailingBuilder: (r) => const Icon(Icons.verified_user, size: 16),
+                return SizedBox(
+                  width: isWide ? 300 : double.infinity,
+                  height: 300, // 👈 fixed height for uniform cards
+                  child: RoleCard(
+                    roleId: rid,
+                    roleName: roleName,
+                    rolePermissions: perRole, // ✅ only this role’s rows
+                    useAr: locale == 'ar',
+                    departmentNames: null,
+                  ),
+                );
+              }).toList(),
             ),
-            isWide,
-          ),
-          if ((rolePermissionView?.isNotEmpty ?? false)) ...[
-            // One card per distinct role
-            ...rolePermissionView!
-                .map((e) => e.roleId)
-                .toSet() // distinct roleIds
-                .map((rid) {
-              final perRole =
-                  rolePermissionView!.where((r) => r.roleId == rid).toList();
-              print(rolePermissionView?.length);
-              final roleName = locale == 'ar'
-                  ? perRole.first.roleNameAr
-                  : perRole.first.roleNameEn;
-
-              return RoleCard(
-                roleId: rid,
-                roleName: roleName,
-                rolePermissions: perRole, // ✅ only this role’s rows
-                useAr: locale == 'ar',
-                departmentNames: null,
-              );
-            }),
           ],
-          responsiveField(
-            CustomTextFormField(
-              controller: contentController,
-              isActive: usersManagerContentField?.isActive ?? false,
-              hintText: locale == 'ar'
-                  ? (usersManagerContentField?.fieldLabelAr ?? '')
-                  : (usersManagerContentField?.fieldLabelEn ?? ''),
-              readOnly: !canEdit(
-                usersManagerContentField?.fieldKey ?? '',
-                isLockFieldsWithoutComment,
-                unlockedFields,
-              ),
-              maxLines: null,
-              reviewerComment: unlockedFields
-                  ?.firstWhereOrNull(
-                    (e) => e.fieldKey == usersManagerContentField?.fieldKey,
-                  )
-                  ?.reason,
-            ),
-            isWide,
-          ),
         ],
+      ),
+      responsiveField(
+        CustomTextFormField(
+          controller: notesController,
+          isActive: usersManagerNotesField?.isActive ?? false,
+          hintText: locale == 'ar'
+              ? (usersManagerNotesField?.fieldLabelAr ?? '')
+              : (usersManagerNotesField?.fieldLabelEn ?? ''),
+          readOnly: !canEdit(
+            usersManagerNotesField?.fieldKey ?? '',
+            isLockFieldsWithoutComment,
+            unlockedFields,
+          ),
+          maxLines: null,
+          required: usersManagerNotesField?.isRequired ?? false,
+          reviewerComment: unlockedFields
+              ?.firstWhereOrNull(
+                (e) => e.fieldKey == usersManagerNotesField?.fieldKey,
+              )
+              ?.reason,
+        ),
+        isWide,
       ),
     ];
   }

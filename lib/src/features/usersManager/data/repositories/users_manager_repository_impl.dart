@@ -52,6 +52,7 @@ class UsersManagerRepositoryImpl implements UsersManagerRepository {
         appliesToAllDepartments: appliesToAllDepartments,
         startAt: startAt,
         action: action,
+        notes: notes,
         createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
       );
       final insertedUsersManager = await usersManagerRemoteDataSource

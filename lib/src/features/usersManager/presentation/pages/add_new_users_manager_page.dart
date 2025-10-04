@@ -36,7 +36,6 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
   List<RolesModel> selectedRoles = [];
   List<RolePermissionViewModel> rolePermissionView = [];
   final TextEditingController notesController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<ServiceField> serviceFields = [];
   @override
@@ -87,26 +86,42 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
         return;
       }
       final createdById = userState.user.id;
-      context.read<UsersManagerBloc>().add(
-            UsersManagerSubmitEvent(
-              createdById: createdById,
-              notes: notesController.text.trim(),
-              userId: '',
-              roleId: '',
-              startAt: DateTime.now().toUtc().add(Duration(hours: 3)),
-              endAt: null,
-              action: '',
-              departmentId: '',
-              appliesToAllDepartments: true,
-            ),
-          );
+      print(notesController.text);
+      for (final userRole in selectedRoles) {
+        context.read<UsersManagerBloc>().add(
+              UsersManagerSubmitEvent(
+                createdById: createdById,
+                notes: notesController.text.trim(),
+                userId: widget.userId!,
+                roleId: userRole.roleId,
+                startAt: DateTime.now().toUtc().add(const Duration(hours: 3)),
+                endAt: null,
+                action: 'ADD',
+                departmentId: '',
+                appliesToAllDepartments: true,
+              ),
+            );
+      }
+
+      // context.read<UsersManagerBloc>().add(
+      //       UsersManagerSubmitEvent(
+      //         createdById: createdById,
+      //         notes: notesController.text.trim(),
+      //         userId: '',
+      //         roleId: '',
+      //         startAt: DateTime.now().toUtc().add(Duration(hours: 3)),
+      //         endAt: null,
+      //         action: '',
+      //         departmentId: '',
+      //         appliesToAllDepartments: true,
+      //       ),
+      //     );
     }
   }
 
   @override
   void dispose() {
     notesController.dispose();
-    contentController.dispose();
     super.dispose();
   }
 
@@ -162,8 +177,7 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
                           serviceFields: serviceFields,
                           isLockFieldsWithoutComment: false,
                           setState: setState,
-                          titleController: notesController,
-                          contentController: contentController,
+                          notesController: notesController,
                           isWide: isWide,
                           permissionsView: permissionsView ?? [],
                           allRoles: allRoles ?? [],

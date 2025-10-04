@@ -270,7 +270,6 @@ class _UsersManagerPageState extends State<UsersManagerPage>
                 positions: allPositions ?? [],
                 users: allUsers ?? [],
                 onEdit: (row) {
-                  print(row['ID']);
                   context.push('/usersManager/submit/${row['ID']}');
                 },
               ),

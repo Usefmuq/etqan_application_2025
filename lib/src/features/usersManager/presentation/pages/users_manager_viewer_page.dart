@@ -180,8 +180,7 @@ class _UsersManagerViewerPageState extends State<UsersManagerViewerPage> {
               permissions ?? [],
               PermissionsConstants.updateUsersManager,
             ) &&
-            usersManagerViewerPage != null &&
-            usersManagerViewerPage!.usersManagersView.toUsersManager() != null)
+            usersManagerViewerPage != null)
           IconButton(
             onPressed: _handleEdit,
             icon: const Icon(Icons.edit),
@@ -300,7 +299,7 @@ class _UsersManagerViewerPageState extends State<UsersManagerViewerPage> {
                                   requestUnlockedFields: requestUnlockedFields,
                                   context: context,
                                   requestId: usersManagerViewerPage!
-                                      .usersManagersView.requestId!,
+                                      .usersManagersView.requestId,
                                   onReturnForCorrection: (unlockedFields) {
                                     approveRequest(
                                       commentController: commentController,

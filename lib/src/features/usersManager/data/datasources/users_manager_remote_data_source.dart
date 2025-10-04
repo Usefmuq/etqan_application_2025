@@ -1,7 +1,10 @@
+import 'package:etqan_application_2025/src/core/common/entities/user_roles.dart';
+import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_master_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
+import 'package:etqan_application_2025/src/core/data/models/user_roles_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/models/users_manager_model.dart';
@@ -60,6 +63,22 @@ class UsersManagerRemoteDataSourceImpl implements UsersManagerRemoteDataSource {
       final approvals = (submitRes['approval'] as List)
           .map((j) => ApprovalSequenceViewModel.fromJson(j))
           .toList();
+      if (usersManagersView.requestStatusId ==
+          LookupConstants.requestStatusCompleted) {
+        await supabaseClient.from('userroles').insert(
+              UserRolesModel(
+                userId: usersManagersView.userId,
+                roleId: usersManagersView.roleId,
+                createdAt: usersManagersView.createdAt,
+                updatedAt: usersManagersView.updatedAt,
+                departmentId: usersManagersView.departmentId,
+                startDate: usersManagersView.startAt,
+                allDepartments: usersManagersView.appliesToAllDepartments,
+                endDate: usersManagersView.endAt,
+                assignedBy: usersManagersView.createdById,
+              ).toJson(),
+            );
+      }
 
       return UsersManagerViewerPageEntity(
         usersManagersView: usersManagersView,
