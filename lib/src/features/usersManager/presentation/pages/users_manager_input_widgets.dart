@@ -1,5 +1,6 @@
 import 'package:etqan_application_2025/src/core/common/entities/permissions_view.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_date_picker.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_multi_checkbox.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_text_form_field.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/responsive_field.dart';
@@ -24,6 +25,11 @@ class UsersManagerInputSection {
     required bool isLockFieldsWithoutComment,
     List<RequestUnlockedFieldModel>? unlockedFields,
     List<ServiceField>? serviceFields,
+    DateTime? startDate,
+    required DateTime? endDate,
+    required bool noEndDate,
+    required ValueChanged<DateTime> onEndDateChanged,
+    required ValueChanged<bool> onNoEndDateChanged,
     required List<RolePermissionViewModel> rolePermissionView,
   }) {
     final locale = Intl.getCurrentLocale();
@@ -31,6 +37,12 @@ class UsersManagerInputSection {
 
     final usersManagerNotesField = serviceFields?.firstWhereOrNull(
       (field) => field.fieldKey == 'usersManager_notes',
+    );
+    final usersManagerFieldStartDate = serviceFields?.firstWhereOrNull(
+      (field) => field.fieldKey == 'usersManager_startDate',
+    );
+    final usersManagerFieldEndDate = serviceFields?.firstWhereOrNull(
+      (field) => field.fieldKey == 'usersManager_endDate',
     );
     return [
       Wrap(
@@ -113,6 +125,58 @@ class UsersManagerInputSection {
           ],
         ],
       ),
+      const SizedBox(height: 20),
+      responsiveField(
+        CustomDatePicker(
+          label: locale == 'ar'
+              ? (usersManagerFieldStartDate?.fieldLabelAr ?? '')
+              : (usersManagerFieldStartDate?.fieldLabelEn ?? ''),
+          selectedDate: startDate,
+          onChanged: (date) => setState(() => startDate = date),
+          isActive: usersManagerFieldStartDate?.isActive ?? false,
+          readOnly: !canEdit(
+            usersManagerFieldStartDate?.fieldKey ?? '',
+            isLockFieldsWithoutComment,
+            unlockedFields,
+          ),
+          isRequired: usersManagerFieldStartDate?.isRequired ?? false,
+          reviewerComment: unlockedFields
+              ?.firstWhereOrNull(
+                (e) => e.fieldKey == usersManagerFieldStartDate?.fieldKey,
+              )
+              ?.reason,
+        ),
+        isWide,
+      ),
+      const SizedBox(height: 20),
+      responsiveField(
+        CustomDatePicker(
+          label: locale == 'ar'
+              ? (usersManagerFieldEndDate?.fieldLabelAr ?? '')
+              : (usersManagerFieldEndDate?.fieldLabelEn ?? ''),
+          selectedDate: endDate,
+          onChanged: onEndDateChanged,
+          isActive: usersManagerFieldEndDate?.isActive ?? false,
+          readOnly: !canEdit(
+            usersManagerFieldEndDate?.fieldKey ?? '',
+            isLockFieldsWithoutComment,
+            unlockedFields,
+          ),
+          isRequired: usersManagerFieldEndDate?.isRequired ?? false,
+          reviewerComment: unlockedFields
+              ?.firstWhereOrNull(
+                (e) => e.fieldKey == usersManagerFieldEndDate?.fieldKey,
+              )
+              ?.reason,
+          noEndDate: noEndDate,
+          showNoEndDateToggle: true,
+          onNoEndDateChanged: (val) {
+            onNoEndDateChanged(val); // -> updates parent state
+          },
+        ),
+        isWide,
+      ),
+      const SizedBox(height: 20),
       responsiveField(
         CustomTextFormField(
           controller: notesController,
@@ -135,6 +199,7 @@ class UsersManagerInputSection {
         ),
         isWide,
       ),
+      const SizedBox(height: 20),
     ];
   }
 

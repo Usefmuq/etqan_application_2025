@@ -26,6 +26,7 @@
   "approve": "Approve",
     "fieldIsRequired": "Field Is Required",
   "reason": "Reason",
+  "noDate": "Make date empty",
 
   "pendingApproval": "Pending Approvals",
   "approveRequestFor": "Approve request for",

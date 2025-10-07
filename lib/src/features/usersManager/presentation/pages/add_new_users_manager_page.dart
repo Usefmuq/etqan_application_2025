@@ -36,6 +36,8 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
   List<RolesModel> selectedRoles = [];
   List<RolePermissionViewModel> rolePermissionView = [];
   final TextEditingController notesController = TextEditingController();
+  DateTime? endDate;
+  bool noEndDate = false;
   final formKey = GlobalKey<FormState>();
   List<ServiceField> serviceFields = [];
   @override
@@ -95,7 +97,7 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
                 userId: widget.userId!,
                 roleId: userRole.roleId,
                 startAt: DateTime.now().toUtc().add(const Duration(hours: 3)),
-                endAt: null,
+                endAt: endDate,
                 action: 'ADD',
                 departmentId: '',
                 appliesToAllDepartments: true,
@@ -183,6 +185,13 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
                           allRoles: allRoles ?? [],
                           selectedRoles: selectedRoles,
                           rolePermissionView: rolePermissionView,
+                          endDate: endDate,
+                          noEndDate: noEndDate,
+                          onEndDateChanged: (d) => setState(() => endDate = d),
+                          onNoEndDateChanged: (v) => setState(() {
+                            noEndDate = v;
+                            if (v) endDate = null;
+                          }),
                         ),
                         const SizedBox(height: 40),
                         const SizedBox(height: 40),

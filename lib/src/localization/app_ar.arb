@@ -24,6 +24,7 @@
   "approve": "موافقة",
   "fieldIsRequired": "الحقل مطلوب",
   "reason": "السبب",
+  "noDate": "جعل التاريخ فارغ",
   "pendingApproval": "الموافقات المعلقة",
     "approveRequestFor": "الموافقة على طلب",
 
