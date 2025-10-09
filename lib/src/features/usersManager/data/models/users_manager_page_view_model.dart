@@ -339,4 +339,39 @@ class UsersManagerPageViewModel extends UsersManagerPageView {
       updatedAt: updatedAt,
     );
   }
+
+  Map<String, dynamic> toTableRow() {
+    return {
+      'Request ID': requestId,
+      'رقم الطلب': requestId,
+      'User': fullNameEn ?? userId,
+      'المستخدم': fullNameAr ?? userId,
+      'Role': roleNameEn ?? '—',
+      'الدور': roleNameAr ?? '—',
+      'Action': action,
+      'الإجراء': action == 'ADD' ? 'إضافة' : 'إزالة',
+      'Department': departmentNameEn ?? '—',
+      'القسم': departmentNameAr ?? '—',
+      'Applies to All Departments': appliesToAllDepartments ? 'Yes' : 'No',
+      'ينطبق على جميع الأقسام': appliesToAllDepartments ? 'نعم' : 'لا',
+      'Start At': startAt.toString(),
+      'تاريخ البدء': startAt.toString(),
+      'End At': endAt?.toString() ?? '—',
+      'تاريخ النهاية': endAt?.toString() ?? '—',
+      'Notes': notes ?? '',
+      'ملاحظات': notes ?? '',
+      'Created By': fullNameEn ?? createdById,
+      'أنشئ بواسطة': fullNameAr ?? createdById,
+      'Created At': createdAt.toString(),
+      'تاريخ الإنشاء': createdAt.toString(),
+      'Updated At': updatedAt.toString(),
+      'تاريخ التحديث': updatedAt.toString(),
+      'Status': requestStatusId,
+      'الحالة': requestStatusId,
+      'Priority': priorityEn ?? '—',
+      'الأولوية': priorityAr ?? '—',
+      'Service': serviceNameEn ?? '—',
+      'الخدمة': serviceNameAr ?? '—',
+    };
+  }
 }

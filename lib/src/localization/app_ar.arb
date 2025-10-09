@@ -14,6 +14,10 @@
   "back": "رجوع",
     "settings": "الاعدادات",
     "logout": "تسجيل خروج",
+    "user": "المستخدم",
+    "allUsers": "جميع المستخدمين",
+    "role": "الدور",
+    "action": "الإجراء",
 
   "edit": "تعديل",
   "noPermission": "لا تملك الصلاحيات",
@@ -81,6 +85,7 @@
   "usersManagersServiceSubtitle": "هذه خدمة إدارة المستخدمين",
   "usersManagerSubmitNew": "تقديم طلب جديد لخدمة إدارة المستخدمين",
   "usersManagerUpdate": "تحديث إدارة المستخدمين",
+  "usersManagerPermsRequests": "طلبات صلاحيات المستخدمين",
 
 
   "submitOnboarding": "إرسال بيانات التوظيف",
@@ -94,6 +99,7 @@
 
   "phone": "رقم الهاتف",
   "startDate": "تاريخ البدء",
+  "endDate": "تاريخ النهاية",
   "selectDate": "اختر التاريخ",
   "startDateValid": "يرجى اختيار تاريخ البدء",
   "notes": "ملاحظات",

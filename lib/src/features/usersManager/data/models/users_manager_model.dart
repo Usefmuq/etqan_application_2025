@@ -117,4 +117,39 @@ class UsersManagerModel extends UsersManager {
       updatedAt: updatedAt,
     );
   }
+
+  Map<String, dynamic> toTableRow() {
+    return {
+      'Request ID': requestId,
+      'رقم الطلب': requestId,
+      'User ID': userId,
+      'المستخدم': userId,
+      'Role ID': roleId,
+      'الدور': roleId,
+      'Action': action,
+      'الإجراء': action,
+      'Applies to All Departments': appliesToAllDepartments ? 'Yes' : 'No',
+      'ينطبق على جميع الأقسام': appliesToAllDepartments ? 'نعم' : 'لا',
+      'Department ID': departmentId ?? '—',
+      'القسم': departmentId ?? '—',
+      'Start At': startAt.toString(),
+      'تاريخ البداية': startAt.toString(),
+      'End At': endAt?.toString() ?? '—',
+      'تاريخ النهاية': endAt?.toString() ?? '—',
+      'Terminated By': terminatedBy ?? '—',
+      'تم الإنهاء بواسطة': terminatedBy ?? '—',
+      'Terminated At': terminatedAt?.toString() ?? '—',
+      'تاريخ الإنهاء': terminatedAt?.toString() ?? '—',
+      'Termination Reason': terminationReason ?? '',
+      'سبب الإنهاء': terminationReason ?? '',
+      'Notes': notes ?? '',
+      'ملاحظات': notes ?? '',
+      'Created By': createdById,
+      'أنشأ بواسطة': createdById,
+      'Created At': createdAt.toString(),
+      'تاريخ الإنشاء': createdAt.toString(),
+      'Updated At': updatedAt.toString(),
+      'تاريخ التحديث': updatedAt.toString(),
+    };
+  }
 }

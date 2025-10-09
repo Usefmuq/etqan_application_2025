@@ -17,7 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-enum _TabKind { my, employees, department, all }
+enum _TabKind { my, all }
 
 class UsersManagerPage extends StatefulWidget {
   static route() => MaterialPageRoute(
@@ -84,12 +84,8 @@ class _UsersManagerPageState extends State<UsersManagerPage>
   }
 
   void _setupTabsAndController() {
-    final isDepManager = userDepartment?.managerId == userDetails?.id;
-
     final kinds = <_TabKind>[
       _TabKind.my,
-      _TabKind.employees,
-      if (isDepManager) _TabKind.department,
       if (isUserHasPermissionsView(
           permissions ?? [], PermissionsConstants.updateUsersManager))
         _TabKind.all,
@@ -111,8 +107,6 @@ class _UsersManagerPageState extends State<UsersManagerPage>
 
         final selectedKind = _tabKinds[_tabController!.index];
         setState(() {
-          isManagerExpanded = (selectedKind == _TabKind.employees);
-          isDepartmentManagerExpanded = (selectedKind == _TabKind.department);
           isViewAll = (selectedKind == _TabKind.all);
         });
 
@@ -184,16 +178,16 @@ class _UsersManagerPageState extends State<UsersManagerPage>
       tabs: _tabsFromKinds(context, _tabKinds),
       bodyPerTab: bodyPerTab,
       tilteActions: [
-        if (isUserHasPermissionsView(
-          permissions ?? [],
-          PermissionsConstants.addUsersManager,
-        ))
-          IconButton(
-            onPressed: () {
-              context.push('/usersManager/submit/');
-            },
-            icon: const Icon(Icons.add),
-          ),
+        // if (isUserHasPermissionsView(
+        //   permissions ?? [],
+        //   PermissionsConstants.addUsersManager,
+        // ))
+        //   IconButton(
+        //     onPressed: () {
+        //       context.push('/usersManager/submit/');
+        //     },
+        //     icon: const Icon(Icons.add),
+        //   ),
       ],
       body: [],
     );
@@ -204,13 +198,9 @@ class _UsersManagerPageState extends State<UsersManagerPage>
     return kinds.map((k) {
       switch (k) {
         case _TabKind.my:
-          return Tab(text: l10n.myRequests);
-        case _TabKind.employees:
-          return Tab(text: l10n.employees);
-        case _TabKind.department:
-          return Tab(text: l10n.department);
+          return Tab(text: l10n.usersManager);
         case _TabKind.all:
-          return Tab(text: l10n.all);
+          return Tab(text: l10n.usersManagerPermsRequests);
       }
     }).toList();
   }
@@ -246,35 +236,70 @@ class _UsersManagerPageState extends State<UsersManagerPage>
           if (allUsers == null) {
             return Center(child: Text(AppLocalizations.of(context)!.noResults));
           }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomSectionTitle(
-                title:
-                    'AppLocalizations.of(context)!.approvalSequence) list of all users',
-              ),
-              CustomTableGrid(
-                headers: [
-                  AppLocalizations.of(context)!.email,
-                  AppLocalizations.of(context)!.fullNameAR,
-                  AppLocalizations.of(context)!.fullNameEN,
-                  AppLocalizations.of(context)!.phone,
-                  AppLocalizations.of(context)!.department,
-                  AppLocalizations.of(context)!.position,
-                  AppLocalizations.of(context)!.status,
-                  AppLocalizations.of(context)!.manager,
-                ],
-                rows: allUsers!.map((u) => u.toTableRow()).toList(),
-                useChipsForStatus: true,
-                departments: allDepartments ?? [],
-                positions: allPositions ?? [],
-                users: allUsers ?? [],
-                onEdit: (row) {
-                  context.push('/usersManager/submit/${row['ID']}');
-                },
-              ),
-            ],
-          );
+          if (_tabKinds[_tabController!.index] == _TabKind.my) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomSectionTitle(
+                  title: AppLocalizations.of(context)!.allUsers,
+                ),
+                CustomTableGrid(
+                  headers: [
+                    AppLocalizations.of(context)!.email,
+                    AppLocalizations.of(context)!.fullNameAR,
+                    AppLocalizations.of(context)!.fullNameEN,
+                    AppLocalizations.of(context)!.phone,
+                    AppLocalizations.of(context)!.department,
+                    AppLocalizations.of(context)!.position,
+                    AppLocalizations.of(context)!.status,
+                    AppLocalizations.of(context)!.manager,
+                  ],
+                  rows: allUsers!.map((u) => u.toTableRow()).toList(),
+                  useChipsForStatus: true,
+                  departments: allDepartments ?? [],
+                  positions: allPositions ?? [],
+                  users: allUsers ?? [],
+                  enableRowTap: true,
+                  onRowPressed: (row) {
+                    context.push('/usersManager/submit/${row['ID']}');
+                  },
+                ),
+              ],
+            );
+          } else if (_tabKinds[_tabController!.index] == _TabKind.all) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomSectionTitle(
+                  title:
+                      AppLocalizations.of(context)!.usersManagerPermsRequests,
+                ),
+                CustomTableGrid(
+                  headers: [
+                    AppLocalizations.of(context)!.requestId,
+                    AppLocalizations.of(context)!.user,
+                    AppLocalizations.of(context)!.role,
+                    AppLocalizations.of(context)!.action,
+                    AppLocalizations.of(context)!.startDate,
+                    AppLocalizations.of(context)!.endDate,
+                    AppLocalizations.of(context)!.createdBy,
+                    AppLocalizations.of(context)!.status,
+                  ],
+                  rows: state.usersManagerPage.usersManagersView
+                      .map((u) => u.toTableRow())
+                      .toList(),
+                  useChipsForStatus: true,
+                  departments: allDepartments ?? [],
+                  positions: allPositions ?? [],
+                  users: allUsers ?? [],
+                  enableRowTap: true,
+                  onRowPressed: (row) {
+                    context.push('/usersManager/${row['Request ID']}');
+                  },
+                ),
+              ],
+            );
+          }
         }
 
         return const SizedBox();

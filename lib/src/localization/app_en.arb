@@ -15,6 +15,11 @@
   "back": "Back",
   "settings": "Settings",
       "logout": "Logout",
+    "user": "User",
+        "allUsers": "All users",
+
+    "role": "Role",
+    "action": "Action",
 
   "edit": "Edit",
     "noPermission": "You don't have permission",
@@ -87,6 +92,7 @@
   "usersManagersServiceSubtitle": "Service to manage users",
   "usersManagerSubmitNew": "تقديم طلب جديد لخدمة إدارة المستخدمين",
   "usersManagerUpdate": "تحديث إدارة المستخدمين",
+  "usersManagerPermsRequests": "Users permission requests",
 
 
 
@@ -100,6 +106,8 @@
     "fullNameEN": "Name (EN)",
   "phone": "Phone",
   "startDate": "Start Date",
+    "endDate": "End Date",
+
   "selectDate": "Select Date",
   "startDateValid": "Please select a start date",
   "notes": "Notes",

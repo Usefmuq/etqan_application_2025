@@ -1,4 +1,3 @@
-import 'package:etqan_application_2025/src/core/common/entities/user_roles.dart';
 import 'package:etqan_application_2025/src/core/constants/lookup_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';

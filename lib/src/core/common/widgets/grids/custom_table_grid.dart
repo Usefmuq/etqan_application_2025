@@ -19,10 +19,14 @@ class CustomTableGrid extends StatefulWidget {
 
   final int rowsPerPage;
 
-  /// NEW: pre-fetched lookup lists
+  /// Pre-fetched lookup lists
   final List<Departments> departments;
   final List<UserModel> users;
   final List<Positions> positions;
+
+  /// Row tap behavior
+  final bool enableRowTap;
+  final Function(Map<String, dynamic> row)? onRowPressed;
 
   const CustomTableGrid({
     super.key,
@@ -33,11 +37,11 @@ class CustomTableGrid extends StatefulWidget {
     this.onDelete,
     this.onApprove,
     this.rowsPerPage = 10,
-
-    // lookups injected (can be empty lists)
     this.departments = const [],
     this.users = const [],
     this.positions = const [],
+    this.enableRowTap = false,
+    this.onRowPressed,
   });
 
   @override
@@ -96,24 +100,26 @@ class _CustomTableGridState extends State<CustomTableGrid> {
   bool _isUuid(dynamic v) =>
       v is String && RegExp(r'^[0-9a-fA-F\-]{36}$').hasMatch(v);
 
-  /// Very simple header-based routing. Tweak to your headers.
   String? _kindForKey(String columnKey) {
     final k = columnKey.toLowerCase();
     if (k.contains('department') || k.contains('القسم')) return 'dept';
     if (k.contains('position') || k.contains('الوظيفة')) return 'pos';
     if (k.contains('user') ||
         k.contains('created by') ||
-        k.contains('المدير') ||
         k.contains('created_by') ||
         k.contains('report to') ||
-        k.contains('report_to')) {
+        k.contains('report_to') ||
+        k.contains('المدير')) {
       return 'user';
     }
     return null;
   }
 
   String? _localized(
-      Map<String, Map<String, String>> map, String id, String locale) {
+    Map<String, Map<String, String>> map,
+    String id,
+    String locale,
+  ) {
     final o = map[id];
     if (o == null) return null;
     return (locale == 'ar' ? o['ar'] : o['en']) ?? o['en'];
@@ -143,7 +149,7 @@ class _CustomTableGridState extends State<CustomTableGrid> {
           : Text(label);
     }
 
-    // 2) UUIDs → try departments / positions / users maps depending on column header
+    // 2) UUIDs → try department / position / user maps
     if (_isUuid(value)) {
       final kind = _kindForKey(columnKey);
       if (kind == 'dept') {
@@ -164,7 +170,6 @@ class _CustomTableGridState extends State<CustomTableGrid> {
           overflow: TextOverflow.ellipsis,
         );
       }
-      // unknown UUID kind → just print raw
       return Text(value);
     }
 
@@ -186,13 +191,109 @@ class _CustomTableGridState extends State<CustomTableGrid> {
         widget.onDelete != null ||
         widget.onApprove != null;
 
+    final showArrowColumn = widget.enableRowTap;
+
+    final dataTable = DataTable(
+      showCheckboxColumn: false,
+      headingRowColor: MaterialStateProperty.all(Colors.grey.shade100),
+      sortColumnIndex: _sortColumnIndex,
+      sortAscending: _sortAscending,
+      columns: [
+        ...widget.headers.asMap().entries.map((entry) {
+          final index = entry.key;
+          final label = entry.value;
+          return DataColumn(
+            label: InkWell(
+              onTap: () {
+                _sortColumnIndex = index;
+                _sortRows(label);
+              },
+              child: Row(
+                children: [
+                  Text(label,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (_sortColumnIndex == index)
+                    Icon(_sortAscending
+                        ? Icons.arrow_drop_up
+                        : Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+          );
+        }),
+        if (hasActions)
+          const DataColumn(
+            label: Text(
+              'Actions',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        if (showArrowColumn)
+          const DataColumn(
+            label: SizedBox.shrink(), // arrow column header
+          ),
+      ],
+      rows: _pagedRows.map((row) {
+        return DataRow(
+          color: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.hovered)) {
+              return Colors.grey.withOpacity(0.06); // full-row hover tint
+            }
+            return null;
+          }),
+          onSelectChanged: (widget.enableRowTap && widget.onRowPressed != null)
+              ? (_) => widget.onRowPressed!(row) // row-wide tap
+              : null,
+          cells: [
+            ...widget.headers.map(
+              (key) => DataCell(_formatValue(context, key, row[key])),
+            ),
+            if (hasActions)
+              DataCell(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.onEdit != null)
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 18),
+                        tooltip: 'Edit',
+                        onPressed: () => widget.onEdit!(row),
+                      ),
+                    if (widget.onApprove != null)
+                      IconButton(
+                        icon: const Icon(Icons.check_circle_outline, size: 18),
+                        tooltip: 'Approve',
+                        onPressed: () => widget.onApprove!(row),
+                      ),
+                    if (widget.onDelete != null)
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 18),
+                        tooltip: 'Delete',
+                        onPressed: () => widget.onDelete!(row),
+                      ),
+                  ],
+                ),
+              ),
+            if (showArrowColumn)
+              const DataCell(
+                Align(
+                  alignment: Alignment.centerRight,
+                  child:
+                      Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                ),
+              ),
+          ],
+        );
+      }).toList(),
+    );
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              maxHeight: 500,
+              maxHeight: 600,
               minWidth: constraints.maxWidth,
             ),
             child: IntrinsicHeight(
@@ -202,87 +303,17 @@ class _CustomTableGridState extends State<CustomTableGrid> {
                   Flexible(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
-                      child: DataTable(
-                        showCheckboxColumn: false,
-                        headingRowColor:
-                            WidgetStateProperty.all(Colors.grey.shade100),
-                        sortColumnIndex: _sortColumnIndex,
-                        sortAscending: _sortAscending,
-                        columns: [
-                          ...widget.headers.asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final label = entry.value;
-                            return DataColumn(
-                              label: InkWell(
-                                onTap: () {
-                                  _sortColumnIndex = index;
-                                  _sortRows(label);
-                                },
-                                child: Row(
-                                  children: [
-                                    Text(label,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    if (_sortColumnIndex == index)
-                                      Icon(_sortAscending
-                                          ? Icons.arrow_drop_up
-                                          : Icons.arrow_drop_down),
-                                  ],
-                                ),
-                              ),
-                            );
+                      child: DataTableTheme(
+                        data: DataTableThemeData(
+                          dataRowColor:
+                              MaterialStateProperty.resolveWith((states) {
+                            if (states.contains(MaterialState.hovered)) {
+                              return Colors.grey.withOpacity(0.06);
+                            }
+                            return null;
                           }),
-                          if (hasActions)
-                            const DataColumn(
-                              label: Text(
-                                'Actions',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                        ],
-                        rows: _pagedRows.map((row) {
-                          return DataRow(
-                            cells: [
-                              ...widget.headers.map(
-                                (key) => DataCell(
-                                  _formatValue(context, key, row[key]),
-                                ),
-                              ),
-                              if (hasActions)
-                                DataCell(
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      if (widget.onEdit != null)
-                                        IconButton(
-                                          icon:
-                                              const Icon(Icons.edit, size: 18),
-                                          tooltip: 'Edit',
-                                          onPressed: () => widget.onEdit!(row),
-                                        ),
-                                      if (widget.onApprove != null)
-                                        IconButton(
-                                          icon: const Icon(
-                                              Icons.check_circle_outline,
-                                              size: 18),
-                                          tooltip: 'Approve',
-                                          onPressed: () =>
-                                              widget.onApprove!(row),
-                                        ),
-                                      if (widget.onDelete != null)
-                                        IconButton(
-                                          icon: const Icon(Icons.delete_outline,
-                                              size: 18),
-                                          tooltip: 'Delete',
-                                          onPressed: () =>
-                                              widget.onDelete!(row),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                            ],
-                          );
-                        }).toList(),
+                        ),
+                        child: dataTable,
                       ),
                     ),
                   ),
