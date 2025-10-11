@@ -1,6 +1,7 @@
 import 'package:etqan_application_2025/init_dependencies.dart';
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/bloc/attendance_bloc.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/presentation/bloc/home_screen_bloc.dart';
@@ -44,6 +45,9 @@ void main() async {
       ),
       BlocProvider(
         create: (_) => serviceLocator<UsersManagerBloc>(),
+      ),
+      BlocProvider(
+        create: (_) => serviceLocator<AttendanceBloc>(),
       ),
       BlocProvider(
         create: (_) => serviceLocator<HomeScreenBloc>(),

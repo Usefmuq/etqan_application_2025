@@ -1,5 +1,10 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/theme/theme.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/add_new_attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/update_attendance_page.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_new_blog_page.dart';
@@ -175,6 +180,40 @@ class MyAppState extends State<MyApp> {
             }
             final requestId = int.tryParse(state.pathParameters['id'] ?? '');
             return UsersManagerViewerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/attendance',
+          builder: (context, state) {
+            return AttendancePage();
+          },
+        ),
+        GoRoute(
+          path: '/attendance/submit',
+          builder: (context, state) {
+            return AddNewAttendancePage();
+          },
+        ),
+        GoRoute(
+          path: '/attendance/update/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as AttendanceViewerPageEntity;
+              return UpdateAttendancePage(initialAttendanceViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateAttendancePage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/attendance/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as AttendanceViewerPageEntity;
+              return AttendanceViewerPage(initialAttendanceViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return AttendanceViewerPage(requestId: requestId!);
           },
         ),
         GoRoute(

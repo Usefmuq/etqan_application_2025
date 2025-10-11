@@ -88,6 +88,16 @@
   "usersManagerPermsRequests": "طلبات صلاحيات المستخدمين",
 
 
+  "attendance": "تحضير",
+  "attendanceTitle": "عنوان التحضير",
+  "attendanceContent": "محتوى التحضير",
+  "attendanceDetails": "تفاصيل التحضير",
+  "attendancesService": "خدمة المدونات",
+  "attendancesServiceSubtitle": "هذه خدمة المدونات",
+  "attendanceSubmitNew": "تقديم طلب جديد لخدمة التحضير",
+  "attendanceUpdate": "تحديث تحضير",
+
+
   "submitOnboarding": "إرسال بيانات التوظيف",
   "updateOnboarding": "تحديث بيانات التوظيف",
   "firstNameEN": "الاسم الأول (إنجليزي)",
@@ -96,6 +106,7 @@
   "lastNameAR": "اسم العائلة (عربي)",
     "fullNameAR": "الإسم (عربي)",
     "fullNameEN": "الإسم (إنجليزي)",
+
 
   "phone": "رقم الهاتف",
   "startDate": "تاريخ البدء",

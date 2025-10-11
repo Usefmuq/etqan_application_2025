@@ -9,6 +9,15 @@ import 'package:etqan_application_2025/src/core/network/connection_checker.dart'
 import 'package:etqan_application_2025/src/core/supabase/supabase_conf.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_permissions.dart';
 import 'package:etqan_application_2025/src/core/usecase/get_user_roles.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/datasources/attendance_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/repositories/attendance_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/approve_attendance.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/fetch_attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/get_all_attendances.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/submit_attendance.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/update_attendance.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/bloc/attendance_bloc.dart';
 import 'package:etqan_application_2025/src/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/auth/domain/repository/auth_repository.dart';
@@ -57,6 +66,7 @@ Future<void> initdependencies() async {
   _intitHomeScreen();
   _intitBlog();
   _intitUsersManager();
+  _intitAttendance();
   _intitOnboarding();
   final supabase = await Supabase.initialize(
     url: SupabaseConf.supabaseUrl,
@@ -247,6 +257,58 @@ void _intitUsersManager() {
         updateUsersManager: serviceLocator(),
         approveUsersManager: serviceLocator(),
         getAllUsersManagers: serviceLocator(),
+      ),
+    );
+}
+
+void _intitAttendance() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<AttendanceRemoteDataSource>(
+      () => AttendanceRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<AttendanceRepository>(
+      () => AttendanceRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitAttendance(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateAttendance(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllAttendances(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchAttendancePage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveAttendance(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => AttendanceBloc(
+        submitAttendance: serviceLocator(),
+        updateAttendance: serviceLocator(),
+        approveAttendance: serviceLocator(),
+        getAllAttendances: serviceLocator(),
       ),
     );
 }

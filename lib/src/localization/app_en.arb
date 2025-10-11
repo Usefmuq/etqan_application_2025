@@ -94,7 +94,14 @@
   "usersManagerUpdate": "تحديث إدارة المستخدمين",
   "usersManagerPermsRequests": "Users permission requests",
 
-
+    "attendance": "Attendance",
+    "attendanceTitle": "Attendance Title",
+    "attendanceContent": "attendance Content",
+    "attendanceDetails": "attendance Details",
+    "attendancesService": "attendances Service",
+    "attendancesServiceSubtitle": "here is attendance service",
+    "attendanceSubmitNew": "Submit new request for attendance service",
+    "attendanceUpdate": "Update attendance",
 
   "submitOnboarding": "Submit New Onboarding",
   "updateOnboarding": "Update Onboarding",

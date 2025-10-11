@@ -18,4 +18,9 @@ class PermissionsConstants {
   static const String addUsersManager = "add_users_manager";
   static const String updateUsersManager = "update_users_manager";
   static const String approveUsersManager = "approve_users_manager";
+  // attendance Permissions
+  static const String viewAttendance = "view_attendance";
+  static const String addAttendance = "add_attendance";
+  static const String updateAttendance = "update_attendance";
+  static const String approveAttendance = "approve_attendance";
 }
