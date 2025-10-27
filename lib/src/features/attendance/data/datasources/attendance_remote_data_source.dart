@@ -4,14 +4,14 @@ import 'package:etqan_application_2025/src/core/data/models/request_master_model
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
-import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class AttendanceRemoteDataSource {
   Future<AttendanceViewerPageEntity> submitAttendance(
-      AttendanceModel attendance, RequestMasterModel request);
+      AttendanceSessionModel attendance, RequestMasterModel request);
   Future<AttendanceViewerPageEntity> updateAttendance(
     AttendancesPageViewModel attendance,
     String updatedBy,
@@ -39,7 +39,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   AttendanceRemoteDataSourceImpl(this.supabaseClient);
   @override
   Future<AttendanceViewerPageEntity> submitAttendance(
-    AttendanceModel attendance,
+    AttendanceSessionModel attendance,
     RequestMasterModel request,
   ) async {
     try {

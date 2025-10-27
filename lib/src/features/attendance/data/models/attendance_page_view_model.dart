@@ -1,5 +1,5 @@
 // attendances_page_view_model.dart
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_session.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendances_page_view.dart';
 
 class AttendancesPageViewModel extends AttendancesPageView {
@@ -197,18 +197,18 @@ class AttendancesPageViewModel extends AttendancesPageView {
     );
   }
 
-  Attendance? toAttendance() {
-    return Attendance(
-      id: attendanceId ?? "",
-      createdById: createdById ?? "",
-      updatedAt:
-          attendanceUpdatedAt ?? DateTime.now().toUtc().add(Duration(hours: 3)),
-      status: status ?? "",
-      requestId: requestId ?? 0,
-      isActive: isActive ?? true,
-      title: title ?? "",
-      content: content ?? "",
-      topics: topics ?? [],
-    );
-  }
+  // AttendanceSession? toAttendance() {
+  //   return AttendanceSession(
+  //     id: attendanceId ?? "",
+  //     createdById: createdById ?? "",
+  //     updatedAt:
+  //         attendanceUpdatedAt ?? DateTime.now().toUtc().add(Duration(hours: 3)),
+  //     status: status ?? "",
+  //     requestId: requestId ?? 0,
+  //     isActive: isActive ?? true,
+  //     title: title ?? "",
+  //     content: content ?? "",
+  //     topics: topics ?? [],
+  //   );
+  // }
 }

@@ -23,6 +23,9 @@ dependencies:
   dotted_border: ^2.1.0
   internet_connection_checker_plus: ^2.7.0
   animated_custom_dropdown: 3.1.1
+  google_maps_flutter: ^2.6.1
+  geolocator: ^12.0.0
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

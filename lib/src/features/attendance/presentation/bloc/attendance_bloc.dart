@@ -2,6 +2,7 @@ import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/data/models/approval_sequence_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/approve_attendance.dart';
@@ -41,12 +42,7 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     Emitter<AttendanceState> emit,
   ) async {
     final response = await _submitAttendance(SubmitAttendanceParams(
-      createdById: event.createdById,
-      // status: event.status,
-      // requestId: event.requestId,
-      title: event.title,
-      content: event.content,
-      topics: event.topics,
+      attendance: event.attendance,
     ));
     response.fold(
       (failure) => emit(AttendanceFailure(failure.message)),

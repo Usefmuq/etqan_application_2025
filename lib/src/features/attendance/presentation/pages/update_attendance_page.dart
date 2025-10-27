@@ -44,7 +44,6 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
   final TextEditingController titleControler = TextEditingController();
   final TextEditingController contentControler = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  List<String> selectedTopics = [];
   String userId = '';
   List<ServiceField> serviceFields = [];
 
@@ -53,7 +52,6 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
     super.initState();
     if (widget.initialAttendanceViewerPage != null) {
       attendanceViewerPage = widget.initialAttendanceViewerPage!;
-      selectedTopics = attendanceViewerPage!.attendancesView.topics!;
       titleControler.text = attendanceViewerPage!.attendancesView.title!;
       contentControler.text = attendanceViewerPage!.attendancesView.content!;
     } else if (widget.requestId != null) {
@@ -98,7 +96,6 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
         setState(() {
           attendanceViewerPage = fetch;
           unlockedFields = fetchedUnlockedFields;
-          selectedTopics = attendanceViewerPage!.attendancesView.topics!;
           titleControler.text = attendanceViewerPage!.attendancesView.title!;
           contentControler.text =
               attendanceViewerPage!.attendancesView.content!;
@@ -110,21 +107,12 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
   void _updateAttendance() {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    if (selectedTopics.isEmpty) {
-      SmartNotifier.warning(
-        context,
-        title: AppLocalizations.of(context)!.error,
-        message: AppLocalizations.of(context)!.fieldIsRequired,
-      );
-      return;
-    }
     context.read<AttendanceBloc>().add(
           AttendanceUpdateEvent(
             attendanceViewerPage:
                 attendanceViewerPage!.attendancesView.copyWith(
               title: titleControler.text,
               content: contentControler.text,
-              topics: selectedTopics,
             ),
             updatedBy: userId,
           ),
@@ -191,7 +179,6 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
                           isLockFieldsWithoutComment:
                               isLockFieldsWithoutComment,
                           setState: setState,
-                          selectedTopics: selectedTopics,
                           // onToggleTopic: (topic) {
                           //   setState(() {
                           //     selectedTopics.contains(topic)

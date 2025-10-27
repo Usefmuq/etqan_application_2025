@@ -5,10 +5,13 @@ import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
 import 'package:etqan_application_2025/src/core/constants/services_constants.dart';
+import 'package:etqan_application_2025/src/core/constants/settings_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
+import 'package:etqan_application_2025/src/core/utils/calculate_utils.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/bloc/attendance_bloc.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_input_widgets.dart';
 import 'package:flutter/material.dart';
@@ -30,9 +33,10 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  List<String> selectedTopics = [];
   List<ServiceField> serviceFields = [];
-
+  double? _lat;
+  double? _lng;
+  double? distanceMeters;
   @override
   void initState() {
     super.initState();
@@ -59,19 +63,23 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
     });
   }
 
+  void _handleLatLng(double lat, double lng) {
+    setState(() {
+      _lat = lat;
+      _lng = lng;
+      distanceMeters = distanceMetersNullable(
+        lat1: _lat,
+        lng1: _lng,
+        lat2: SettingsConstants.attendanceSiteLat,
+        lng2: SettingsConstants.attendanceSiteLng,
+      );
+      print("$_lat $lng");
+    });
+  }
+
   void _submitAttendance() {
     final isValid = formKey.currentState?.validate() ?? false;
     if (!isValid) return;
-
-    if (selectedTopics.isEmpty) {
-      SmartNotifier.warning(
-        context,
-        title: AppLocalizations.of(context)!.error,
-        message: AppLocalizations.of(context)!
-            .fieldIsRequired, // or a “select topics” string
-      );
-      return;
-    }
 
     {
       final userState = context.read<AppUserCubit>().state;
@@ -88,11 +96,14 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
       final createdById = userState.user.id;
       context.read<AttendanceBloc>().add(
             AttendanceSubmitEvent(
-              createdById: createdById,
-              title: titleController.text.trim(),
-              content: contentController.text.trim(),
-              topics: selectedTopics,
-            ),
+                attendance: AttendanceSessionModel(
+              id: 'id',
+              userId: createdById,
+              sourceKey: 'sourceKey',
+              startAt: DateTime.now(),
+              startLat: _lat,
+              startLng: _lng,
+            )),
           );
     }
   }
@@ -163,7 +174,6 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                           serviceFields: serviceFields,
                           isLockFieldsWithoutComment: false,
                           setState: setState,
-                          selectedTopics: selectedTopics,
                           // onToggleTopic: (topic) {
                           //   setState(() {
                           //     selectedTopics.contains(topic)
@@ -174,9 +184,12 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                           titleController: titleController,
                           contentController: contentController,
                           isWide: isWide,
+                          onLatLng: _handleLatLng,
                         ),
                         const SizedBox(height: 40),
                         Divider(thickness: 1.5, color: Colors.grey[300]),
+                        const SizedBox(height: 24),
+                        Text("distance $distanceMeters meters"),
                         const SizedBox(height: 24),
                         Wrap(
                           spacing: 16,
@@ -186,13 +199,15 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                             CustomButton(
                               width: 180,
                               icon: Icons.check_circle,
-                              text: AppLocalizations.of(context)!.submit,
+                              text: AppLocalizations.of(context)!
+                                  .attendanceCheckIn,
                               onPressed: _submitAttendance,
                             ),
                             CustomButton(
                               width: 180,
                               icon: Icons.cancel,
-                              text: AppLocalizations.of(context)!.cancel,
+                              text: AppLocalizations.of(context)!
+                                  .attendanceCheckOut,
                               // type: ButtonType.outlined,
                               backgroundColor: AppPallete.errorColor,
                               onPressed: context.pop,

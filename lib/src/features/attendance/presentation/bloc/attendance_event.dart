@@ -4,20 +4,10 @@ part of 'attendance_bloc.dart';
 sealed class AttendanceEvent {}
 
 final class AttendanceSubmitEvent extends AttendanceEvent {
-  final String createdById;
-  // final String status;
-  // final String requestId;
-  final String title;
-  final String content;
-  final List<String> topics;
+  final AttendanceSessionModel attendance;
 
   AttendanceSubmitEvent({
-    required this.createdById,
-    // required this.status,
-    // required this.requestId,
-    required this.title,
-    required this.content,
-    required this.topics,
+    required this.attendance,
   });
 }
 

@@ -96,6 +96,8 @@
   "attendancesServiceSubtitle": "هذه خدمة المدونات",
   "attendanceSubmitNew": "تقديم طلب جديد لخدمة التحضير",
   "attendanceUpdate": "تحديث تحضير",
+    "attendanceCheckIn": "تسجيل دخول",
+    "attendanceCheckOut": "تسجيل خروج",
 
 
   "submitOnboarding": "إرسال بيانات التوظيف",

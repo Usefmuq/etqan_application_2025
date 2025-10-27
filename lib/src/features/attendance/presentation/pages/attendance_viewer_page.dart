@@ -176,16 +176,16 @@ class _AttendanceViewerPageState extends State<AttendanceViewerPage> {
           ? '${AppLocalizations.of(context)!.attendance}- ${attendanceViewerPage!.attendancesView.requestId}'
           : AppLocalizations.of(context)!.attendance,
       tilteActions: [
-        if (isUserHasPermissionsView(
-              permissions ?? [],
-              PermissionsConstants.updateAttendance,
-            ) &&
-            attendanceViewerPage != null &&
-            attendanceViewerPage!.attendancesView.toAttendance() != null)
-          IconButton(
-            onPressed: _handleEdit,
-            icon: const Icon(Icons.edit),
-          ),
+        // if (isUserHasPermissionsView(
+        //       permissions ?? [],
+        //       PermissionsConstants.updateAttendance,
+        //     ) &&
+        //     attendanceViewerPage != null &&
+        //     attendanceViewerPage!.attendancesView.toAttendance() != null)
+        //   IconButton(
+        //     onPressed: _handleEdit,
+        //     icon: const Icon(Icons.edit),
+        //   ),
       ],
       body: [
         BlocConsumer<AttendanceBloc, AttendanceState>(

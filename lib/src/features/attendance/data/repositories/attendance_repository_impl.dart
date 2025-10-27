@@ -8,7 +8,7 @@ import 'package:etqan_application_2025/src/core/data/models/request_unlocked_fie
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/datasources/attendance_remote_data_source.dart';
-import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
@@ -25,35 +25,19 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   );
   @override
   Future<Either<Failure, AttendanceViewerPageEntity>> submitAttendance({
-    required String createdById,
-    // required String status,
-    // required String requestId,
-    required String title,
-    required String content,
-    required List<String> topics,
+    required AttendanceSessionModel attendance,
   }) async {
     try {
       RequestMasterModel requestMasterModel = RequestMasterModel(
         // requestId: 0,
-        userId: createdById,
+        userId: 'createdById',
         serviceId: ServicesConstants.attendanceServiceId,
         status: LookupConstants.requestStatusPending,
         createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
         updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
       );
-      AttendanceModel attendanceModel = AttendanceModel(
-        id: Uuid().v1(),
-        createdById: createdById,
-        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
-        status: LookupConstants.requestStatusPending,
-        requestId: -1,
-        isActive: true,
-        title: title,
-        content: content,
-        topics: topics,
-      );
       final insertedAttendance = await attendanceRemoteDataSource
-          .submitAttendance(attendanceModel, requestMasterModel);
+          .submitAttendance(attendance, requestMasterModel);
       return right(insertedAttendance);
     } on ServerException catch (e) {
       return left(Failure(e.message));

@@ -102,6 +102,8 @@
     "attendancesServiceSubtitle": "here is attendance service",
     "attendanceSubmitNew": "Submit new request for attendance service",
     "attendanceUpdate": "Update attendance",
+    "attendanceCheckIn": "Check-In",
+    "attendanceCheckOut": "Check-Out",
 
   "submitOnboarding": "Submit New Onboarding",
   "updateOnboarding": "Update Onboarding",
