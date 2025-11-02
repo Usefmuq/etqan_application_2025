@@ -43,27 +43,43 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
     RequestMasterModel request,
   ) async {
     try {
-      // SUBMIT
-      final submitRes =
-          await supabaseClient.rpc('rpc_service_submit_generic', params: {
-        'p_service_id': ServicesConstants.attendanceServiceId, // int
-        'p_entity_table': 'attendances',
-        'p_view_name': 'attendances_page_view',
-        'p_approvals_view': 'approval_sequence_view',
-        'p_request': request.toJson(),
-        'p_entity': attendance
-            .toJson(), // no need to include request_id; RPC injects it
-      });
-      final attendancesView =
-          AttendancesPageViewModel.fromJson(submitRes['view']);
-      final approvals = (submitRes['approval'] as List)
-          .map((j) => ApprovalSequenceViewModel.fromJson(j))
-          .toList();
+      // SUBMIT Check in
+      if (attendance.endAt.isNullOrEmpty) {
+        final submitRes = await supabaseClient.rpc('start_attendance', params: {
+          'p_source_key': attendance.sourceKey,
+          'p_site_id': attendance.siteId,
+          'p_inside_site': attendance.insideSite,
+          'p_note': attendance.note,
+          'p_start_lat': attendance.startLat,
+          'p_start_lng': attendance.startLng,
+          'p_start_accuracy_m': null,
+        });
+        final attendancesView = AttendancesPageViewModel();
+        final approvals = [ApprovalSequenceViewModel()];
 
-      return AttendanceViewerPageEntity(
-        attendancesView: attendancesView,
-        approval: approvals,
-      );
+        return AttendanceViewerPageEntity(
+          attendancesView: attendancesView,
+          approval: approvals,
+        );
+      }
+      // SUBMIT Check out
+      else {
+        final submitRes = await supabaseClient.rpc('end_attendance', params: {
+          'p_site_id': attendance.siteId,
+          'p_inside_site': attendance.insideSite,
+          'p_note': attendance.note,
+          'p_end_lat': attendance.endLat,
+          'p_end_lng': attendance.endLng,
+          'p_end_accuracy_m': null,
+        });
+        final attendancesView = AttendancesPageViewModel();
+        final approvals = [ApprovalSequenceViewModel()];
+
+        return AttendanceViewerPageEntity(
+          attendancesView: attendancesView,
+          approval: approvals,
+        );
+      }
     } catch (e) {
       throw ServerException(e.toString());
     }

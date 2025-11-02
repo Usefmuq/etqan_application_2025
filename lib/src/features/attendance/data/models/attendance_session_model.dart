@@ -1,4 +1,5 @@
 // attendance_session_model.dart
+import 'package:etqan_application_2025/src/core/utils/calculate_utils.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_session.dart';
 
 class AttendanceSessionModel extends AttendanceSession {
@@ -122,8 +123,10 @@ class AttendanceSessionModel extends AttendanceSession {
   Map<String, dynamic> toTableRow() {
     return {
       'Source': sourceKey,
-      'Start': startAt,
-      'End': endAt,
+      'Check-In': startAt,
+      'Check-Out': endAt,
+      'تسجيل دخول': startAt,
+      'تسجيل خروج': endAt,
       'Start (lat,lng)': (startLat != null && startLng != null)
           ? '${startLat!.toStringAsFixed(6)}, ${startLng!.toStringAsFixed(6)}'
           : '—',
@@ -137,6 +140,8 @@ class AttendanceSessionModel extends AttendanceSession {
       'Inside Site': insideSite == true ? 'Yes' : 'No',
       'Note': note ?? '',
       'Active': isActive,
+      'Total': diffAsHm(startAt, endAt),
+      'المجموع': diffAsHm(startAt, endAt),
     };
   }
 }

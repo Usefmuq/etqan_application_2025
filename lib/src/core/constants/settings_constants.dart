@@ -3,6 +3,7 @@
 library;
 
 class SettingsConstants {
-  static double attendanceSiteLat = 26.3592;
-  static double attendanceSiteLng = 43.9818;
+  static double attendanceSiteLat = 24.89470;
+  static double attendanceSiteLng = 46.6117;
+  static double maxSiteDistanceM = 50;
 }

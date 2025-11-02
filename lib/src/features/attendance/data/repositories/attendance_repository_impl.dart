@@ -14,7 +14,6 @@ import 'package:etqan_application_2025/src/features/attendance/domain/entities/a
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:uuid/uuid.dart';
 
 class AttendanceRepositoryImpl implements AttendanceRepository {
   final AttendanceRemoteDataSource attendanceRemoteDataSource;

@@ -4,6 +4,7 @@ import 'package:etqan_application_2025/src/core/common/entities/service_fields.d
 import 'package:etqan_application_2025/src/core/data/models/role_permission_view_model.dart';
 import 'package:etqan_application_2025/src/core/data/models/roles_model.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/auth/data/models/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -118,4 +119,19 @@ Future<List<ServiceField>> fetchFieldsByServiceId(int serviceId) async {
 
   final data = response as List;
   return data.map((json) => ServiceField.fromJson(json)).toList();
+}
+
+Future<List<AttendanceSessionModel>> fetchLatestAttendances(
+  String userId,
+) async {
+  final response = await Supabase.instance.client
+      .from('attendance_sessions')
+      .select()
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .lte('start_at', DateTime.now())
+      .order('start_at', ascending: false);
+
+  final data = response as List;
+  return data.map((json) => AttendanceSessionModel.fromJson(json)).toList();
 }

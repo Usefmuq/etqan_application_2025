@@ -11,6 +11,7 @@
       "myRequests": "My Requests",
       "employees": "Employees",
       "all": "All",
+      "total": "Total",
 
   "back": "Back",
   "settings": "Settings",
@@ -104,6 +105,8 @@
     "attendanceUpdate": "Update attendance",
     "attendanceCheckIn": "Check-In",
     "attendanceCheckOut": "Check-Out",
+    "attendanceLocationFar": "Your location is too far.",
+    "attendanceLocationFarDesc": "Please try again after being closer to the building.",
 
   "submitOnboarding": "Submit New Onboarding",
   "updateOnboarding": "Update Onboarding",

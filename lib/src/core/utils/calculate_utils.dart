@@ -43,3 +43,22 @@ double? distanceKmNullable({
       distanceMetersNullable(lat1: lat1, lng1: lng1, lat2: lat2, lng2: lng2);
   return m == null ? null : m / 1000.0;
 }
+
+String diffAsHm(
+  DateTime? start,
+  DateTime? end, {
+  String placeholder = '--:--',
+}) {
+  if (start == null || end == null) {
+    return placeholder;
+  }
+
+  final diff = end.difference(start);
+  final totalMinutes = diff.inMinutes;
+  final sign = totalMinutes < 0 ? '-' : '';
+  final absMinutes = totalMinutes.abs();
+  final h = absMinutes ~/ 60;
+  final m = absMinutes % 60;
+
+  return '$sign${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}';
+}

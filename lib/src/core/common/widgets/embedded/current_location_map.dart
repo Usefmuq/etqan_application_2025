@@ -1,15 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 
 class CurrentLocationMap extends StatefulWidget {
   final bool followUser;
   final double? height;
-
-  /// Optional: notify parent whenever lat/lng updates
   final void Function(double lat, double lng)? onLatLng;
 
   const CurrentLocationMap({
@@ -24,26 +22,18 @@ class CurrentLocationMap extends StatefulWidget {
 }
 
 class _CurrentLocationMapState extends State<CurrentLocationMap> {
-  final _controllerCompleter = Completer<GoogleMapController>();
-  GoogleMapController? _mapController;
-
+  final MapController _mapController = MapController();
   StreamSubscription<Position>? _posSub;
-  Position? _lastPosition;
 
-  // store latest coords here (as you asked)
   double? lat;
   double? lng;
+  double _currentZoom = 16.0;
 
-  // Blue dot + accuracy circle like Google Maps
-  final Map<CircleId, Circle> _circles = {};
-  static const CircleId _dotCircleId = CircleId('user-dot');
-  static const CircleId _accCircleId = CircleId('user-accuracy');
+  bool _isLoading = true;
+  String? _errorMsg;
 
-  // Fallback camera (Riyadh)
-  static const _fallback = CameraPosition(
-    target: LatLng(24.7136, 46.6753),
-    zoom: 12,
-  );
+  // fallback: Riyadh
+  static final LatLng _fallback = LatLng(24.7136, 46.6753);
 
   @override
   void initState() {
@@ -54,35 +44,56 @@ class _CurrentLocationMapState extends State<CurrentLocationMap> {
   @override
   void dispose() {
     _posSub?.cancel();
-    _mapController?.dispose();
+    _posSub = null;
     super.dispose();
   }
 
   Future<void> _initLocationFlow() async {
-    final hasPermission = await _ensurePermission();
-    if (!hasPermission) return;
+    final ok = await _ensurePermission();
+    if (!ok) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMsg = 'Location not available';
+        });
+      }
+      return;
+    }
 
     Position? initial;
     try {
-      if (kIsWeb) {
-        initial = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-          timeLimit: const Duration(seconds: 10),
-        );
-      } else {
-        initial = await Geolocator.getLastKnownPosition();
-        initial ??= await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-          timeLimit: const Duration(seconds: 10),
-        );
+      initial = await Geolocator.getLastKnownPosition();
+      initial ??= await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+        timeLimit: const Duration(seconds: 10),
+      );
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMsg = 'Could not get location';
+        });
       }
-    } catch (_) {}
+    }
 
     if (!mounted) return;
 
     if (initial != null) {
-      _applyPosition(initial); // <— updates lat/lng, UI, camera
-      _moveCameraTo(LatLng(initial.latitude, initial.longitude), zoom: 16.5);
+      _applyPosition(initial);
+      _moveCamera(
+        LatLng(initial.latitude, initial.longitude),
+        zoom: _currentZoom,
+      );
+      setState(() {
+        _isLoading = false;
+        _errorMsg = null;
+      });
+    } else {
+      // no initial fix yet → keep spinner, wait for stream
+      setState(() {
+        _isLoading = true;
+        _errorMsg = null;
+      });
     }
 
     if (widget.followUser) {
@@ -91,23 +102,13 @@ class _CurrentLocationMapState extends State<CurrentLocationMap> {
   }
 
   Future<bool> _ensurePermission() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    var permission = await Geolocator.checkPermission();
 
-    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
-
     if (permission == LocationPermission.deniedForever) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Location permissions are permanently denied. Enable them in Settings.',
-            ),
-          ),
-        );
-      }
       return false;
     }
 
@@ -118,117 +119,169 @@ class _CurrentLocationMapState extends State<CurrentLocationMap> {
 
   void _startPositionStream() {
     _posSub?.cancel();
+
     const settings = LocationSettings(
       accuracy: LocationAccuracy.best,
-      distanceFilter: 5, // meters
+      distanceFilter: 5,
     );
 
     _posSub = Geolocator.getPositionStream(locationSettings: settings).listen(
       (pos) {
-        _applyPosition(pos); // <— updates lat/lng and UI
-        _moveCameraTo(LatLng(pos.latitude, pos.longitude));
+        if (!mounted) return;
+
+        _applyPosition(pos);
+        _moveCamera(LatLng(pos.latitude, pos.longitude));
+
+        // once we have a real GPS point → hide loader & message
+        setState(() {
+          _isLoading = false;
+          _errorMsg = null;
+        });
       },
-      onError: (_) {},
+      onError: (_) {
+        if (!mounted) return;
+        setState(() {
+          _errorMsg = 'Location stream error';
+        });
+      },
     );
   }
 
-  // Centralized place to keep state in sync (lat/lng + blue dot)
   void _applyPosition(Position p) {
-    _lastPosition = p;
+    if (!mounted) return;
 
-    // 1) store lat/lng
     setState(() {
       lat = p.latitude;
       lng = p.longitude;
     });
 
-    // 2) notify parent if asked
-    if (widget.onLatLng != null) {
-      widget.onLatLng!(p.latitude, p.longitude);
-    }
-
-    // 3) update dot/accuracy
-    _updateUserGraphics(p);
+    widget.onLatLng?.call(p.latitude, p.longitude);
   }
 
-  void _updateUserGraphics(Position p) {
-    final userLatLng = LatLng(p.latitude, p.longitude);
-
-    final Circle dot = Circle(
-      circleId: _dotCircleId,
-      center: userLatLng,
-      radius: 6,
-      fillColor: const Color(0xFF1A73E8),
-      strokeColor: Colors.white,
-      strokeWidth: 2,
-      zIndex: 2,
-    );
-
-    final double acc =
-        (p.accuracy.isFinite && p.accuracy > 0) ? p.accuracy : 30;
-    final Circle accCircle = Circle(
-      circleId: _accCircleId,
-      center: userLatLng,
-      radius: acc.clamp(20, 80),
-      fillColor: const Color(0x331A73E8),
-      strokeColor: const Color(0x551A73E8),
-      strokeWidth: 1,
-      zIndex: 1,
-    );
-
-    setState(() {
-      _circles[_dotCircleId] = dot;
-      _circles[_accCircleId] = accCircle;
-    });
-  }
-
-  Future<void> _moveCameraTo(LatLng target, {double? zoom}) async {
-    if (!_controllerCompleter.isCompleted) {
-      try {
-        _mapController = await _controllerCompleter.future;
-      } catch (_) {
-        return;
-      }
-    }
-    final ctrl = _mapController;
-    if (ctrl == null) return;
-
-    final update = zoom != null
-        ? CameraUpdate.newCameraPosition(
-            CameraPosition(target: target, zoom: zoom))
-        : CameraUpdate.newLatLng(target);
-
+  void _moveCamera(LatLng target, {double? zoom}) {
+    if (!mounted) return;
     try {
-      await ctrl.animateCamera(update);
-    } catch (_) {}
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    _mapController = controller;
-    if (!_controllerCompleter.isCompleted) {
-      _controllerCompleter.complete(controller);
-    }
-    final p = _lastPosition;
-    if (p != null) {
-      _moveCameraTo(LatLng(p.latitude, p.longitude), zoom: 16.5);
+      _mapController.move(target, zoom ?? _currentZoom);
+    } catch (_) {
+      // ignore if map not ready
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final map = GoogleMap(
-      initialCameraPosition: _fallback,
-      onMapCreated: _onMapCreated,
-      myLocationEnabled: false, // we draw our own dot
-      myLocationButtonEnabled: true,
-      zoomControlsEnabled: false,
-      compassEnabled: true,
-      circles: Set<Circle>.of(_circles.values),
+    final map = FlutterMap(
+      mapController: _mapController,
+      options: MapOptions(
+        initialCenter: _fallback,
+        initialZoom: _currentZoom,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.none, // disable user interaction
+        ),
+      ),
+      children: [
+        // OSM tiles (with place names)
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.etqan.app',
+        ),
+
+        // marker
+        if (lat != null && lng != null)
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(lat!, lng!),
+                width: 44,
+                height: 44,
+                child: const _NiceUserDot(),
+              ),
+            ],
+          ),
+      ],
+    );
+
+    final content = Stack(
+      children: [
+        Positioned.fill(child: map),
+
+        // loading overlay
+        if (_isLoading)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.12),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
+
+        // error / info message
+        if (!_isLoading && _errorMsg != null)
+          Positioned(
+            top: 12,
+            left: 12,
+            right: 12,
+            child: Material(
+              color: Colors.red.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                child: Text(
+                  _errorMsg!,
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
 
     if (widget.height != null) {
-      return SizedBox(height: widget.height, child: map);
+      return SizedBox(height: widget.height, child: content);
     }
-    return map;
+    return content;
+  }
+}
+
+class _NiceUserDot extends StatelessWidget {
+  const _NiceUserDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // glow
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: const Color(0x331A73E8),
+              shape: BoxShape.circle,
+            ),
+          ),
+          // white ring
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+          // blue core
+          Container(
+            width: 14,
+            height: 14,
+            decoration: const BoxDecoration(
+              color: Color(0xFF1A73E8),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

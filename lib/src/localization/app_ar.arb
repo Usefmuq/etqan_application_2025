@@ -10,6 +10,7 @@
         "myRequests": "طلباتي",
       "employees": "موظفيني",
       "all": "الكل",
+      "total": "المجموع",
 
   "back": "رجوع",
     "settings": "الاعدادات",
@@ -98,6 +99,8 @@
   "attendanceUpdate": "تحديث تحضير",
     "attendanceCheckIn": "تسجيل دخول",
     "attendanceCheckOut": "تسجيل خروج",
+    "attendanceLocationFar": "موقعك بعيد جداً.",
+    "attendanceLocationFarDesc": "يرجى المحاولة مرة أخرى بعد أن تكون أقرب إلى المبنى.",
 
 
   "submitOnboarding": "إرسال بيانات التوظيف",

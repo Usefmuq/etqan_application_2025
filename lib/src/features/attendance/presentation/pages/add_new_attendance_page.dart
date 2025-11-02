@@ -1,6 +1,8 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/common/entities/service_fields.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_help_card.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/forms/custom_button.dart';
+import 'package:etqan_application_2025/src/core/common/widgets/grids/custom_table_grid.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
@@ -8,6 +10,7 @@ import 'package:etqan_application_2025/src/core/constants/services_constants.dar
 import 'package:etqan_application_2025/src/core/constants/settings_constants.dart';
 import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:etqan_application_2025/src/core/utils/calculate_utils.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
@@ -18,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 class AddNewAttendancePage extends StatefulWidget {
   const AddNewAttendancePage({super.key});
@@ -34,6 +38,7 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
   final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<ServiceField> serviceFields = [];
+  List<AttendanceSessionModel> latestAttendances = [];
   double? _lat;
   double? _lng;
   double? distanceMeters;
@@ -53,11 +58,13 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
       final fetchedPermissions = await fetchUserPermissions(userId);
       final fetchedServiceFields =
           await fetchFieldsByServiceId(ServicesConstants.attendanceServiceId);
+      final fetchedLatestAttendances = await fetchLatestAttendances(userId);
 
       if (mounted) {
         setState(() {
           permissions = fetchedPermissions;
           serviceFields = fetchedServiceFields;
+          latestAttendances = fetchedLatestAttendances;
         });
       }
     });
@@ -77,7 +84,7 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
     });
   }
 
-  void _submitAttendance() {
+  void _submitAttendance(bool isCheckIn) {
     final isValid = formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
@@ -97,12 +104,15 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
       context.read<AttendanceBloc>().add(
             AttendanceSubmitEvent(
                 attendance: AttendanceSessionModel(
-              id: 'id',
+              id: '',
               userId: createdById,
-              sourceKey: 'sourceKey',
+              sourceKey: 'emp_gps',
               startAt: DateTime.now(),
               startLat: _lat,
               startLng: _lng,
+              endAt: !isCheckIn ? DateTime.now() : null,
+              endLat: !isCheckIn ? _lat : null,
+              endLng: !isCheckIn ? _lng : null,
             )),
           );
     }
@@ -141,7 +151,7 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
               });
             } else if (state is AttendanceSubmitSuccess) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted) context.pop();
+                if (mounted) context.pushReplacement('/attendance/submit');
               });
             }
           },
@@ -186,35 +196,60 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                           isWide: isWide,
                           onLatLng: _handleLatLng,
                         ),
-                        const SizedBox(height: 40),
-                        Divider(thickness: 1.5, color: Colors.grey[300]),
                         const SizedBox(height: 24),
-                        Text("distance $distanceMeters meters"),
-                        const SizedBox(height: 24),
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 12,
-                          alignment: WrapAlignment.spaceBetween,
-                          children: [
-                            CustomButton(
-                              width: 180,
-                              icon: Icons.check_circle,
-                              text: AppLocalizations.of(context)!
-                                  .attendanceCheckIn,
-                              onPressed: _submitAttendance,
-                            ),
-                            CustomButton(
-                              width: 180,
-                              icon: Icons.cancel,
-                              text: AppLocalizations.of(context)!
-                                  .attendanceCheckOut,
-                              // type: ButtonType.outlined,
-                              backgroundColor: AppPallete.errorColor,
-                              onPressed: context.pop,
-                            ),
-                          ],
+                        Center(
+                          child: Wrap(
+                            spacing: 16,
+                            runSpacing: 12,
+                            alignment: WrapAlignment.center,
+                            children: [
+                              CustomButton(
+                                width: 180,
+                                icon: Icons.check_circle,
+                                isDisabled:
+                                    latestAttendances.first.endAt.isNullOrEmpty,
+                                text:
+                                    "${AppLocalizations.of(context)!.attendanceCheckIn} ${latestAttendances.first.endAt.isNullOrEmpty ? DateFormat.yMMMd(Localizations.localeOf(context).languageCode).add_jm().format(latestAttendances.first.startAt) : ""}",
+                                onPressed: () => _submitAttendance(true),
+                              ),
+                              CustomButton(
+                                width: 180,
+                                icon: Icons.cancel,
+                                text: AppLocalizations.of(context)!
+                                    .attendanceCheckOut,
+                                // type: ButtonType.outlined,
+                                isDisabled: !latestAttendances
+                                    .first.endAt.isNullOrEmpty,
+                                backgroundColor: AppPallete.errorColor,
+                                onPressed: () => _submitAttendance(false),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(height: 12),
+                        if (distanceMeters.isNullOrEmpty ||
+                            distanceMeters! >
+                                SettingsConstants.maxSiteDistanceM)
+                          CustomHelpCard(
+                            type: HelpCardType.warning,
+                            title: AppLocalizations.of(context)!
+                                .attendanceLocationFar,
+                            description: AppLocalizations.of(context)!
+                                .attendanceLocationFarDesc,
+                          ),
+                        const SizedBox(height: 24),
+                        Divider(thickness: 1.5, color: Colors.grey[300]),
                         const SizedBox(height: 32),
+                        CustomTableGrid(
+                          headers: [
+                            AppLocalizations.of(context)!.attendanceCheckIn,
+                            AppLocalizations.of(context)!.attendanceCheckOut,
+                            AppLocalizations.of(context)!.total,
+                          ],
+                          rows: latestAttendances
+                              .map((u) => u.toTableRow())
+                              .toList(),
+                        )
                       ],
                     );
                   },

@@ -1,5 +1,4 @@
 // attendances_page_view_model.dart
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_session.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendances_page_view.dart';
 
 class AttendancesPageViewModel extends AttendancesPageView {

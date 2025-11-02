@@ -12,5 +12,5 @@ class ServicesConstants {
   static int blogServiceId = 1;
   static int onboardingServiceId = 2;
   static int usersManagerServiceId = 3;
-  static int attendanceServiceId = 3;
+  static int attendanceServiceId = 4;
 }
