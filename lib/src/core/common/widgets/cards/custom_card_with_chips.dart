@@ -111,7 +111,7 @@ class CustomCardWithChips extends StatelessWidget {
                 child: Text(
                   '1 min ago',
                   style: TextStyle(
-                    color: Colors.grey[500],
+                    color: AppPallete.greyColor,
                     fontSize: 12,
                   ),
                 ),

@@ -73,9 +73,9 @@ class _CustomScaffoldState extends State<CustomScaffold> {
                     color: Colors.white, // 👈 New background color
                     child: TabBar(
                       controller: widget.tabController,
-                      labelColor: Colors.blue,
+                      labelColor: AppPallete.gradient2,
                       unselectedLabelColor: Colors.grey,
-                      indicatorColor: Colors.blue,
+                      indicatorColor: AppPallete.gradient2,
                       tabs: widget.tabs!,
                     ),
                   ),

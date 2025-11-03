@@ -278,8 +278,8 @@ class _CustomTableGridState extends State<CustomTableGrid> {
               const DataCell(
                 Align(
                   alignment: Alignment.centerRight,
-                  child:
-                      Icon(Icons.chevron_right, size: 18, color: Colors.grey),
+                  child: Icon(Icons.chevron_right,
+                      size: 18, color: AppPallete.greyColor),
                 ),
               ),
           ],

@@ -238,7 +238,7 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                                 .attendanceLocationFarDesc,
                           ),
                         const SizedBox(height: 24),
-                        Divider(thickness: 1.5, color: Colors.grey[300]),
+                        Divider(thickness: 1.5, color: AppPallete.greyColor),
                         const SizedBox(height: 32),
                         CustomTableGrid(
                           headers: [

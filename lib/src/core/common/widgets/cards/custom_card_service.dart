@@ -1,3 +1,4 @@
+import 'package:etqan_application_2025/src/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
 
 class CustomCardServiceList extends StatelessWidget {
@@ -25,7 +26,8 @@ class CustomCardServiceList extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withAlpha((0.3 * 255).toInt())),
+          border: Border.all(
+              color: AppPallete.greyColor.withAlpha((0.3 * 255).toInt())),
         ),
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -49,7 +51,7 @@ class CustomCardServiceList extends StatelessWidget {
                 subtitle!,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
+                      color: AppPallete.greyColor,
                     ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,

@@ -29,11 +29,11 @@ class CustomCardListRequests extends StatelessWidget {
       final lookup = UuidLookupConstants.combinedLookup[id]!;
       return {
         'label': lookup[locale] ?? '—',
-        'color': lookup['color'] ?? Colors.grey,
+        'color': lookup['color'] ?? AppPallete.greyColor,
         'isChip': true,
       };
     }
-    return {'label': '—', 'color': Colors.grey, 'isChip': true};
+    return {'label': '—', 'color': AppPallete.greyColor, 'isChip': true};
   }
 
   @override
@@ -103,7 +103,7 @@ class CustomCardListRequests extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .bodySmall
-                              ?.copyWith(color: Colors.grey[700]),
+                              ?.copyWith(color: AppPallete.greyColor),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -114,7 +114,7 @@ class CustomCardListRequests extends StatelessWidget {
                           dateFormatted,
                           style:
                               Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey[600],
+                                    color: AppPallete.greyColor,
                                   ),
                         ),
                       ),

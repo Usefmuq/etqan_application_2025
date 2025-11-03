@@ -195,7 +195,7 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
                         ),
                         const SizedBox(height: 40),
                         const SizedBox(height: 40),
-                        Divider(thickness: 1.5, color: Colors.grey[300]),
+                        Divider(thickness: 1.5, color: AppPallete.greyColor),
                         const SizedBox(height: 24),
                         Wrap(
                           spacing: 16,
