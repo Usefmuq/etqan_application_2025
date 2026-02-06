@@ -107,25 +107,25 @@ class _UpdateUsersManagerPageState extends State<UpdateUsersManagerPage> {
     });
   }
 
-  void _updateUsersManager() {
-    if (!(formKey.currentState?.validate() ?? false)) return;
+  // void _updateUsersManager() {
+  //   if (!(formKey.currentState?.validate() ?? false)) return;
 
-    if (selectedTopics.isEmpty) {
-      SmartNotifier.warning(
-        context,
-        title: AppLocalizations.of(context)!.error,
-        message: AppLocalizations.of(context)!.fieldIsRequired,
-      );
-      return;
-    }
-    context.read<UsersManagerBloc>().add(
-          UsersManagerUpdateEvent(
-            usersManagerViewerPage:
-                usersManagerViewerPage!.usersManagersView.copyWith(),
-            updatedBy: userId,
-          ),
-        );
-  }
+  //   if (selectedTopics.isEmpty) {
+  //     SmartNotifier.warning(
+  //       context,
+  //       title: AppLocalizations.of(context)!.error,
+  //       message: AppLocalizations.of(context)!.fieldIsRequired,
+  //     );
+  //     return;
+  //   }
+  //   context.read<UsersManagerBloc>().add(
+  //         UsersManagerUpdateEvent(
+  //           usersManagerViewerPage:
+  //               usersManagerViewerPage!.usersManagersView.copyWith(),
+  //           updatedBy: userId,
+  //         ),
+  //       );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +163,8 @@ class _UpdateUsersManagerPageState extends State<UpdateUsersManagerPage> {
             //             .createdById;
 
 // approver = has update permission (your existing flag)
-            final isApprover = isUserHasPermissionsView(
+            // final isApprover =
+            isUserHasPermissionsView(
                 permissions ?? [], PermissionsConstants.updateUsersManager);
 
 // creator?
@@ -179,7 +180,7 @@ class _UpdateUsersManagerPageState extends State<UpdateUsersManagerPage> {
                 key: formKey,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final isWide = constraints.maxWidth >= 600;
+                    // final isWide = constraints.maxWidth >= 600;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

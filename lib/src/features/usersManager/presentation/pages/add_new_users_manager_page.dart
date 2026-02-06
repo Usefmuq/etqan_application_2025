@@ -88,7 +88,6 @@ class _AddNewUsersManagerPageState extends State<AddNewUsersManagerPage> {
         return;
       }
       final createdById = userState.user.id;
-      print(notesController.text);
       for (final userRole in selectedRoles) {
         context.read<UsersManagerBloc>().add(
               UsersManagerSubmitEvent(

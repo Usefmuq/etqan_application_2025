@@ -25,9 +25,9 @@ class AttendanceSessionModel extends AttendanceSession {
   });
 
   factory AttendanceSessionModel.fromJson(Map<String, dynamic> json) {
-    DateTime? _dt(dynamic v) =>
+    DateTime? dt(dynamic v) =>
         v == null ? null : DateTime.tryParse(v.toString());
-    double? _num(dynamic v) => v == null
+    double? numb(dynamic v) => v == null
         ? null
         : (v is num ? v.toDouble() : double.tryParse(v.toString()));
 
@@ -37,24 +37,24 @@ class AttendanceSessionModel extends AttendanceSession {
       sourceKey: json['source_key'] ?? 'auto',
       siteId: json['site_id'],
       insideSite: json['inside_site'],
-      startAt: _dt(json['start_at']) ?? DateTime.now(),
-      endAt: _dt(json['end_at']),
+      startAt: dt(json['start_at']) ?? DateTime.now(),
+      endAt: dt(json['end_at']),
       note: json['note'],
-      startLat: _num(json['start_lat']),
-      startLng: _num(json['start_lng']),
-      startAccuracyM: _num(json['start_accuracy_m']),
-      endLat: _num(json['end_lat']),
-      endLng: _num(json['end_lng']),
-      endAccuracyM: _num(json['end_accuracy_m']),
-      createdAt: _dt(json['created_at']),
-      updatedAt: _dt(json['updated_at']),
+      startLat: numb(json['start_lat']),
+      startLng: numb(json['start_lng']),
+      startAccuracyM: numb(json['start_accuracy_m']),
+      endLat: numb(json['end_lat']),
+      endLng: numb(json['end_lng']),
+      endAccuracyM: numb(json['end_accuracy_m']),
+      createdAt: dt(json['created_at']),
+      updatedAt: dt(json['updated_at']),
       isActive: (json['is_active'] ?? true) == true,
-      workDateLocal: _dt(json['work_date_local']),
+      workDateLocal: dt(json['work_date_local']),
     );
   }
 
   Map<String, dynamic> toJson() {
-    String? _ts(DateTime? d) => d?.toUtc().toIso8601String();
+    String? ts(DateTime? d) => d?.toUtc().toIso8601String();
 
     return {
       'id': id,
@@ -62,8 +62,8 @@ class AttendanceSessionModel extends AttendanceSession {
       'source_key': sourceKey,
       'site_id': siteId,
       'inside_site': insideSite,
-      'start_at': _ts(startAt),
-      'end_at': _ts(endAt),
+      'start_at': ts(startAt),
+      'end_at': ts(endAt),
       'note': note,
       'start_lat': startLat,
       'start_lng': startLng,
@@ -71,8 +71,8 @@ class AttendanceSessionModel extends AttendanceSession {
       'end_lat': endLat,
       'end_lng': endLng,
       'end_accuracy_m': endAccuracyM,
-      'created_at': _ts(createdAt),
-      'updated_at': _ts(updatedAt),
+      'created_at': ts(createdAt),
+      'updated_at': ts(updatedAt),
       'is_active': isActive,
       // 'work_date_local' is generated; usually don’t send it back
     };

@@ -25,13 +25,13 @@ class CustomHelpCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _colors = _mapTypeToColors(type, context);
+    final colors = _mapTypeToColors(type, context);
 
     return Container(
       decoration: BoxDecoration(
-        color: _colors.bg,
+        color: colors.bg,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: _colors.border, width: 1.1),
+        border: Border.all(color: colors.border, width: 1.1),
       ),
       padding: const EdgeInsets.all(14),
       child: Row(
@@ -42,12 +42,12 @@ class CustomHelpCard extends StatelessWidget {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: _colors.iconBg,
+              color: colors.iconBg,
               shape: BoxShape.circle,
             ),
             child: Icon(
-              icon ?? _colors.defaultIcon,
-              color: _colors.icon,
+              icon ?? colors.defaultIcon,
+              color: colors.icon,
               size: 20,
             ),
           ),
@@ -61,7 +61,7 @@ class CustomHelpCard extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: _colors.text,
+                        color: colors.text,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
@@ -70,7 +70,7 @@ class CustomHelpCard extends StatelessWidget {
                   Text(
                     description!,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: _colors.text.withOpacity(0.9),
+                          color: colors.text.withOpacity(0.9),
                         ),
                   ),
                 ],

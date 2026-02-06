@@ -80,7 +80,6 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
         lat2: SettingsConstants.attendanceSiteLat,
         lng2: SettingsConstants.attendanceSiteLng,
       );
-      print("$_lat $lng");
     });
   }
 

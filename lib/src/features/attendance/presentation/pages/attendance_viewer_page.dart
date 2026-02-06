@@ -19,7 +19,6 @@ import 'package:etqan_application_2025/src/features/attendance/presentation/bloc
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AttendanceViewerPage extends StatefulWidget {
@@ -365,18 +364,18 @@ class _AttendanceViewerPageState extends State<AttendanceViewerPage> {
     );
   }
 
-  void _handleEdit() async {
-    final updatedEntity = await context.push<AttendanceViewerPageEntity>(
-      '/attendance/update/${attendanceViewerPage!.attendancesView.requestId}',
-      // extra: attendanceViewerPage!.attendancesView.toAttendance()!,
-    );
+  // void _handleEdit() async {
+  //   final updatedEntity = await context.push<AttendanceViewerPageEntity>(
+  //     '/attendance/update/${attendanceViewerPage!.attendancesView.requestId}',
+  //     // extra: attendanceViewerPage!.attendancesView.toAttendance()!,
+  //   );
 
-    if (updatedEntity != null && mounted) {
-      setState(() {
-        attendanceViewerPage = updatedEntity;
-      });
-    }
-  }
+  //   if (updatedEntity != null && mounted) {
+  //     setState(() {
+  //       attendanceViewerPage = updatedEntity;
+  //     });
+  //   }
+  // }
 
   @override
   void dispose() {

@@ -45,7 +45,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
     try {
       // SUBMIT Check in
       if (attendance.endAt.isNullOrEmpty) {
-        final submitRes = await supabaseClient.rpc('start_attendance', params: {
+        await supabaseClient.rpc('start_attendance', params: {
           'p_source_key': attendance.sourceKey,
           'p_site_id': attendance.siteId,
           'p_inside_site': attendance.insideSite,
@@ -64,7 +64,7 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
       }
       // SUBMIT Check out
       else {
-        final submitRes = await supabaseClient.rpc('end_attendance', params: {
+        await supabaseClient.rpc('end_attendance', params: {
           'p_site_id': attendance.siteId,
           'p_inside_site': attendance.insideSite,
           'p_note': attendance.note,

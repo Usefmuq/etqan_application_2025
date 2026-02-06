@@ -27,7 +27,7 @@ class _CurrentLocationMapState extends State<CurrentLocationMap> {
 
   double? lat;
   double? lng;
-  double _currentZoom = 16.0;
+  final double _currentZoom = 16.0;
 
   bool _isLoading = true;
   String? _errorMsg;
