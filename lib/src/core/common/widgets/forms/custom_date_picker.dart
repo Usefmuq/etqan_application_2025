@@ -142,10 +142,21 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
           ),
         ),
         if (showComment && !widget.showCommentAbove) ...[
-          const SizedBox(height: 4),
-          Text(
-            widget.reviewerComment!,
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.orange),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.info_outline, size: 16, color: Colors.orange),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  widget.reviewerComment!,
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ],
@@ -190,11 +201,22 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showComment && widget.showCommentAbove) ...[
-          Text(
-            widget.reviewerComment!,
-            style: theme.textTheme.bodySmall?.copyWith(color: Colors.orange),
-          ),
           const SizedBox(height: 6),
+          Row(
+            children: [
+              const Icon(Icons.info_outline, size: 16, color: Colors.orange),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  widget.reviewerComment!,
+                  style: const TextStyle(
+                    color: Colors.orange,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
         datePickerCore,
         noEndToggle,

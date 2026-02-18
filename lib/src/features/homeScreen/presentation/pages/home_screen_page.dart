@@ -209,7 +209,7 @@ class _HomeScreenPageState extends State<HomeScreenPage>
                         : approval.serviceNameAr,
                     onTap: () {
                       context.push(
-                        '/blog/${approval.requestId}',
+                        '${ServicesConstants.servicesRoutes[(approval.serviceId ?? 1) - 1]}/${approval.requestId}',
                       );
                     },
                   ),
@@ -259,7 +259,7 @@ class _HomeScreenPageState extends State<HomeScreenPage>
                     subtitle: req.requestDetails,
                     onTap: () {
                       context.push(
-                        '/blog/update/${req.requestId}',
+                        '${ServicesConstants.servicesRoutes[(req.serviceId) - 1]}/update/${req.requestId}',
                       );
                     },
                   ),

@@ -56,6 +56,15 @@ import 'package:etqan_application_2025/src/features/usersManager/domain/usecases
 import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/submit_users_manager.dart';
 import 'package:etqan_application_2025/src/features/usersManager/domain/usecases/update_users_manager.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/bloc/users_manager_bloc.dart';
+import 'package:etqan_application_2025/src/features/vacation/data/datasources/vacation_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/vacation/data/repositories/vacation_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/repositories/vacation_repository.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/usecases/approve_vacation.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/usecases/fetch_vacation_page.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/usecases/get_all_vacations.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/usecases/submit_vacation.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/usecases/update_vacation.dart';
+import 'package:etqan_application_2025/src/features/vacation/presentation/bloc/vacation_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -65,6 +74,7 @@ Future<void> initdependencies() async {
   _intitAuth();
   _intitHomeScreen();
   _intitBlog();
+  _intitVacation();
   _intitUsersManager();
   _intitAttendance();
   _intitOnboarding();
@@ -205,6 +215,58 @@ void _intitBlog() {
         updateBlog: serviceLocator(),
         approveBlog: serviceLocator(),
         getAllBlogs: serviceLocator(),
+      ),
+    );
+}
+
+void _intitVacation() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<VacationRemoteDataSource>(
+      () => VacationRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<VacationRepository>(
+      () => VacationRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitVacation(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateVacation(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllVacations(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchVacationPage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveVacation(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => VacationBloc(
+        submitVacation: serviceLocator(),
+        updateVacation: serviceLocator(),
+        approveVacation: serviceLocator(),
+        getAllVacations: serviceLocator(),
       ),
     );
 }

@@ -62,3 +62,27 @@ String diffAsHm(
 
   return '$sign${h.toString().padLeft(2, '0')}:${m.toString().padLeft(2, '0')}';
 }
+
+int calculateBusinessDays(DateTime startDate, DateTime endDate) {
+  // 1. Safety Check: If end is before start, return 0
+  if (endDate.isBefore(startDate)) return 0;
+
+  int businessDays = 0;
+  DateTime current = startDate;
+
+  // 2. Loop through each day from start to end (inclusive)
+  while (current.isBefore(endDate) || current.isAtSameMomentAs(endDate)) {
+    // 3. Check for Weekends (Friday & Saturday)
+    // If you need Western weekends (Sat/Sun), change to:
+    // if (current.weekday != DateTime.saturday && current.weekday != DateTime.sunday)
+    if (current.weekday != DateTime.friday &&
+        current.weekday != DateTime.saturday) {
+      businessDays++;
+    }
+
+    // Move to next day
+    current = current.add(const Duration(days: 1));
+  }
+
+  return businessDays;
+}

@@ -276,7 +276,7 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                     CustomDropdownList<Departments>(
                                       label: AppLocalizations.of(context)!
                                           .department,
-                                      hint: AppLocalizations.of(context)!
+                                      hintText: AppLocalizations.of(context)!
                                           .selectDepartment,
                                       items: departments,
                                       selectedItem: selectedDepartment,
@@ -308,7 +308,7 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                     CustomDropdownList<Positions>(
                                       label: AppLocalizations.of(context)!
                                           .position,
-                                      hint: AppLocalizations.of(context)!
+                                      hintText: AppLocalizations.of(context)!
                                           .selectPosition,
                                       items: positions,
                                       selectedItem: selectedPosition,
@@ -328,7 +328,7 @@ class _UpdateOnboardingPageState extends State<UpdateOnboardingPage> {
                                     CustomDropdownList<UserModel>(
                                       label:
                                           AppLocalizations.of(context)!.manager,
-                                      hint: AppLocalizations.of(context)!
+                                      hintText: AppLocalizations.of(context)!
                                           .selectManager,
                                       items: managers,
                                       selectedItem: selectedManager,

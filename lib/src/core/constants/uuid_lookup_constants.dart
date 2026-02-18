@@ -72,10 +72,63 @@ class UuidLookupConstants {
       'color': AppPallete.gradient1,
     },
   };
+  static const Map<String, Map<String, dynamic>> vacationTypeMap = {
+    '5a5dd595-79f1-419a-8285-ceeb3871cf52': {
+      'en': 'Annual Leave',
+      'ar': 'إجازة سنوية',
+      'color': AppPallete.inProgressColor,
+    },
+    '6a7b3e2b-b992-438e-9323-0a97a9b267de': {
+      'en': 'Sick Leave',
+      'ar': 'إجازة مرضية',
+      'color': AppPallete.greyColor,
+    },
+    'db2fdb25-f6ea-407d-bed4-bb2f39d7eed6': {
+      'en': 'Unpaid Leave',
+      'ar': 'إجازة بدون راتب',
+      'color': AppPallete.completedColor,
+    },
+    'f85f51f1-37f9-45b2-860c-b8cb2c51f2c5': {
+      'en': 'Emergency Leave',
+      'ar': 'إجازة اضطرارية',
+      'color': AppPallete.rejectColor,
+    },
+    'c802154f-b589-4f12-b7c4-8e64e8e605a3': {
+      'en': 'Maternity Leave',
+      'ar': 'إجازة وضع (أمومة)',
+      'color': AppPallete.gradient1,
+    },
+    '9bbd2b4c-16fb-49ae-914d-7a9df08ad585': {
+      'en': 'Paternity Leave',
+      'ar': 'إجازة مولود (أبوة)',
+      'color': AppPallete.gradient1,
+    },
+    '14013bdd-3b39-42c1-bd5e-4986c4f3638b': {
+      'en': 'Marriage Leave',
+      'ar': 'إجازة زواج',
+      'color': AppPallete.gradient1,
+    },
+    'd94d9702-2f02-4e4d-897e-5a86c5e8b742': {
+      'en': 'Bereavement Leave',
+      'ar': 'إجازة وفاة',
+      'color': AppPallete.gradient1,
+    },
+    '0e7b1cbb-bfd6-4d7f-917c-8f9a18e83769': {
+      'en': 'Hajj Leave',
+      'ar': 'إجازة حج',
+      'color': AppPallete.gradient1,
+    },
+    '47b88135-2f7c-44a5-b996-1132d90f1c66': {
+      'en': 'Examination Leave',
+      'ar': 'إجازة اختبارات',
+      'color': AppPallete.gradient1,
+    },
+  };
 
   static final Map<String, Map<String, dynamic>> combinedLookup = {
     ...requestStatusMap,
     ...approvalStatusMap,
     ...userStatusMap,
+    ...vacationTypeMap,
   };
 }

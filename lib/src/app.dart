@@ -23,6 +23,11 @@ import 'package:etqan_application_2025/src/features/usersManager/presentation/pa
 import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/update_users_manager_page.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/users_manager_page.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/users_manager_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/vacation/domain/entities/vacation_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/vacation/presentation/pages/add_new_vacation_page.dart';
+import 'package:etqan_application_2025/src/features/vacation/presentation/pages/update_vacation_page.dart';
+import 'package:etqan_application_2025/src/features/vacation/presentation/pages/vacation_page.dart';
+import 'package:etqan_application_2025/src/features/vacation/presentation/pages/vacation_viewer_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -214,6 +219,40 @@ class MyAppState extends State<MyApp> {
             }
             final requestId = int.tryParse(state.pathParameters['id'] ?? '');
             return AttendanceViewerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/vacations',
+          builder: (context, state) {
+            return VacationPage();
+          },
+        ),
+        GoRoute(
+          path: '/vacations/submit',
+          builder: (context, state) {
+            return AddNewVacationPage();
+          },
+        ),
+        GoRoute(
+          path: '/vacations/update/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as VacationViewerPageEntity;
+              return UpdateVacationPage(initialVacationViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateVacationPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/vacations/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as VacationViewerPageEntity;
+              return VacationViewerPage(initialVacationViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return VacationViewerPage(requestId: requestId!);
           },
         ),
         GoRoute(
