@@ -28,4 +28,6 @@ class PermissionsConstants {
   static const String addVacation = "add_vacations";
   static const String updateVacation = "update_vacations";
   static const String approveVacation = "approve_vacations";
+  // attendance Vacation
+  static const String viewReports = "view_reports";
 }

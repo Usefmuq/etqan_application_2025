@@ -47,6 +47,15 @@ import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/g
 import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/submit_onboarding.dart';
 import 'package:etqan_application_2025/src/features/onboarding/domain/usecases/update_onboarding.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:etqan_application_2025/src/features/reports/data/datasources/reports_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/reports/data/repositories/reports_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/repositories/reports_repository.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/approve_reports.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetch_reports_page.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/get_all_reportss.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/submit_reports.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/update_reports.dart';
+import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/datasources/users_manager_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/repositories/users_manager_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/usersManager/domain/repositories/users_manager_repository.dart';
@@ -75,6 +84,7 @@ Future<void> initdependencies() async {
   _intitHomeScreen();
   _intitBlog();
   _intitVacation();
+  _intitReports();
   _intitUsersManager();
   _intitAttendance();
   _intitOnboarding();
@@ -267,6 +277,58 @@ void _intitVacation() {
         updateVacation: serviceLocator(),
         approveVacation: serviceLocator(),
         getAllVacations: serviceLocator(),
+      ),
+    );
+}
+
+void _intitReports() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<ReportsRemoteDataSource>(
+      () => ReportsRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<ReportsRepository>(
+      () => ReportsRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitReports(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateReports(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllReportss(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchReportsPage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveReports(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => ReportsBloc(
+        submitReports: serviceLocator(),
+        updateReports: serviceLocator(),
+        approveReports: serviceLocator(),
+        getAllReportss: serviceLocator(),
       ),
     );
 }
