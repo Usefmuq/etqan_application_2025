@@ -50,16 +50,5 @@ final class ReportsApproveEvent extends ReportsEvent {
 }
 
 final class ReportsGetAllReportssEvent extends ReportsEvent {
-  final User user;
-  final String? departmentId;
-  final bool isManagerExpanded;
-  final bool isDepartmentManagerExpanded;
-  final bool isViewAll;
-  ReportsGetAllReportssEvent({
-    required this.user,
-    this.departmentId,
-    required this.isManagerExpanded,
-    required this.isDepartmentManagerExpanded,
-    required this.isViewAll,
-  });
+  ReportsGetAllReportssEvent();
 }

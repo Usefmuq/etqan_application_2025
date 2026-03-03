@@ -1,4 +1,3 @@
-import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/entities/reports_page_entity.dart';
@@ -12,28 +11,10 @@ class GetAllReportss
   @override
   Future<Either<Failure, ReportsPageEntity>> call(
       GetAllReportssParams params) async {
-    return await reportsRepostory.getAllReportss(
-      user: params.user,
-      departmentId: params.departmentId,
-      isManagerExpanded: params.isManagerExpanded,
-      isDepartmentManagerExpanded: params.isDepartmentManagerExpanded,
-      isViewAll: params.isViewAll,
-    );
+    return await reportsRepostory.getAllReportss();
   }
 }
 
 class GetAllReportssParams {
-  final User user;
-  final String? departmentId;
-  final bool isManagerExpanded;
-  final bool isDepartmentManagerExpanded;
-  final bool isViewAll;
-
-  GetAllReportssParams({
-    required this.user,
-    this.departmentId,
-    required this.isManagerExpanded,
-    required this.isDepartmentManagerExpanded,
-    required this.isViewAll,
-  });
+  GetAllReportssParams();
 }

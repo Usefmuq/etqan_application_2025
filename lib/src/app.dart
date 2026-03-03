@@ -271,8 +271,8 @@ class MyAppState extends State<MyApp> {
               final entity = state.extra as ReportsViewerPageEntity;
               return ReportsViewerPage(initialReportsViewerPage: entity);
             }
-            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
-            return ReportsViewerPage(requestId: requestId!);
+            final requestId = state.pathParameters['id'];
+            return ReportsViewerPage(reportId: requestId);
           },
         ),
         GoRoute(

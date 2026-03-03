@@ -18,7 +18,7 @@ class FetchReportsPage
 }
 
 class FetchReportsPageParams {
-  final int requestId;
+  final String requestId;
 
   FetchReportsPageParams({
     required this.requestId,

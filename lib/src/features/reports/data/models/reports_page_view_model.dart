@@ -1,214 +1,35 @@
-// reportss_page_view_model.dart
-import 'package:etqan_application_2025/src/features/reports/domain/entities/reports.dart';
-import 'package:etqan_application_2025/src/features/reports/domain/entities/reportss_page_view.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/entities/reports_directory.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/entities/report_columns_meta.dart';
+import 'package:etqan_application_2025/src/features/reports/data/models/reports_directory_model.dart';
 
-class ReportssPageViewModel extends ReportssPageView {
-  ReportssPageViewModel({
-    super.reportsId,
-    super.title,
-    super.content,
-    super.status,
-    super.isActive,
-    super.topics,
-    super.reportsUpdatedAt,
-    super.createdById,
-    super.fullNameEn,
-    super.fullNameAr,
-    super.email,
-    super.phone,
-    super.departmentId,
-    super.departmentNameEn,
-    super.departmentNameAr,
-    super.positionId,
-    super.positionNameEn,
-    super.positionNameAr,
-    super.reportTo,
-    super.reportToNameEn,
-    super.reportToNameAr,
-    super.requestId,
-    super.serviceId,
-    super.serviceNameEn,
-    super.serviceNameAr,
-    super.requestStatusId,
-    super.requestStatusKey,
-    super.requestStatusEn,
-    super.requestStatusAr,
-    super.priorityId,
-    super.priorityKey,
-    super.priorityEn,
-    super.priorityAr,
-    super.requestDetails,
-    super.requestCreatedAt,
-    super.requestUpdatedAt,
-    super.requestApprovedAt,
-    super.requestIsActive,
-    super.numberOfManagerApprovalsNeeded,
-    super.numberOfApprovalsNeeded,
-    super.numberOfApprovalsDone,
-    super.numberOfApprovalsPending,
+class ReportssPageViewModel {
+  final ReportsDirectory reportInfo;
+  final List<ReportColumnsMeta> columns;
+  final List<Map<String, dynamic>> rows;
+
+  const ReportssPageViewModel({
+    required this.reportInfo,
+    required this.columns,
+    required this.rows,
   });
-  ReportssPageViewModel copyWith({
-    String? reportsId,
-    String? createdById,
-    DateTime? reportsUpdatedAt,
-    String? status,
-    bool? isActive,
-    String? title,
-    String? content,
-    List<String>? topics,
-    String? fullNameEn,
-    String? fullNameAr,
-    String? email,
-    String? phone,
-    String? departmentId,
-    String? departmentNameEn,
-    String? departmentNameAr,
-    String? positionId,
-    String? positionNameEn,
-    String? positionNameAr,
-    String? reportTo,
-    String? reportToNameEn,
-    String? reportToNameAr,
-    int? requestId,
-    int? serviceId,
-    String? serviceNameEn,
-    String? serviceNameAr,
-    String? requestStatusId,
-    String? requestStatusKey,
-    String? requestStatusEn,
-    String? requestStatusAr,
-    String? priorityId,
-    String? priorityKey,
-    String? priorityEn,
-    String? priorityAr,
-    String? requestDetails,
-    DateTime? requestCreatedAt,
-    DateTime? requestUpdatedAt,
-    DateTime? requestApprovedAt,
-    bool? requestIsActive,
-    int? numberOfManagerApprovalsNeeded,
-    int? numberOfApprovalsNeeded,
-    int? numberOfApprovalsDone,
-    int? numberOfApprovalsPending,
-  }) {
+
+  // 👇 ADD THIS FACTORY
+  factory ReportssPageViewModel.fromDirectory(Map<String, dynamic> json) {
     return ReportssPageViewModel(
-      reportsId: reportsId ?? this.reportsId,
-      createdById: createdById ?? this.createdById,
-      reportsUpdatedAt: reportsUpdatedAt ?? this.reportsUpdatedAt,
-      status: status ?? this.status,
-      isActive: isActive ?? this.isActive,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      topics: topics ?? this.topics,
-      fullNameEn: fullNameEn ?? this.fullNameEn,
-      fullNameAr: fullNameAr ?? this.fullNameAr,
-      email: email ?? this.email,
-      phone: phone ?? this.phone,
-      departmentId: departmentId ?? this.departmentId,
-      departmentNameEn: departmentNameEn ?? this.departmentNameEn,
-      departmentNameAr: departmentNameAr ?? this.departmentNameAr,
-      positionId: positionId ?? this.positionId,
-      positionNameEn: positionNameEn ?? this.positionNameEn,
-      positionNameAr: positionNameAr ?? this.positionNameAr,
-      reportTo: reportTo ?? this.reportTo,
-      reportToNameEn: reportToNameEn ?? this.reportToNameEn,
-      reportToNameAr: reportToNameAr ?? this.reportToNameAr,
-      requestId: requestId ?? this.requestId,
-      serviceId: serviceId ?? this.serviceId,
-      serviceNameEn: serviceNameEn ?? this.serviceNameEn,
-      serviceNameAr: serviceNameAr ?? this.serviceNameAr,
-      requestStatusId: requestStatusId ?? this.requestStatusId,
-      requestStatusKey: requestStatusKey ?? this.requestStatusKey,
-      requestStatusEn: requestStatusEn ?? this.requestStatusEn,
-      requestStatusAr: requestStatusAr ?? this.requestStatusAr,
-      priorityId: priorityId ?? this.priorityId,
-      priorityKey: priorityKey ?? this.priorityKey,
-      priorityEn: priorityEn ?? this.priorityEn,
-      priorityAr: priorityAr ?? this.priorityAr,
-      requestDetails: requestDetails ?? this.requestDetails,
-      requestCreatedAt: requestCreatedAt ?? this.requestCreatedAt,
-      requestUpdatedAt: requestUpdatedAt ?? this.requestUpdatedAt,
-      requestApprovedAt: requestApprovedAt ?? this.requestApprovedAt,
-      requestIsActive: requestIsActive ?? this.requestIsActive,
-      numberOfManagerApprovalsNeeded:
-          numberOfManagerApprovalsNeeded ?? this.numberOfManagerApprovalsNeeded,
-      numberOfApprovalsNeeded:
-          numberOfApprovalsNeeded ?? this.numberOfApprovalsNeeded,
-      numberOfApprovalsDone:
-          numberOfApprovalsDone ?? this.numberOfApprovalsDone,
-      numberOfApprovalsPending:
-          numberOfApprovalsPending ?? this.numberOfApprovalsPending,
+      // We parse the Directory info
+      reportInfo: ReportsDirectoryModel.fromJson(json),
+      // We leave the heavy data empty for the list view
+      columns: const [],
+      rows: const [],
     );
   }
 
-  factory ReportssPageViewModel.fromJson(Map<String, dynamic> json) {
-    return ReportssPageViewModel(
-      reportsId: json['id'],
-      title: json['title'],
-      content: json['content'],
-      status: json['status'],
-      isActive: json['is_active'],
-      topics: json['topics'] != null ? List<String>.from(json['topics']) : null,
-      reportsUpdatedAt: json['reports_updated_at'] != null
-          ? DateTime.tryParse(json['reports_updated_at'])
-          : null,
-      createdById: json['created_by_id'],
-      fullNameEn: json['full_name_en'],
-      fullNameAr: json['full_name_ar'],
-      email: json['email'],
-      phone: json['phone'],
-      departmentId: json['department_id'],
-      departmentNameEn: json['department_name_en'],
-      departmentNameAr: json['department_name_ar'],
-      positionId: json['position_id'],
-      positionNameEn: json['position_name_en'],
-      positionNameAr: json['position_name_ar'],
-      reportTo: json['report_to'],
-      reportToNameEn: json['report_to_name_en'],
-      reportToNameAr: json['report_to_name_ar'],
-      requestId: json['request_id'],
-      serviceId: json['service_id'],
-      serviceNameEn: json['service_name_en'],
-      serviceNameAr: json['service_name_ar'],
-      requestStatusId: json['request_status_id'],
-      requestStatusKey: json['request_status_key'],
-      requestStatusEn: json['request_status_en'],
-      requestStatusAr: json['request_status_ar'],
-      priorityId: json['priority_id'],
-      priorityKey: json['priority_key'],
-      priorityEn: json['priority_en'],
-      priorityAr: json['priority_ar'],
-      requestDetails: json['request_details'],
-      requestCreatedAt: json['request_created_at'] != null
-          ? DateTime.tryParse(json['request_created_at'])
-          : null,
-      requestUpdatedAt: json['request_updated_at'] != null
-          ? DateTime.tryParse(json['request_updated_at'])
-          : null,
-      requestApprovedAt: json['request_approved_at'] != null
-          ? DateTime.tryParse(json['request_approved_at'])
-          : null,
-      requestIsActive: json['request_is_active'],
-      numberOfManagerApprovalsNeeded:
-          json['number_of_manager_approvals_needed'],
-      numberOfApprovalsNeeded: json['number_of_approvals_needed'],
-      numberOfApprovalsDone: json['number_of_approvals_done'],
-      numberOfApprovalsPending: json['number_of_approvals_pending'],
-    );
-  }
+  // Helper to get title
+  String getTitle(String locale) =>
+      locale == 'ar' ? reportInfo.titleAr : reportInfo.titleEn;
 
-  Reports? toReports() {
-    return Reports(
-      id: reportsId ?? "",
-      createdById: createdById ?? "",
-      updatedAt:
-          reportsUpdatedAt ?? DateTime.now().toUtc().add(Duration(hours: 3)),
-      status: status ?? "",
-      requestId: requestId ?? 0,
-      isActive: isActive ?? true,
-      title: title ?? "",
-      content: content ?? "",
-      topics: topics ?? [],
-    );
-  }
+  // Helper to get description
+  String getDescription(String locale) => locale == 'ar'
+      ? (reportInfo.descriptionAr ?? '')
+      : (reportInfo.descriptionEn ?? '');
 }

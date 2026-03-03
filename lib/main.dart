@@ -6,6 +6,7 @@ import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_
 import 'package:etqan_application_2025/src/features/blog/presentation/bloc/blog_bloc.dart';
 import 'package:etqan_application_2025/src/features/homeScreen/presentation/bloc/home_screen_bloc.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc/onboarding_bloc.dart';
+import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/bloc/users_manager_bloc.dart';
 import 'package:etqan_application_2025/src/features/vacation/presentation/bloc/vacation_bloc.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,9 @@ void main() async {
       ),
       BlocProvider(
         create: (_) => serviceLocator<VacationBloc>(),
+      ),
+      BlocProvider(
+        create: (_) => serviceLocator<ReportsBloc>(),
       ),
       BlocProvider(
         create: (_) => serviceLocator<UsersManagerBloc>(),

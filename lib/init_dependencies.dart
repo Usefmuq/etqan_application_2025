@@ -50,11 +50,8 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc
 import 'package:etqan_application_2025/src/features/reports/data/datasources/reports_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/reports/data/repositories/reports_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/repositories/reports_repository.dart';
-import 'package:etqan_application_2025/src/features/reports/domain/usecases/approve_reports.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetch_reports_page.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/get_all_reportss.dart';
-import 'package:etqan_application_2025/src/features/reports/domain/usecases/submit_reports.dart';
-import 'package:etqan_application_2025/src/features/reports/domain/usecases/update_reports.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/datasources/users_manager_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/repositories/users_manager_repository_impl.dart';
@@ -298,16 +295,6 @@ void _intitReports() {
     )
     //UseCases
     ..registerFactory(
-      () => SubmitReports(
-        serviceLocator(),
-      ),
-    )
-    ..registerFactory(
-      () => UpdateReports(
-        serviceLocator(),
-      ),
-    )
-    ..registerFactory(
       () => GetAllReportss(
         serviceLocator(),
       ),
@@ -317,17 +304,9 @@ void _intitReports() {
         serviceLocator(),
       ),
     )
-    ..registerFactory(
-      () => ApproveReports(
-        serviceLocator(),
-      ),
-    )
     //Bloc
     ..registerLazySingleton(
       () => ReportsBloc(
-        submitReports: serviceLocator(),
-        updateReports: serviceLocator(),
-        approveReports: serviceLocator(),
         getAllReportss: serviceLocator(),
       ),
     );
