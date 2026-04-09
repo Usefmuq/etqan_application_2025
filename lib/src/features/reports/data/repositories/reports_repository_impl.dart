@@ -44,4 +44,26 @@ class ReportsRepositoryImpl implements ReportsRepository {
       return left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, ReportsViewerPageEntity>> fetchAttendanceReport({
+    required String selectedEmployeeId,
+    required DateTime startDate,
+    required DateTime endDate,
+  }) async {
+    try {
+      final reportssVeiw = await reportsRemoteDataSource.getAttendanceReports(
+        selectedEmployeeId,
+        startDate,
+        endDate,
+      );
+      return right(ReportsViewerPageEntity(
+        reportssView: reportssVeiw,
+      ));
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
 }

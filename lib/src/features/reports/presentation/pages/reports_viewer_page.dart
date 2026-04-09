@@ -98,14 +98,19 @@ class _ReportsViewerPageState extends State<ReportsViewerPage> {
 
   MaterialColor _getStatusColor(String value) {
     final lower = value.toLowerCase();
-    if (lower.contains('pending') || lower.contains('wait'))
+    if (lower.contains('pending') || lower.contains('wait')) {
       return Colors.orange;
+    }
     if (lower.contains('approv') ||
         lower.contains('success') ||
-        lower.contains('done')) return Colors.green;
+        lower.contains('done')) {
+      return Colors.green;
+    }
     if (lower.contains('reject') ||
         lower.contains('error') ||
-        lower.contains('cancel')) return Colors.red;
+        lower.contains('cancel')) {
+      return Colors.red;
+    }
     return Colors.blue;
   }
 

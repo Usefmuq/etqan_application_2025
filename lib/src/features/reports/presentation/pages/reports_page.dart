@@ -3,6 +3,7 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/animated_ca
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
+import 'package:etqan_application_2025/src/core/utils/permission.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/entities/reports_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class ReportsPage extends StatefulWidget {
 }
 
 class _ReportsPageState extends State<ReportsPage> {
+  List<String>? permissions;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +34,19 @@ class _ReportsPageState extends State<ReportsPage> {
       if (userState is AppUserSignedIn) {
         context.read<ReportsBloc>().add(ReportsGetAllReportssEvent());
       }
+    });
+
+    final appUserState = context.read<AppUserCubit>().state;
+    if (appUserState is! AppUserSignedIn) return;
+    final user = appUserState.user;
+
+    Future.microtask(() async {
+      final fetchedPermissions = await fetchUserPermissions(user.id);
+
+      if (!mounted) return;
+      setState(() {
+        permissions = fetchedPermissions;
+      });
     });
   }
 
@@ -65,43 +81,75 @@ class _ReportsPageState extends State<ReportsPage> {
                   child: Text(AppLocalizations.of(context)!.noResults),
                 );
               }
+              final user =
+                  (context.read<AppUserCubit>().state as AppUserSignedIn).user;
 
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(top: 10, bottom: 20),
-                itemCount: availableReports.reportssView.length,
-                itemBuilder: (context, index) {
-                  final report = availableReports.reportssView[index];
+              return Column(
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.only(top: 10, bottom: 20),
+                    itemCount: availableReports.reportssView.length,
+                    itemBuilder: (context, index) {
+                      final report = availableReports.reportssView[index];
 
-                  final title = locale == 'ar'
-                      ? report.reportInfo.titleAr
-                      : report.reportInfo.titleEn;
+                      final title = locale == 'ar'
+                          ? report.reportInfo.titleAr
+                          : report.reportInfo.titleEn;
 
-                  final desc = locale == 'ar'
-                      ? report.reportInfo.descriptionAr
-                      : report.reportInfo.descriptionEn;
-
-                  return Padding(
+                      final desc = locale == 'ar'
+                          ? report.reportInfo.descriptionAr
+                          : report.reportInfo.descriptionEn;
+                      final perm = report.reportInfo.reportKey;
+                      if (isUserHasPermissionsView(
+                        permissions ?? [],
+                        perm,
+                      )) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          child: AnimatedCardWrapper(
+                            index: index,
+                            child: _ReportDirectoryCard(
+                              title: title,
+                              subtitle: desc ?? '',
+                              onTap: () {
+                                context.push(
+                                  '/reports/${report.reportInfo.id}',
+                                  extra: ReportsViewerPageEntity(
+                                    reportssView: report,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+                  Padding(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     child: AnimatedCardWrapper(
-                      index: index,
+                      index: availableReports.reportssView.length,
                       child: _ReportDirectoryCard(
-                        title: title,
-                        subtitle: desc ?? '',
+                        title:
+                            locale == 'ar' ? 'سجل الحضور' : 'Attendance Report',
+                        subtitle: locale == 'ar'
+                            ? 'عرض تقارير الحضور والانصراف'
+                            : 'View attendance and departure reports',
                         onTap: () {
                           context.push(
-                            '/reports/${report.reportInfo.id}',
-                            extra: ReportsViewerPageEntity(
-                              reportssView: report,
-                            ),
+                            '/reports/attendance',
+                            extra: user,
                           );
                         },
                       ),
                     ),
-                  );
-                },
+                  )
+                ],
               );
             }
 

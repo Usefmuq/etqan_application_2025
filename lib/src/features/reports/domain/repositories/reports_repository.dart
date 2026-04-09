@@ -8,4 +8,9 @@ abstract interface class ReportsRepository {
   Future<Either<Failure, ReportsViewerPageEntity>> fetchReportsViewerPage({
     required String requestId,
   });
+  Future<Either<Failure, ReportsViewerPageEntity>> fetchAttendanceReport({
+    required String selectedEmployeeId,
+    required DateTime startDate,
+    required DateTime endDate,
+  });
 }

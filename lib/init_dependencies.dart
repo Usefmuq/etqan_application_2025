@@ -50,6 +50,7 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/bloc
 import 'package:etqan_application_2025/src/features/reports/data/datasources/reports_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/reports/data/repositories/reports_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/repositories/reports_repository.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetch_attendance_reports.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetch_reports_page.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/get_all_reportss.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
@@ -301,6 +302,11 @@ void _intitReports() {
     )
     ..registerFactory(
       () => FetchReportsPage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchAttendanceReport(
         serviceLocator(),
       ),
     )

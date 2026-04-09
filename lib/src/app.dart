@@ -19,6 +19,7 @@ import 'package:etqan_application_2025/src/features/onboarding/presentation/page
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/onboarding_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/onboarding/presentation/pages/update_onboarding_page.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/entities/reports_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/reports/presentation/pages/attendance_report_page.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/pages/reports_page.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/pages/reports_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/usersManager/domain/entities/users_manager_viewer_page_entity.dart';
@@ -262,6 +263,12 @@ class MyAppState extends State<MyApp> {
           path: '/reports',
           builder: (context, state) {
             return ReportsPage();
+          },
+        ),
+        GoRoute(
+          path: '/reports/attendance',
+          builder: (context, state) {
+            return AttendanceReportPage();
           },
         ),
         GoRoute(

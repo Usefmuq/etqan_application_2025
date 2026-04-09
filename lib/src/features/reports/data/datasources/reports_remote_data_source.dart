@@ -2,11 +2,17 @@ import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/features/reports/data/models/report_columns_meta_model.dart';
 import 'package:etqan_application_2025/src/features/reports/data/models/reports_directory_model.dart';
 import 'package:etqan_application_2025/src/features/reports/data/models/reports_page_view_model.dart';
+import 'package:etqan_application_2025/src/features/reports/domain/entities/reports_directory.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class ReportsRemoteDataSource {
   Future<List<ReportssPageViewModel>> getAllReportssView();
   Future<ReportssPageViewModel> getReportsViewByRequestId(String requestId);
+  Future<ReportssPageViewModel> getAttendanceReports(
+    String selectedEmployeeId,
+    DateTime startDate,
+    DateTime endDate,
+  );
 }
 
 class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
@@ -67,6 +73,46 @@ class ReportsRemoteDataSourceImpl implements ReportsRemoteDataSource {
         reportInfo: reportInfo,
         columns: columns,
         rows: rows,
+      );
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<ReportssPageViewModel> getAttendanceReports(
+    String selectedEmployeeId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      // 1. Make the Supabase Call
+      final response = await supabaseClient
+          .from('attendance_rolling_year_view')
+          .select()
+          .eq('user_id', selectedEmployeeId)
+          .gte('date', startDate.toIso8601String())
+          .lte('date', endDate.toIso8601String())
+          .order('date', ascending: false);
+
+      // 2. Parse the rows
+      final rows = List<Map<String, dynamic>>.from(response);
+
+      // 3. Return it packaged as your standard ViewModel/Entity!
+      return ReportssPageViewModel(
+        // We can pass empty/dummy values for info and columns
+        // because our new UI completely handles the titles and columns locally!
+        reportInfo: ReportsDirectory(
+          id: 'attendance',
+          reportKey: 'ATTENDANCE_ROLLING',
+          titleEn: 'Attendance',
+          titleAr: 'الحضور',
+          viewName: '',
+          isActive: true,
+          createdAt: DateTime.now(),
+        ),
+        columns: [], // Ignored by the new UI
+        rows: rows, // The actual data the UI needs!
       );
     } catch (e) {
       throw ServerException(e.toString());
