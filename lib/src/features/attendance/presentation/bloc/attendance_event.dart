@@ -11,6 +11,14 @@ final class AttendanceSubmitEvent extends AttendanceEvent {
   });
 }
 
+final class AttendanceRegularizationSubmitEvent extends AttendanceEvent {
+  final AttendanceRegularizationModel attendance;
+
+  AttendanceRegularizationSubmitEvent({
+    required this.attendance,
+  });
+}
+
 final class AttendanceUpdateEvent extends AttendanceEvent {
   final AttendancesPageViewModel attendanceViewerPage;
   final String updatedBy;

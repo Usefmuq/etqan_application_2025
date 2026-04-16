@@ -34,8 +34,6 @@ class AddNewAttendancePage extends StatefulWidget {
 
 class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
   List<String>? permissions;
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController contentController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   List<ServiceField> serviceFields = [];
   List<AttendanceSessionModel> latestAttendances = [];
@@ -119,8 +117,6 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
 
   @override
   void dispose() {
-    titleController.dispose();
-    contentController.dispose();
     super.dispose();
   }
 
@@ -190,8 +186,6 @@ class _AddNewAttendancePageState extends State<AddNewAttendancePage> {
                           //         : selectedTopics.add(topic);
                           //   });
                           // },
-                          titleController: titleController,
-                          contentController: contentController,
                           isWide: isWide,
                           onLatLng: _handleLatLng,
                         ),

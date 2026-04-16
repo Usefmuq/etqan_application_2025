@@ -101,6 +101,7 @@
     "attendanceCheckOut": "تسجيل خروج",
     "attendanceLocationFar": "موقعك بعيد جداً.",
     "attendanceLocationFarDesc": "يرجى المحاولة مرة أخرى بعد أن تكون أقرب إلى المبنى.",
+    "attendanceRegularizationSubmitNew": "تقديم طلب جديد لخدمة تسوية الحضور",
 
 "vacation": "إجازة",
   "vacationTitle": "عنوان الإجازة", 

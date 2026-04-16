@@ -8,9 +8,11 @@ import 'package:etqan_application_2025/src/core/data/models/request_unlocked_fie
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/datasources/attendance_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
 import 'package:fpdart/fpdart.dart';
@@ -37,6 +39,30 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       );
       final insertedAttendance = await attendanceRemoteDataSource
           .submitAttendance(attendance, requestMasterModel);
+      return right(insertedAttendance);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AttendanceRegularizationViewerPageEntity>>
+      submitAttendanceRegularization({
+    required AttendanceRegularizationModel attendance,
+  }) async {
+    try {
+      RequestMasterModel requestMasterModel = RequestMasterModel(
+        // requestId: 0,
+        userId: attendance.createdById,
+        serviceId: ServicesConstants.attendanceRegularizationServiceId,
+        status: LookupConstants.requestStatusPending,
+        createdAt: DateTime.now().toUtc().add(Duration(hours: 3)),
+        updatedAt: DateTime.now().toUtc().add(Duration(hours: 3)),
+      );
+      final insertedAttendance = await attendanceRemoteDataSource
+          .submitAttendanceRegularization(attendance, requestMasterModel);
       return right(insertedAttendance);
     } on ServerException catch (e) {
       return left(Failure(e.message));

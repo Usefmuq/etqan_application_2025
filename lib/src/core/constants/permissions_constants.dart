@@ -25,11 +25,21 @@ class PermissionsConstants {
   static const String approveAttendance = "approve_attendance";
   static const String viewAllAttendance = "VIEW_ALL_ATTENDANCE";
   static const String viewDepartmentAttendance = "VIEW_DEPARTMENT_ATTENDANCE";
-  // attendance Vacation
+  // attendance Regularization Permissions
+  static const String addAttendanceRegularization =
+      "add_attendanceRegularization";
+  static const String viewAttendanceRegularization =
+      "view_attendanceRegularization";
+  static const String approveattendanceRegularization =
+      "approve_attendanceRegularization";
+  static const String updateAttendanceRegularization =
+      "update_attendanceRegularization";
+
+  //  Vacation Permissions
   static const String viewVacation = "view_vacations";
   static const String addVacation = "add_vacations";
   static const String updateVacation = "update_vacations";
   static const String approveVacation = "approve_vacations";
-  // attendance Vacation
+  // reports Permissions
   static const String viewReports = "view_reports";
 }

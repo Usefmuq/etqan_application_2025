@@ -4,14 +4,20 @@ import 'package:etqan_application_2025/src/core/data/models/request_master_model
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/utils/extensions.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract interface class AttendanceRemoteDataSource {
   Future<AttendanceViewerPageEntity> submitAttendance(
       AttendanceSessionModel attendance, RequestMasterModel request);
+  Future<AttendanceRegularizationViewerPageEntity>
+      submitAttendanceRegularization(
+          AttendanceRegularizationModel attendance, RequestMasterModel request);
   Future<AttendanceViewerPageEntity> updateAttendance(
     AttendancesPageViewModel attendance,
     String updatedBy,
@@ -256,6 +262,40 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
       return approvalsView
           .map((approvals) => ApprovalSequenceViewModel.fromJson(approvals))
           .toList();
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<AttendanceRegularizationViewerPageEntity>
+      submitAttendanceRegularization(
+    AttendanceRegularizationModel attendance,
+    RequestMasterModel request,
+  ) async {
+    try {
+      // SUBMIT
+      final submitRes =
+          await supabaseClient.rpc('rpc_service_submit_generic', params: {
+        'p_service_id':
+            ServicesConstants.attendanceRegularizationServiceId, // int
+        'p_entity_table': 'attendance_regularizations',
+        'p_view_name': 'attendance_regularizations_view',
+        'p_approvals_view': 'approval_sequence_view',
+        'p_request': request.toJson(),
+        'p_entity': attendance
+            .toJson(), // no need to include request_id; RPC injects it
+      });
+      final attendanceregularizationsView =
+          AttendanceRegularizationViewModel.fromJson(submitRes['view']);
+      final approvals = (submitRes['approval'] as List)
+          .map((j) => ApprovalSequenceViewModel.fromJson(j))
+          .toList();
+
+      return AttendanceRegularizationViewerPageEntity(
+        attendancesView: attendanceregularizationsView,
+        approval: approvals,
+      );
     } catch (e) {
       throw ServerException(e.toString());
     }

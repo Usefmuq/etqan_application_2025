@@ -107,6 +107,7 @@
     "attendanceCheckOut": "Check-Out",
     "attendanceLocationFar": "Your location is too far.",
     "attendanceLocationFarDesc": "Please try again after being closer to the building.",
+    "attendanceRegularizationSubmitNew": "Submit new request for attendance regularization service",
 
 "vacation": "Vacation",
     "vacationTitle": "Vacation Title", 

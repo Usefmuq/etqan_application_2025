@@ -10,6 +10,7 @@ class ServicesConstants {
     '/attendance/submit',
     '/vacations',
     '/reports',
+    '/attendanceRegularization/submit',
   ];
   static int blogServiceId = 1;
   static int onboardingServiceId = 2;
@@ -17,4 +18,5 @@ class ServicesConstants {
   static int attendanceServiceId = 4;
   static int vacationServiceId = 5;
   static int reportsServiceId = 6;
+  static int attendanceRegularizationServiceId = 7;
 }

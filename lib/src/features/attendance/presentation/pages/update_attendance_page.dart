@@ -186,8 +186,8 @@ class _UpdateAttendancePageState extends State<UpdateAttendancePage> {
                           //         : selectedTopics.add(topic);
                           //   });
                           // },
-                          titleController: titleControler,
-                          contentController: contentControler,
+                          // titleController: titleControler,
+                          // contentController: contentControler,
                           isWide: isWide,
                           unlockedFields: unlockedFields,
                         ),
