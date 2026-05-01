@@ -3,8 +3,9 @@ import 'package:etqan_application_2025/src/core/data/models/approval_sequence_vi
 import 'package:etqan_application_2025/src/core/data/models/request_unlocked_field_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/approve_attendance.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/get_all_attendances.dart';
@@ -41,7 +42,8 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
         _onAttendanceRegularizationSubmitEvent);
     on<AttendanceUpdateEvent>(_onAttendanceUpdateEvent);
     on<AttendanceApproveEvent>(_onAttendanceApproveEvent);
-    on<AttendanceGetAllAttendancesEvent>(_onAttendanceGetAllAttendancesEvent);
+    on<AttendanceRegularizationGetAllAttendancesEvent>(
+        _onAttendanceRegularizationGetAllAttendancesEvent);
   }
 
   void _onAttendanceSubmitEvent(
@@ -108,8 +110,8 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     );
   }
 
-  void _onAttendanceGetAllAttendancesEvent(
-    AttendanceGetAllAttendancesEvent event,
+  void _onAttendanceRegularizationGetAllAttendancesEvent(
+    AttendanceRegularizationGetAllAttendancesEvent event,
     Emitter<AttendanceState> emit,
   ) async {
     final response = await _getAllAttendances(GetAllAttendancesParams(

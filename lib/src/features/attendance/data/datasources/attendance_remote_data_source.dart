@@ -27,7 +27,8 @@ abstract interface class AttendanceRemoteDataSource {
     List<RequestUnlockedFieldModel>? requestUnlockedFields,
     AttendancesPageViewModel attendance,
   );
-  Future<List<AttendancesPageViewModel>> getAllAttendancesView(
+  Future<List<AttendanceRegularizationViewModel>>
+      getAllAttendancesRegularizationView(
     String userId,
     String? departmentId,
     bool isManagerExpanded,
@@ -35,6 +36,8 @@ abstract interface class AttendanceRemoteDataSource {
     bool isViewAll,
   );
   Future<AttendancesPageViewModel> getAttendanceViewByRequestId(int requestId);
+  Future<AttendanceRegularizationViewModel>
+      getAttendanceRegularizationViewByRequestId(int requestId);
   Future<List<ApprovalSequenceViewModel>> getAllApprovalsView();
   Future<List<ApprovalSequenceViewModel>> getApprovalViewByRequestId(
       int requestId);
@@ -161,7 +164,8 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
   }
 
   @override
-  Future<List<AttendancesPageViewModel>> getAllAttendancesView(
+  Future<List<AttendanceRegularizationViewModel>>
+      getAllAttendancesRegularizationView(
     String userId,
     String? departmentId,
     bool isManagerExpanded,
@@ -195,13 +199,14 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
       }
 
       final result = await supabaseClient
-          .from('attendances_page_view')
+          .from('attendance_regularizations_view')
           .select('*')
           .match(filters)
-          .order('updated_at', ascending: false);
+          .order('request_updated_at', ascending: false);
 
       return result
-          .map((attendance) => AttendancesPageViewModel.fromJson(attendance))
+          .map((attendance) =>
+              AttendanceRegularizationViewModel.fromJson(attendance))
           .toList();
     } catch (e) {
       throw ServerException(e.toString());
@@ -229,6 +234,32 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
       }
 
       return AttendancesPageViewModel.fromJson(row);
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<AttendanceRegularizationViewModel>
+      getAttendanceRegularizationViewByRequestId(int requestId) async {
+    try {
+      final Map<String, Object> filters = {
+        'request_is_active': true,
+        'request_id': requestId,
+      };
+
+      final Map<String, dynamic>? row = await supabaseClient
+          .from('attendance_regularizations_view')
+          .select('*')
+          .match(filters)
+          .order('updated_at', ascending: false)
+          .maybeSingle();
+
+      if (row == null) {
+        throw ServerException('Result view not found');
+      }
+
+      return AttendanceRegularizationViewModel.fromJson(row);
     } catch (e) {
       throw ServerException(e.toString());
     }

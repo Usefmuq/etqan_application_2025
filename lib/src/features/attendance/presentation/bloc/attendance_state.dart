@@ -25,6 +25,6 @@ final class AttendanceApproveSuccess extends AttendanceState {
 }
 
 final class AttendanceShowAllSuccess extends AttendanceState {
-  final AttendancePageEntity attendancePage;
+  final AttendanceRegularizationPageEntity attendancePage;
   AttendanceShowAllSuccess(this.attendancePage);
 }

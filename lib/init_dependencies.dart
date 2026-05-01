@@ -14,6 +14,7 @@ import 'package:etqan_application_2025/src/features/attendance/data/repositories
 import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/approve_attendance.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/fetch_attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/fetch_attendance_regularization_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/get_all_attendances.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/submit_attendance.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/submit_attendance_regularization.dart';
@@ -409,6 +410,11 @@ void _intitAttendance() {
     )
     ..registerFactory(
       () => FetchAttendancePage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchAttendanceRegularizationPage(
         serviceLocator(),
       ),
     )

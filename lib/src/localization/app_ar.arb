@@ -101,7 +101,24 @@
     "attendanceCheckOut": "تسجيل خروج",
     "attendanceLocationFar": "موقعك بعيد جداً.",
     "attendanceLocationFarDesc": "يرجى المحاولة مرة أخرى بعد أن تكون أقرب إلى المبنى.",
-    "attendanceRegularizationSubmitNew": "تقديم طلب جديد لخدمة تسوية الحضور",
+
+
+"attendanceRegularization": "تسوية الحضور",
+  "attendanceRegularizationTitle": "عنوان تسوية الحضور",
+  "attendanceRegularizationContent": "محتوى تسوية الحضور",
+  "attendanceRegularizationDetails": "تفاصيل تسوية الحضور",
+  "attendanceRegularizationService": "خدمة تسوية الحضور",
+  "attendanceRegularizationServiceSubtitle": "قدم طلبات لتصحيح أو تحديث سجلات الحضور والغياب السابقة",
+  "attendanceRegularizationSubmitNew": "تقديم طلب جديد لخدمة تسوية الحضور",
+  "attendanceRegularizationUpdate": "تحديث طلب تسوية الحضور",
+  "attendanceRegularizationStartDate": "تاريخ البدء",
+  "attendanceRegularizationEndDate": "تاريخ الانتهاء",
+  "attendanceRegularizationProposedCheckIn": "وقت الدخول المقترح",
+  "attendanceRegularizationProposedCheckOut": "وقت الخروج المقترح",
+  "attendanceRegularizationIncludeWeekends": "تضمين نهاية الأسبوع",
+  "attendanceRegularizationIncludeWeekendsDesc": "حساب الحضور لأيام الجمعة والسبت",
+  "attendanceRegularizationReason": "السبب",
+
 
 "vacation": "إجازة",
   "vacationTitle": "عنوان الإجازة", 

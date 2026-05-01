@@ -6,10 +6,12 @@ import 'package:etqan_application_2025/src/core/common/widgets/cards/custom_card
 import 'package:etqan_application_2025/src/core/common/widgets/loader.dart';
 import 'package:etqan_application_2025/src/core/common/widgets/pages/custom_scaffold.dart';
 import 'package:etqan_application_2025/src/core/constants/permissions_constants.dart';
+import 'package:etqan_application_2025/src/core/utils/extensions.dart';
 import 'package:etqan_application_2025/src/core/utils/lookups_and_constants.dart';
 import 'package:etqan_application_2025/src/core/utils/notifier.dart';
 import 'package:etqan_application_2025/src/core/utils/permission.dart';
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/core/utils/time_utils.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/bloc/attendance_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,18 +20,20 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 enum _TabKind { my, employees, department, all }
 
-class AttendancePage extends StatefulWidget {
+class AttendanceRegularizationPage extends StatefulWidget {
   static route() => MaterialPageRoute(
-        builder: (context) => const AttendancePage(),
+        builder: (context) => const AttendanceRegularizationPage(),
       );
 
-  const AttendancePage({super.key});
+  const AttendanceRegularizationPage({super.key});
 
   @override
-  State<AttendancePage> createState() => _AttendancePageState();
+  State<AttendanceRegularizationPage> createState() =>
+      _AttendanceRegularizationPageState();
 }
 
-class _AttendancePageState extends State<AttendancePage>
+class _AttendanceRegularizationPageState
+    extends State<AttendanceRegularizationPage>
     with SingleTickerProviderStateMixin {
   List<String>? permissions;
   TabController? _tabController;
@@ -82,8 +86,8 @@ class _AttendancePageState extends State<AttendancePage>
       _TabKind.my,
       _TabKind.employees,
       if (isDepManager) _TabKind.department,
-      if (isUserHasPermissionsView(
-          permissions ?? [], PermissionsConstants.updateAttendance))
+      if (isUserHasPermissionsView(permissions ?? [],
+          PermissionsConstants.updateAttendanceRegularization))
         _TabKind.all,
     ];
 
@@ -91,7 +95,8 @@ class _AttendancePageState extends State<AttendancePage>
 
     setState(() {
       _tabKinds = kinds;
-      bodyPerTab = List.generate(_tabKinds.length, (_) => [_attendanceTab()]);
+      bodyPerTab = List.generate(
+          _tabKinds.length, (_) => [_attendanceregularizationTab()]);
       _tabController = TabController(length: _tabKinds.length, vsync: this);
 
       isManagerExpanded = false;
@@ -113,7 +118,7 @@ class _AttendancePageState extends State<AttendancePage>
         final user = appUserState.user;
 
         context.read<AttendanceBloc>().add(
-              AttendanceGetAllAttendancesEvent(
+              AttendanceRegularizationGetAllAttendancesEvent(
                 user: user,
                 departmentId: user.departmentId,
                 isManagerExpanded: isManagerExpanded,
@@ -128,7 +133,7 @@ class _AttendancePageState extends State<AttendancePage>
       if (appUserState is AppUserSignedIn) {
         final user = appUserState.user;
         context.read<AttendanceBloc>().add(
-              AttendanceGetAllAttendancesEvent(
+              AttendanceRegularizationGetAllAttendancesEvent(
                 user: user,
                 departmentId: user.departmentId,
                 isManagerExpanded: false,
@@ -152,7 +157,7 @@ class _AttendancePageState extends State<AttendancePage>
         final ModalRoute? route = ModalRoute.of(context);
         if (route?.isCurrent == true) {
           context.read<AttendanceBloc>().add(
-                AttendanceGetAllAttendancesEvent(
+                AttendanceRegularizationGetAllAttendancesEvent(
                   user: user,
                   departmentId: user.departmentId,
                   isManagerExpanded: isManagerExpanded,
@@ -170,19 +175,20 @@ class _AttendancePageState extends State<AttendancePage>
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      title: AppLocalizations.of(context)!.attendancesService,
-      subtitle: AppLocalizations.of(context)!.attendancesServiceSubtitle,
+      title: AppLocalizations.of(context)!.attendanceRegularizationService,
+      subtitle:
+          AppLocalizations.of(context)!.attendanceRegularizationServiceSubtitle,
       tabController: _tabController,
       tabs: _tabsFromKinds(context, _tabKinds),
       bodyPerTab: bodyPerTab,
       tilteActions: [
         if (isUserHasPermissionsView(
           permissions ?? [],
-          PermissionsConstants.addAttendance,
+          PermissionsConstants.addAttendanceRegularization,
         ))
           IconButton(
             onPressed: () {
-              context.push('/attendance/submit/');
+              context.push('/attendanceRegularization/submit/');
             },
             icon: const Icon(Icons.add),
           ),
@@ -207,7 +213,7 @@ class _AttendancePageState extends State<AttendancePage>
     }).toList();
   }
 
-  Widget _attendanceTab() {
+  Widget _attendanceregularizationTab() {
     return BlocConsumer<AttendanceBloc, AttendanceState>(
       listener: (context, state) {
         if (state is AttendanceFailure) {
@@ -222,7 +228,7 @@ class _AttendancePageState extends State<AttendancePage>
         final permsReady = permissions != null;
         final canAdd = isUserHasPermissionsView(
           permissions ?? const [],
-          PermissionsConstants.viewAttendance,
+          PermissionsConstants.viewAttendanceRegularization,
         );
 
         if (state is AttendanceLoading || !permsReady) {
@@ -235,7 +241,7 @@ class _AttendancePageState extends State<AttendancePage>
         }
 
         if (state is AttendanceShowAllSuccess) {
-          if (state.attendancePage.attendancesView.isEmpty) {
+          if (state.attendancePage.attendancesView.isNullOrEmpty) {
             return Center(child: Text(AppLocalizations.of(context)!.noResults));
           }
 
@@ -244,7 +250,8 @@ class _AttendancePageState extends State<AttendancePage>
             physics: const NeverScrollableScrollPhysics(),
             itemCount: state.attendancePage.attendancesView.length,
             itemBuilder: (context, index) {
-              final attendance = state.attendancePage.attendancesView[index];
+              final attendanceregularization =
+                  state.attendancePage.attendancesView[index];
 
               return Padding(
                 padding:
@@ -252,18 +259,21 @@ class _AttendancePageState extends State<AttendancePage>
                 child: AnimatedCardWrapper(
                   index: index,
                   child: CustomCardListRequests(
-                    chips: attendance.topics ?? [],
-                    title: attendance.title ?? '',
-                    statusId: attendance.requestStatusId,
-                    requestDate: attendance.requestCreatedAt,
-                    subtitle: attendance.content,
+                    title:
+                        '${fmt(attendanceregularization.startDate)} - ${fmt(attendanceregularization.endDate)} ${attendanceregularization.fullNameAr}',
+                    statusId: attendanceregularization.requestStatusId,
+                    requestDate: attendanceregularization.requestCreatedAt,
+                    subtitle:
+                        '${attendanceregularization.proposedCheckIn} - ${attendanceregularization.proposedCheckOut}',
                     onTap: () {
                       context.push(
-                        '/attendance/${attendance.requestId}',
-                        extra: AttendanceViewerPageEntity(
-                          attendancesView: attendance,
+                        '/attendanceRegularization/${attendanceregularization.requestId}',
+                        extra: AttendanceRegularizationViewerPageEntity(
+                          attendancesView: attendanceregularization,
                           approval: state.attendancePage.approvalsView
-                              .where((a) => a.requestId == attendance.requestId)
+                              .where((a) =>
+                                  a.requestId ==
+                                  attendanceregularization.requestId)
                               .toList(),
                         ),
                       );

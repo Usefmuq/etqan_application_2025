@@ -1,16 +1,17 @@
 import 'package:etqan_application_2025/src/core/common/entities/user.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/core/usecase/usecase.dart';
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
 import 'package:fpdart/fpdart.dart';
 
 class GetAllAttendances
-    implements Usecase<AttendancePageEntity, GetAllAttendancesParams> {
+    implements
+        Usecase<AttendanceRegularizationPageEntity, GetAllAttendancesParams> {
   final AttendanceRepository attendanceRepostory;
   GetAllAttendances(this.attendanceRepostory);
   @override
-  Future<Either<Failure, AttendancePageEntity>> call(
+  Future<Either<Failure, AttendanceRegularizationPageEntity>> call(
       GetAllAttendancesParams params) async {
     return await attendanceRepostory.getAllAttendances(
       user: params.user,

@@ -31,3 +31,13 @@ String formatTimeForDisplay(String time24, String locale) {
 
   return '${displayHour.toString().padLeft(2, '0')}:$minute $amPm';
 }
+
+String fmt(DateTime? date) {
+  if (date == null) return '—';
+
+  String y = date.year.toString();
+  String m = date.month.toString().padLeft(2, '0');
+  String d = date.day.toString().padLeft(2, '0');
+
+  return "$y-$m-$d";
+}

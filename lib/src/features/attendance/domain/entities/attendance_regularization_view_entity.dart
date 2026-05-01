@@ -6,8 +6,8 @@ class AttendanceRegularizationViewEntity {
   final DateTime startDate;
   final DateTime endDate;
   final bool includeWeekends;
-  final DateTime? proposedCheckIn;
-  final DateTime? proposedCheckOut;
+  final String? proposedCheckIn;
+  final String? proposedCheckOut;
   final String reason;
   final String? status;
   final int requestId;

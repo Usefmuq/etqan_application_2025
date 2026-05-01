@@ -30,12 +30,6 @@ final class AttendanceUpdateEvent extends AttendanceEvent {
 }
 
 final class AttendanceApproveEvent extends AttendanceEvent {
-  // final int approvalId;
-  // final String approverUserId;
-  // final String approvalStatus;
-  // final int requestId;
-  // final bool isActive;
-  // final String approverComment;
   final ApprovalSequenceViewModel approvalSequence;
   final List<RequestUnlockedFieldModel>? requestUnlockedFields;
   final AttendancesPageViewModel attendanceModel;
@@ -47,13 +41,26 @@ final class AttendanceApproveEvent extends AttendanceEvent {
   });
 }
 
-final class AttendanceGetAllAttendancesEvent extends AttendanceEvent {
+final class AttendanceRegularizationApproveEvent extends AttendanceEvent {
+  final ApprovalSequenceViewModel approvalSequence;
+  final List<RequestUnlockedFieldModel>? requestUnlockedFields;
+  final AttendanceRegularizationViewModel attendanceregularizationModel;
+
+  AttendanceRegularizationApproveEvent({
+    required this.approvalSequence,
+    this.requestUnlockedFields,
+    required this.attendanceregularizationModel,
+  });
+}
+
+final class AttendanceRegularizationGetAllAttendancesEvent
+    extends AttendanceEvent {
   final User user;
   final String? departmentId;
   final bool isManagerExpanded;
   final bool isDepartmentManagerExpanded;
   final bool isViewAll;
-  AttendanceGetAllAttendancesEvent({
+  AttendanceRegularizationGetAllAttendancesEvent({
     required this.user,
     this.departmentId,
     required this.isManagerExpanded,

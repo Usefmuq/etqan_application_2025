@@ -1,9 +1,11 @@
 import 'package:etqan_application_2025/src/core/common/cubits/app_user/app_user_cubit.dart';
 import 'package:etqan_application_2025/src/core/theme/theme.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/add_attendance_regularization_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/add_new_attendance_page.dart';
-import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_regularization_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_regularization_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/update_attendance_page.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
@@ -193,9 +195,9 @@ class MyAppState extends State<MyApp> {
           },
         ),
         GoRoute(
-          path: '/attendance',
+          path: '/attendanceRegularization',
           builder: (context, state) {
-            return AttendancePage();
+            return AttendanceRegularizationPage();
           },
         ),
         GoRoute(
@@ -230,6 +232,19 @@ class MyAppState extends State<MyApp> {
             }
             final requestId = int.tryParse(state.pathParameters['id'] ?? '');
             return AttendanceViewerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/attendanceRegularization/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity =
+                  state.extra as AttendanceRegularizationViewerPageEntity;
+              return AttendanceRegularizationViewerPage(
+                  initialAttendanceRegularizationViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return AttendanceRegularizationViewerPage(requestId: requestId!);
           },
         ),
         GoRoute(

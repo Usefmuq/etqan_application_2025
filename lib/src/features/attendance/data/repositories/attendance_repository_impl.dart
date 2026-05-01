@@ -11,7 +11,7 @@ import 'package:etqan_application_2025/src/features/attendance/data/datasources/
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
-import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/repositories/attendance_repository.dart';
@@ -112,7 +112,8 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }
 
   @override
-  Future<Either<Failure, AttendancePageEntity>> getAllAttendances({
+  Future<Either<Failure, AttendanceRegularizationPageEntity>>
+      getAllAttendances({
     required User user,
     String? departmentId,
     required bool isManagerExpanded,
@@ -121,7 +122,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   }) async {
     try {
       final attendancesVeiw =
-          await attendanceRemoteDataSource.getAllAttendancesView(
+          await attendanceRemoteDataSource.getAllAttendancesRegularizationView(
         user.id,
         departmentId,
         isManagerExpanded,
@@ -130,7 +131,7 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       );
       final approvalsView =
           await attendanceRemoteDataSource.getAllApprovalsView();
-      return right(AttendancePageEntity(
+      return right(AttendanceRegularizationPageEntity(
         attendancesView: attendancesVeiw,
         approvalsView: approvalsView,
       ));
@@ -151,6 +152,25 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
           .getApprovalViewByRequestId(requestId);
       return right(AttendanceViewerPageEntity(
         attendancesView: attendancesVeiw,
+        approval: approvalsView,
+      ));
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AttendanceRegularizationViewerPageEntity>>
+      fetchAttendanceRegularizationViewerPage({required int requestId}) async {
+    try {
+      final attendanceregularizationsVeiw = await attendanceRemoteDataSource
+          .getAttendanceRegularizationViewByRequestId(requestId);
+      final approvalsView = await attendanceRemoteDataSource
+          .getApprovalViewByRequestId(requestId);
+      return right(AttendanceRegularizationViewerPageEntity(
+        attendancesView: attendanceregularizationsVeiw,
         approval: approvalsView,
       ));
     } on ServerException catch (e) {
