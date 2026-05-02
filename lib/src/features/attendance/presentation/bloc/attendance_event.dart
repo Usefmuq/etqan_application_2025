@@ -29,6 +29,16 @@ final class AttendanceUpdateEvent extends AttendanceEvent {
   });
 }
 
+final class AttendanceRegularizationUpdateEvent extends AttendanceEvent {
+  final AttendanceRegularizationViewModel attendanceRegularizationViewerPage;
+  final String updatedBy;
+
+  AttendanceRegularizationUpdateEvent({
+    required this.attendanceRegularizationViewerPage,
+    required this.updatedBy,
+  });
+}
+
 final class AttendanceApproveEvent extends AttendanceEvent {
   final ApprovalSequenceViewModel approvalSequence;
   final List<RequestUnlockedFieldModel>? requestUnlockedFields;

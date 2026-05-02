@@ -22,6 +22,11 @@ abstract interface class AttendanceRemoteDataSource {
     AttendancesPageViewModel attendance,
     String updatedBy,
   );
+  Future<AttendanceRegularizationViewerPageEntity>
+      updateAttendanceRegularization(
+    AttendanceRegularizationViewModel attendanceregularizationregularization,
+    String updatedBy,
+  );
   Future<AttendanceViewerPageEntity> approveAttendance(
     ApprovalSequenceViewModel approvalSequence,
     List<RequestUnlockedFieldModel>? requestUnlockedFields,
@@ -122,6 +127,50 @@ class AttendanceRemoteDataSourceImpl implements AttendanceRemoteDataSource {
 
       return AttendanceViewerPageEntity(
         attendancesView: attendancesView,
+        approval: approvals,
+      );
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
+
+  @override
+  Future<AttendanceRegularizationViewerPageEntity>
+      updateAttendanceRegularization(
+    AttendanceRegularizationViewModel attendanceregularizationViewerPage,
+    String updatedBy,
+  ) async {
+    try {
+      final res =
+          await supabaseClient.rpc('rpc_service_update_generic', params: {
+        'p_service_id': ServicesConstants.attendanceRegularizationServiceId,
+        'p_entity_table': 'attendance_regularizations',
+        'p_view_name': 'attendance_regularizations_view',
+        'p_approvals_view': 'approval_sequence_view',
+        'p_request_id': attendanceregularizationViewerPage.requestId,
+        'p_updated_by': updatedBy,
+        'p_entity': {
+          'start_date':
+              attendanceregularizationViewerPage.startDate.toIso8601String(),
+          'end_date':
+              attendanceregularizationViewerPage.endDate.toIso8601String(),
+          'include_weekends':
+              attendanceregularizationViewerPage.includeWeekends,
+          'proposed_check_in':
+              attendanceregularizationViewerPage.proposedCheckIn,
+          'proposed_check_out':
+              attendanceregularizationViewerPage.proposedCheckOut,
+          'reason': attendanceregularizationViewerPage.reason,
+        },
+      });
+      final attendanceregularizationsView =
+          AttendanceRegularizationViewModel.fromJson(res['view']);
+      final approvals = (res['approval'] as List)
+          .map((j) => ApprovalSequenceViewModel.fromJson(j))
+          .toList();
+
+      return AttendanceRegularizationViewerPageEntity(
+        attendancesView: attendanceregularizationsView,
         approval: approvals,
       );
     } catch (e) {

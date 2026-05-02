@@ -8,6 +8,7 @@ import 'package:etqan_application_2025/src/features/attendance/presentation/page
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_regularization_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/attendance_viewer_page.dart';
 import 'package:etqan_application_2025/src/features/attendance/presentation/pages/update_attendance_page.dart';
+import 'package:etqan_application_2025/src/features/attendance/presentation/pages/update_attendance_regularization_page.dart';
 import 'package:etqan_application_2025/src/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:etqan_application_2025/src/features/blog/domain/entities/blog_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/blog/presentation/pages/add_new_blog_page.dart';
@@ -221,6 +222,19 @@ class MyAppState extends State<MyApp> {
             }
             final requestId = int.tryParse(state.pathParameters['id'] ?? '');
             return UpdateAttendancePage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/attendanceRegularization/update/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity =
+                  state.extra as AttendanceRegularizationViewerPageEntity;
+              return UpdateAttendanceRegularizationPage(
+                  initialAttendanceRegularizationViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateAttendanceRegularizationPage(requestId: requestId!);
           },
         ),
         GoRoute(

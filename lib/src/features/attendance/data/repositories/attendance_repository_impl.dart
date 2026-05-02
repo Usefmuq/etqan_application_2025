@@ -9,6 +9,7 @@ import 'package:etqan_application_2025/src/core/error/exception.dart';
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/datasources/attendance_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
@@ -83,6 +84,26 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
         updatedBy,
       );
       return right(updatedAttendance);
+    } on ServerException catch (e) {
+      return left(Failure(e.message));
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AttendanceRegularizationViewerPageEntity>>
+      updateAttendanceRegularization({
+    required AttendanceRegularizationViewModel attendanceViewerPage,
+    required String updatedBy,
+  }) async {
+    try {
+      final updatedAttendanceRegularization =
+          await attendanceRemoteDataSource.updateAttendanceRegularization(
+        attendanceViewerPage,
+        updatedBy,
+      );
+      return right(updatedAttendanceRegularization);
     } on ServerException catch (e) {
       return left(Failure(e.message));
     } catch (e) {

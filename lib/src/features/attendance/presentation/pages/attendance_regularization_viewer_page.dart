@@ -20,6 +20,7 @@ import 'package:etqan_application_2025/src/features/attendance/presentation/page
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class AttendanceRegularizationViewerPage extends StatefulWidget {
   final AttendanceRegularizationViewerPageEntity?
@@ -186,16 +187,15 @@ class _AttendanceRegularizationViewerPageState
           ? '${AppLocalizations.of(context)!.attendanceRegularization}- ${attendanceregularizationViewerPage!.attendancesView.requestId}'
           : AppLocalizations.of(context)!.attendanceRegularization,
       tilteActions: [
-        // if (isUserHasPermissionsView(
-        //       permissions ?? [],
-        //       PermissionsConstants.updateAttendanceRegularization,
-        //     ) &&
-        //     attendanceregularizationViewerPage != null &&
-        //     attendanceregularizationViewerPage!.attendanceregularizationsView.toAttendanceRegularization() != null)
-        //   IconButton(
-        //     onPressed: _handleEdit,
-        //     icon: const Icon(Icons.edit),
-        //   ),
+        if (isUserHasPermissionsView(
+              permissions ?? [],
+              PermissionsConstants.updateAttendanceRegularization,
+            ) &&
+            attendanceregularizationViewerPage != null)
+          IconButton(
+            onPressed: _handleEdit,
+            icon: const Icon(Icons.edit),
+          ),
       ],
       body: [
         BlocConsumer<AttendanceBloc, AttendanceState>(
@@ -378,6 +378,19 @@ class _AttendanceRegularizationViewerPageState
         ),
       ],
     );
+  }
+
+  void _handleEdit() async {
+    final updatedEntity =
+        await context.push<AttendanceRegularizationViewerPageEntity>(
+      '/attendanceRegularization/update/${attendanceregularizationViewerPage!.attendancesView.requestId}',
+    );
+
+    if (updatedEntity != null && mounted) {
+      setState(() {
+        attendanceregularizationViewerPage = updatedEntity;
+      });
+    }
   }
 
   @override

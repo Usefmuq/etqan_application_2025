@@ -4,6 +4,7 @@ import 'package:etqan_application_2025/src/core/data/models/request_unlocked_fie
 import 'package:etqan_application_2025/src/core/error/failure.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_page_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_model.dart';
+import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
@@ -20,6 +21,11 @@ abstract interface class AttendanceRepository {
   });
   Future<Either<Failure, AttendanceViewerPageEntity>> updateAttendance({
     required AttendancesPageViewModel attendanceViewerPage,
+    required String updatedBy,
+  });
+  Future<Either<Failure, AttendanceRegularizationViewerPageEntity>>
+      updateAttendanceRegularization({
+    required AttendanceRegularizationViewModel attendanceViewerPage,
     required String updatedBy,
   });
   Future<Either<Failure, AttendanceViewerPageEntity>> approveAttendance({

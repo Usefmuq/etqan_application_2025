@@ -19,6 +19,13 @@ final class AttendanceUpdateSuccess extends AttendanceState {
   AttendanceUpdateSuccess(this.attendanceViewerPageEntity);
 }
 
+final class AttendanceRegularizationUpdateSuccess extends AttendanceState {
+  final AttendanceRegularizationViewerPageEntity
+      attendanceRegularizationViewerPageEntity;
+  AttendanceRegularizationUpdateSuccess(
+      this.attendanceRegularizationViewerPageEntity);
+}
+
 final class AttendanceApproveSuccess extends AttendanceState {
   final AttendanceViewerPageEntity attendanceViewerPageEntity;
   AttendanceApproveSuccess(this.attendanceViewerPageEntity);

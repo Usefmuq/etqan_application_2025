@@ -6,12 +6,14 @@ import 'package:etqan_application_2025/src/features/attendance/data/models/atten
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_regularization_view_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/data/models/attendance_session_model.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_page_entity.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_regularization_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/entities/attendance_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/approve_attendance.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/get_all_attendances.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/submit_attendance.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/submit_attendance_regularization.dart';
 import 'package:etqan_application_2025/src/features/attendance/domain/usecases/update_attendance.dart';
+import 'package:etqan_application_2025/src/features/attendance/domain/usecases/update_attendance_regularization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,17 +24,20 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
   final SubmitAttendance _submitAttendance;
   final SubmitAttendanceRegularization _submitAttendanceRegularization;
   final UpdateAttendance _updateAttendance;
+  final UpdateAttendanceRegularization _updateAttendanceRegularization;
   final ApproveAttendance _approveAttendance;
   final GetAllAttendances _getAllAttendances;
   AttendanceBloc({
     required SubmitAttendance submitAttendance,
     required SubmitAttendanceRegularization submitAttendanceRegularization,
     required UpdateAttendance updateAttendance,
+    required UpdateAttendanceRegularization updateAttendanceRegularization,
     required ApproveAttendance approveAttendance,
     required GetAllAttendances getAllAttendances,
   })  : _submitAttendance = submitAttendance,
         _submitAttendanceRegularization = submitAttendanceRegularization,
         _updateAttendance = updateAttendance,
+        _updateAttendanceRegularization = updateAttendanceRegularization,
         _approveAttendance = approveAttendance,
         _getAllAttendances = getAllAttendances,
         super(AttendanceInitial()) {
@@ -41,6 +46,8 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
     on<AttendanceRegularizationSubmitEvent>(
         _onAttendanceRegularizationSubmitEvent);
     on<AttendanceUpdateEvent>(_onAttendanceUpdateEvent);
+    on<AttendanceRegularizationUpdateEvent>(
+        _onAttendanceRegularizationUpdateEvent);
     on<AttendanceApproveEvent>(_onAttendanceApproveEvent);
     on<AttendanceRegularizationGetAllAttendancesEvent>(
         _onAttendanceRegularizationGetAllAttendancesEvent);
@@ -89,6 +96,24 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
       (failure) => emit(AttendanceFailure(failure.message)),
       (attendance) {
         emit(AttendanceUpdateSuccess(attendance));
+      },
+    );
+  }
+
+  void _onAttendanceRegularizationUpdateEvent(
+    AttendanceRegularizationUpdateEvent event,
+    Emitter<AttendanceState> emit,
+  ) async {
+    final response = await _updateAttendanceRegularization(
+        UpdateAttendanceRegularizationParams(
+      attendanceregularizationViewerPage:
+          event.attendanceRegularizationViewerPage,
+      updatedBy: event.updatedBy,
+    ));
+    response.fold(
+      (failure) => emit(AttendanceFailure(failure.message)),
+      (attendanceregularization) {
+        emit(AttendanceRegularizationUpdateSuccess(attendanceregularization));
       },
     );
   }
