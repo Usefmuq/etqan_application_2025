@@ -119,6 +119,22 @@
   "attendanceRegularizationIncludeWeekendsDesc": "حساب الحضور لأيام الجمعة والسبت",
   "attendanceRegularizationReason": "السبب",
 
+"servicesManager": "إدارة الخدمات",
+  "servicesManagerTitle": "عنوان إدارة الخدمات",
+  "servicesManagerContent": "محتوى إدارة الخدمات",
+  "servicesManagerDetails": "تفاصيل إدارة الخدمات",
+  "servicesManagerService": "خدمة إدارة الخدمات",
+  "servicesManagerServiceSubtitle": "إدارة وتكوين ومراقبة خدمات النظام",
+  "servicesManagerSubmitNew": "تقديم طلب جديد لإدارة الخدمات",
+  "servicesManagerUpdate": "تحديث بيانات إدارة الخدمات",
+  
+  "servicesManagerStartDate": "تاريخ البدء",
+  "servicesManagerEndDate": "تاريخ الانتهاء",
+  "servicesManagerProposedCheckIn": "وقت الدخول المقترح",
+  "servicesManagerProposedCheckOut": "وقت الخروج المقترح",
+  "servicesManagerIncludeWeekends": "تضمين نهاية الأسبوع",
+  "servicesManagerIncludeWeekendsDesc": "حساب أيام الجمعة والسبت",
+  "servicesManagerReason": "السبب",
 
 "vacation": "إجازة",
   "vacationTitle": "عنوان الإجازة", 

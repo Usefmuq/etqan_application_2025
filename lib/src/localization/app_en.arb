@@ -124,6 +124,22 @@
   "attendanceRegularizationIncludeWeekendsDesc": "Calculate attendance for Friday and Saturday",
   "attendanceRegularizationReason": "Reason",
 
+"servicesManager": "Services Manager",
+  "servicesManagerTitle": "Services Manager Title",
+  "servicesManagerContent": "Services Manager Content",
+  "servicesManagerDetails": "Services Manager Details",
+  "servicesManagerService": "Services Manager",
+  "servicesManagerServiceSubtitle": "Manage, configure, and monitor system services",
+  "servicesManagerSubmitNew": "Submit new request for services manager",
+  "servicesManagerUpdate": "Update services manager",
+  
+  "servicesManagerStartDate": "Start Date",
+  "servicesManagerEndDate": "End Date",
+  "servicesManagerProposedCheckIn": "Proposed Check-In",
+  "servicesManagerProposedCheckOut": "Proposed Check-Out",
+  "servicesManagerIncludeWeekends": "Include Weekends",
+  "servicesManagerIncludeWeekendsDesc": "Calculate for Friday and Saturday",
+  "servicesManagerReason": "Reason",
 
 "vacation": "Vacation",
     "vacationTitle": "Vacation Title", 

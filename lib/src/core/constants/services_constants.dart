@@ -19,4 +19,5 @@ class ServicesConstants {
   static int vacationServiceId = 5;
   static int reportsServiceId = 6;
   static int attendanceRegularizationServiceId = 7;
+  static int servicesManagerServiceId = 8;
 }

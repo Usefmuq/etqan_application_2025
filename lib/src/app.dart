@@ -26,6 +26,11 @@ import 'package:etqan_application_2025/src/features/reports/domain/entities/repo
 import 'package:etqan_application_2025/src/features/reports/presentation/pages/attendance_report_page.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/pages/reports_page.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/pages/reports_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/entities/services_manager_viewer_page_entity.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/presentation/pages/add_new_services_manager_page.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/presentation/pages/services_manager_page.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/presentation/pages/services_manager_viewer_page.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/presentation/pages/update_services_manager_page.dart';
 import 'package:etqan_application_2025/src/features/usersManager/domain/entities/users_manager_viewer_page_entity.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/add_new_users_manager_page.dart';
 import 'package:etqan_application_2025/src/features/usersManager/presentation/pages/update_users_manager_page.dart';
@@ -342,6 +347,42 @@ class MyAppState extends State<MyApp> {
           builder: (context, state) {
             final entity = state.extra as OnboardingViewerPageEntity;
             return OnboardingViewerPage(onboardingViewerPage: entity);
+          },
+        ),
+        GoRoute(
+          path: '/servicesmanagers',
+          builder: (context, state) {
+            return ServicesManagerPage();
+          },
+        ),
+        GoRoute(
+          path: '/servicesmanager/submit',
+          builder: (context, state) {
+            return AddNewServicesManagerPage();
+          },
+        ),
+        GoRoute(
+          path: '/servicesmanager/update/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as ServicesManagerViewerPageEntity;
+              return UpdateServicesManagerPage(
+                  initialServicesManagerViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return UpdateServicesManagerPage(requestId: requestId!);
+          },
+        ),
+        GoRoute(
+          path: '/servicesmanager/:id',
+          builder: (context, state) {
+            if (state.extra != null) {
+              final entity = state.extra as ServicesManagerViewerPageEntity;
+              return ServicesManagerViewerPage(
+                  initialServicesManagerViewerPage: entity);
+            }
+            final requestId = int.tryParse(state.pathParameters['id'] ?? '');
+            return ServicesManagerViewerPage(requestId: requestId!);
           },
         ),
       ],

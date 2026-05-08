@@ -57,6 +57,15 @@ import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetc
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/fetch_reports_page.dart';
 import 'package:etqan_application_2025/src/features/reports/domain/usecases/get_all_reportss.dart';
 import 'package:etqan_application_2025/src/features/reports/presentation/bloc/reports_bloc.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/data/datasources/services_manager_remote_data_source.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/data/repositories/services_manager_repository_impl.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/repositories/services_manager_repository.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/usecases/approve_services_manager.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/usecases/fetch_services_manager_page.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/usecases/get_all_services_managers.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/usecases/submit_services_manager.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/domain/usecases/update_services_manager.dart';
+import 'package:etqan_application_2025/src/features/servicesManager/presentation/bloc/services_manager_bloc.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/datasources/users_manager_remote_data_source.dart';
 import 'package:etqan_application_2025/src/features/usersManager/data/repositories/users_manager_repository_impl.dart';
 import 'package:etqan_application_2025/src/features/usersManager/domain/repositories/users_manager_repository.dart';
@@ -89,6 +98,7 @@ Future<void> initdependencies() async {
   _intitUsersManager();
   _intitAttendance();
   _intitOnboarding();
+  _intitServicesManager();
   final supabase = await Supabase.initialize(
     url: SupabaseConf.supabaseUrl,
     anonKey: SupabaseConf.supabaseAnonKey,
@@ -513,6 +523,58 @@ void _intitOnboarding() {
         updateOnboarding: serviceLocator(),
         approveOnboarding: serviceLocator(),
         getAllOnboardings: serviceLocator(),
+      ),
+    );
+}
+
+void _intitServicesManager() {
+  // DataSource
+  serviceLocator
+    ..registerFactory<ServicesManagerRemoteDataSource>(
+      () => ServicesManagerRemoteDataSourceImpl(
+        serviceLocator(),
+      ),
+    )
+    // Repository
+    ..registerFactory<ServicesManagerRepository>(
+      () => ServicesManagerRepositoryImpl(
+        serviceLocator(),
+        serviceLocator(),
+      ),
+    )
+    //UseCases
+    ..registerFactory(
+      () => SubmitServicesManager(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => UpdateServicesManager(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => GetAllServicesManagers(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => FetchServicesManagerPage(
+        serviceLocator(),
+      ),
+    )
+    ..registerFactory(
+      () => ApproveServicesManager(
+        serviceLocator(),
+      ),
+    )
+    //Bloc
+    ..registerLazySingleton(
+      () => ServicesManagerBloc(
+        submitServicesManager: serviceLocator(),
+        updateServicesManager: serviceLocator(),
+        approveServicesManager: serviceLocator(),
+        getAllServicesManagers: serviceLocator(),
       ),
     );
 }
